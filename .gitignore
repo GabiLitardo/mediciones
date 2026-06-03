@@ -1,0 +1,11 @@
+# Ignorar archivos internos de Python
+__pycache__/
+*.pyc
+
+# Ignorar las imágenes y reportes interactivos generados
+*.png
+*.html
+
+# Ignorar archivos ocultos del sistema
+.DS_Store
+.ipynb_checkpoints/
