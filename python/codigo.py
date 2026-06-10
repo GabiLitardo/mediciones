@@ -131,8 +131,6 @@ class AnalizadorRadiacion:
 
             if tipo_disp == "FOXFET":
                 tiempo_acumulado = self._calcular_tiempo_acumulado_foxfet(nro)
-            elif tipo_disp == "FG_tanda2" and disp == "PFGIP2":
-                tiempo_acumulado = (nro + 7) * self.intervalo_minutos
             else:
                 tiempo_acumulado = nro * self.intervalo_minutos
 
