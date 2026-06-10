@@ -118,7 +118,7 @@ class AnalizadorRadiacion:
 
         # ORDENAMIENTO GLOBAL CRUCIAL: Ordenamos de menor a mayor por tiempo acumulado 
         # para solucionar desajustes de orden entre distintas carpetas físicas de fechas.
-        for clave en self.resultados:
+        for clave in self.resultados:
             if self.resultados[clave]["tiempos"]:
                 tiempos = np.array(self.resultados[clave]["tiempos"])
                 valores = np.array(self.resultados[clave]["valores"])
