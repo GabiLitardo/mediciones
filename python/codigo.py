@@ -67,7 +67,10 @@ class AnalizadorRadiacion:
         return tiempo
 
     def procesar_carpetas(self, fechas=None):
-        """Ejecuta la extracción de datos detectando automáticamente las carpetas de fechas."""
+        """Ejecuta la extracción de datos detectando automáticamente las carpetas de fechas
+
+        y ordenando numéricamente los pasos de postrad de forma estricta.
+        """
         if not os.path.exists(self.ruta_base):
             return
 
@@ -97,7 +100,7 @@ class AnalizadorRadiacion:
 
                             match = re.search(r"postrad(\d+)_M(\d+)", f)
                             if match:
-                                nro = int(match.group(1))
+                                nro = int(match.group(1))  # Numérico real
                                 m_version = int(match.group(2))
 
                                 if nro not in mapeo_prioridad:
@@ -106,6 +109,7 @@ class AnalizadorRadiacion:
                                     if m_version > mapeo_prioridad[nro][0]:
                                         mapeo_prioridad[nro] = (m_version, f)
 
+                    # ALERTA: Forzamos el ordenamiento numérico estricto de las claves (los enteros de postrad)
                     for nro in sorted(mapeo_prioridad.keys()):
                         nombre_f = mapeo_prioridad[nro][1]
                         self._extraer_punto_operacion(
