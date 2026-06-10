@@ -56,14 +56,43 @@ class AnalizadorRadiacion:
         return estructuras
 
     def _calcular_tiempo_acumulado_foxfet(self, nro_postrad):
+        """Calcula el tiempo acumulado dinámico para los FOXFETs."""
         tiempo = 0
         for i in range(1, nro_postrad + 1):
             if i <= 32:
                 tiempo += 10
             elif i <= 44:
                 tiempo += 15
-            else:
+            elif i <= 47:
                 tiempo += 20
+            elif i <= 50:
+                tiempo += 25
+            elif i <= 52:
+                tiempo += 30
+            elif i <= 53:
+                tiempo += 35
+            else:
+                tiempo += 10
+        return tiempo
+
+    def _calcular_tiempo_acumulado_fg(self, nro_postrad):
+        """Calcula el tiempo acumulado dinámico para los Floating Gates."""
+        tiempo = 0
+        for i in range(1, nro_postrad + 1):
+            if i <= 9:  # Equivalente a FF <= 32 (manteniendo desfasaje físico indexado)
+                tiempo += 10
+            elif i <= 21:  # Equivalente a FF <= 44 (intervalos de 15 min)
+                tiempo += 15
+            elif i <= 24:  # Equivalente a FF <= 47 (intervalos de 20 min)
+                tiempo += 20
+            elif i <= 27:  # Equivalente a FF <= 50 (intervalos de 25 min)
+                tiempo += 25
+            elif i <= 29:  # Equivalente a FF <= 52 (intervalos de 30 min)
+                tiempo += 30
+            elif i <= 30:  # Equivalente a FF <= 53 (intervalo de 35 min)
+                tiempo += 35
+            else:  # FF > 53, vuelve a intervalos de 10 min
+                tiempo += 10
         return tiempo
 
     def procesar_carpetas(self, fechas=None):
@@ -116,8 +145,6 @@ class AnalizadorRadiacion:
                             tipo,
                         )
 
-        # ORDENAMIENTO GLOBAL CRUCIAL: Ordenamos de menor a mayor por tiempo acumulado 
-        # para solucionar desajustes de orden entre distintas carpetas físicas de fechas.
         for clave in self.resultados:
             if self.resultados[clave]["tiempos"]:
                 tiempos = np.array(self.resultados[clave]["tiempos"])
@@ -143,7 +170,7 @@ class AnalizadorRadiacion:
             if tipo_disp == "FOXFET":
                 tiempo_acumulado = self._calcular_tiempo_acumulado_foxfet(nro)
             else:
-                tiempo_acumulado = nro * self.intervalo_minutos
+                tiempo_acumulado = self._calcular_tiempo_acumulado_fg(nro)
 
             if conf["modo"] == "corriente":
                 fila = df[(df["V"].round(1) == conf["target_val"])]
