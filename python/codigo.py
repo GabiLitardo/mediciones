@@ -258,7 +258,7 @@ class AnalizadorRadiacion:
                 plt.close(fig_mpl)
 
             # =====================================================================
-            # NUEVA SECCIÓN ADICIONAL: GRAFICOS CON SUAVIZADO SEVERO ADAPTATIVO (>210 uA)
+            # NUEVA SECCIÓN ADICIONAL: GRAFICOS SUAVIZADOS CON SAVITZKY-GOLAY
             # =====================================================================
             fig_mpl_suav, ax_suav = plt.subplots(figsize=(10, 6))
             fig_ply_suav = go.Figure()
@@ -268,28 +268,16 @@ class AnalizadorRadiacion:
                 tiempos = np.array(self.resultados[f"{tanda}_{disp}"]["tiempos"])
                 corrientes = np.array(self.resultados[f"{tanda}_{disp}"]["valores"])
 
-                # Necesitamos suficientes puntos para poder aplicar ventanas de filtrado anchas
-                if len(corrientes) < 12:
+                # Savitzky-Golay con ventana=5 necesita al menos 5 puntos de datos
+                if len(corrientes) < 5:
                     continue
 
                 factor = conf["factores_wl"][disp]
                 corrientes_norm = corrientes / factor
 
-                # --- FILTRADO ADAPTATIVO POR TRAMOS ---
-                # Pasada 1: Suavizado base muy leve para todo el vector (ventana=5)
+                # Aplicamos el filtro anti-ruido antes de hacer la derivada discreta
                 corrientes_suavizadas = savgol_filter(corrientes_norm, window_length=5, polyorder=2)
-                
-                # Buscamos dónde la señal cruza los 210 uA
-                indices_ruidosos = np.where(corrientes_norm >= 210.0)[0]
-                
-                if len(indices_ruidosos) > 0:
-                    idx_corte = indices_ruidosos[0]
-                    # Si quedan suficientes puntos ruidosos al final, les aplicamos un filtro mucho más severo (ventana=11)
-                    if len(corrientes_suavizadas[idx_corte:]) >= 11:
-                        tramo_ruidoso_suavizado = savgol_filter(corrientes_suavizadas[idx_corte:], window_length=11, polyorder=2)
-                        corrientes_suavizadas[idx_corte:] = tramo_ruidoso_suavizado
 
-                # Calculamos las derivadas con el vector resultante combinado
                 d_corriente_suav = np.abs(np.diff(corrientes_suavizadas))
                 d_tiempo = np.diff(tiempos)
 
@@ -302,7 +290,7 @@ class AnalizadorRadiacion:
                     corrientes_promedio_suav,
                     derivadas_suav,
                     marker=conf["marker"],
-                    label=f"{disp} (Suavizado Adaptativo)",
+                    label=f"{disp} (Suavizado)",
                     linestyle="-",
                 )
 
@@ -311,13 +299,13 @@ class AnalizadorRadiacion:
                         x=corrientes_promedio_suav,
                         y=derivadas_suav,
                         mode="lines+markers",
-                        name=f"{disp} (Suavizado Adaptativo)",
+                        name=f"{disp} (Suavizado)",
                     )
                 )
                 hay_datos_suav = True
 
             if hay_datos_suav:
-                titulo_suav = f"Dinámica de Degradación SUAVIZADA SEVERA ({tanda.replace('_', ' ').title()}): $dI/dt$ vs Corriente"
+                titulo_suav = f"Dinámica de Degradación SUAVIZADA ({tanda.replace('_', ' ').title()}): $dI/dt$ vs Corriente"
                 ax_suav.set_title(titulo_suav)
                 ax_suav.set_xlabel(r"Corriente Normalizada I [$\mu$A]")
                 ax_suav.set_ylabel(r"$dI/dt$ [$\mu$A/min]")
@@ -325,12 +313,12 @@ class AnalizadorRadiacion:
                 ax_suav.grid(True, linestyle=":", alpha=0.6)
                 plt.savefig(f"grafico_derivada_{tanda}_suavizado.png")
                 
-                st.subheader(f"Dinámica diferencial CON SUAVIZADO SEVERO ADAPTATIVO (>210 uA) - {tanda.replace('_', ' ').title()}")
+                st.subheader(f"Dinámica diferencial SUAVIZADA - {tanda.replace('_', ' ').title()}")
                 st.pyplot(fig_mpl_suav)
 
                 fig_ply_suav.update_layout(
                     title=titulo_suav.replace("$", ""),
-                    xaxis_title="Corriente Normalizada I [uA] (Filtro Severo > 210uA)",
+                    xaxis_title="Corriente Normalizada I [uA] (Filtrada)",
                     yaxis_title="dI/dt [uA/min]",
                     template="plotly_white",
                 )
