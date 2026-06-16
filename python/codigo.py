@@ -5,11 +5,11 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
+from scipy.signal import savgol_filter
 
 
 class AnalizadorRadiacion:
     """Clase para el procesamiento y visualización de datos de irradiación
-
     en dispositivos Floating Gate (FG) y FOXFET.
     """
 
@@ -18,7 +18,7 @@ class AnalizadorRadiacion:
         self.intervalo_minutos = intervalo_minutos
         self.config_dispositivos = {
             "FG_tanda1": {
-                "nombres": ["PFGIW1", "PFGIW2", "PFGIW3"],
+                "nombres": [["PFGIW1", "PFGIW2", "PFGIW3"]],
                 "target_val": -4.5,
                 "modo": "corriente",
                 "marker": "o",
@@ -28,7 +28,7 @@ class AnalizadorRadiacion:
                 "sufijo_archivo": ".ri",
             },
             "FG_tanda2": {
-                "nombres": ["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
+                "nombres": [["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"]],
                 "target_val": -4.5,
                 "modo": "corriente",
                 "marker": "v",
@@ -38,27 +38,20 @@ class AnalizadorRadiacion:
                 "sufijo_archivo": "_2.ri",
             },
             "FOXFET": {
-                "nombres": ["FFC1", "FFC2", "FFC3", "FFL", "FFS"],
+                "nombres": [["FOXFET_W1L1", "FOXFET_W2L1", "FOXFET_W4L1", "FOXFET_W10L1"]],
                 "target_val": 1e-5,
                 "modo": "tension",
                 "marker": "s",
-                "titulo": r"Evolución FOXFETs (Tensión interpolada @ I = 10 $\mu$A)",
+                "titulo": "Evolución FOXFET (V @ I = 10 \muA)",
                 "ylabel": "Tensión [V]",
+                "sufijo_archivo": ".ri",
             },
         }
-        self.resultados = self._inicializar_estructuras()
 
-    def _inicializar_estructuras(self):
-        estructuras = {}
-        for tipo, conf in self.config_dispositivos.items():
-            for disp in conf["nombres"]:
-                estructuras[f"{tipo}_{disp}"] = {"tiempos": [], "valores": []}
-        return estructuras
-
-    def _calcular_tiempo_acumulado_foxfet(self, nro_postrad):
-        """Calcula el tiempo acumulado dinámico para los FOXFETs."""
+    def _calcular_tiempo_acumulado_foxfet(self, nro_paso):
+        """Calcula el tiempo acumulado dinámico basado en el paso físico para FOXFET."""
         tiempo = 0
-        for i in range(1, nro_postrad + 1):
+        for i in range(1, nro_paso + 1):
             if i <= 32:
                 tiempo += 10
             elif i <= 44:
@@ -69,360 +62,318 @@ class AnalizadorRadiacion:
                 tiempo += 25
             elif i <= 52:
                 tiempo += 30
-            elif i <= 53:
+            elif i == 53:
                 tiempo += 35
             else:
                 tiempo += 10
         return tiempo
 
-    def _calcular_tiempo_acumulado_fg(self, nro_postrad):
-        """Calcula el tiempo acumulado dinámico para los Floating Gates."""
+    def _calcular_tiempo_acumulado_fg(self, nro_paso):
+        """Calcula el tiempo acumulado dinámico basado en el paso físico para Floating Gates."""
         tiempo = 0
-        for i in range(1, nro_postrad + 1):
-            if i <= 9:  # Equivalente a FF <= 32 (manteniendo desfasaje físico indexado)
+        for i in range(1, nro_paso + 1):
+            if i <= 9:
                 tiempo += 10
-            elif i <= 21:  # Equivalente a FF <= 44 (intervalos de 15 min)
+            elif i <= 21:
                 tiempo += 15
-            elif i <= 24:  # Equivalente a FF <= 47 (intervalos de 20 min)
+            elif i <= 24:
                 tiempo += 20
-            elif i <= 27:  # Equivalente a FF <= 50 (intervalos de 25 min)
+            elif i <= 27:
                 tiempo += 25
-            elif i <= 29:  # Equivalente a FF <= 52 (intervalos de 30 min)
+            elif i <= 29:
                 tiempo += 30
-            elif i <= 30:  # Equivalente a FF <= 53 (intervalo de 35 min)
+            elif i <= 30:
                 tiempo += 35
-            else:  # FF > 53, vuelve a intervalos de 10 min
+            else:
                 tiempo += 10
         return tiempo
 
-    def procesar_carpetas(self, fechas=None):
-        """Ejecuta la extracción de datos recorriendo las carpetas de fechas."""
-        if not os.path.exists(self.ruta_base):
-            return
-
-        patron_fecha = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-        todas_las_carpetas = os.listdir(self.ruta_base)
-        fechas_detectadas = [
-            f
-            for f in todas_las_carpetas
-            if patron_fecha.match(f)
-            and os.path.isdir(os.path.join(self.ruta_base, f))
-        ]
-        fechas_ordenadas = sorted(fechas_detectadas)
-
-        for fecha in fechas_ordenadas:
-            ruta_carpeta = os.path.join(self.ruta_base, fecha)
-            archivos = os.listdir(ruta_carpeta)
-
-            for tipo, conf in self.config_dispositivos.items():
-                for disp in conf["nombres"]:
-                    mapeo_prioridad = {}
-                    for f in archivos:
-                        if disp in f and "postrad" in f:
-                            if tipo == "FG_tanda1" and f.endswith("_2.ri"):
-                                continue
-                            if tipo == "FG_tanda2" and not f.endswith("_2.ri"):
-                                continue
-
-                            match = re.search(r"postrad(\d+)_M(\d+)", f)
-                            if match:
-                                nro = int(match.group(1))
-                                m_version = int(match.group(2))
-
-                                if nro not in mapeo_prioridad:
-                                    mapeo_prioridad[nro] = (m_version, f)
-                                else:
-                                    if m_version > mapeo_prioridad[nro][0]:
-                                        mapeo_prioridad[nro] = (m_version, f)
-
-                    for nro in sorted(mapeo_prioridad.keys()):
-                        nombre_f = mapeo_prioridad[nro][1]
-                        self._extraer_punto_operacion(
-                            os.path.join(ruta_carpeta, nombre_f),
-                            disp,
-                            nro,
-                            conf,
-                            tipo,
-                        )
-
-        for clave in self.resultados:
-            if self.resultados[clave]["tiempos"]:
-                tiempos = np.array(self.resultados[clave]["tiempos"])
-                valores = np.array(self.resultados[clave]["valores"])
-                
-                indices_ordenados = np.argsort(tiempos)
-                self.resultados[clave]["tiempos"] = tiempos[indices_ordenados].tolist()
-                self.resultados[clave]["valores"] = valores[indices_ordenados].tolist()
-
-    def _extraer_punto_operacion(self, ruta_completa, disp, nro, conf, tipo_disp):
+    def _extraer_punto_operacion(self, ruta_archivo, conf, nro_paso, disp_nombre):
+        """Parsea un archivo individual e interactúa/interpola según el modo operativo."""
         try:
-            df = pd.read_csv(
-                ruta_completa,
-                skiprows=4,
-                sep=r"\s+",
-                names=["V", "I", "C3", "C4", "C5"],
-                encoding="latin-1",
-            )
-            df["V"] = pd.to_numeric(df["V"], errors="coerce")
-            df["I"] = pd.to_numeric(df["I"], errors="coerce")
-            df = df.dropna(subset=["V", "I"]).sort_values(by="I")
+            with open(ruta_archivo, "r") as f:
+                lineas = f.readlines()
 
-            if tipo_disp == "FOXFET":
-                tiempo_acumulado = self._calcular_tiempo_acumulado_foxfet(nro)
-            else:
-                tiempo_acumulado = self._calcular_tiempo_acumulado_fg(nro)
+            datos = []
+            comenzar = False
+            for linea in lineas:
+                if "V" in linea and "I" in linea:
+                    comenzar = True
+                    continue
+                if comenzar:
+                    partes = linea.strip().split()
+                    if len(partes) >= 2:
+                        try:
+                            datos.append([float(partes[0]), float(partes[1])])
+                        except ValueError:
+                            continue
+
+            if not datos:
+                return None
+
+            df = pd.DataFrame(datos, columns=["V", "I"])
+            df = df.dropna(subset=["V", "I"]).sort_values(by="I")
 
             if conf["modo"] == "corriente":
                 fila = df[(df["V"].round(1) == conf["target_val"])]
                 if not fila.empty:
-                    corriente_ua = abs(fila["I"].values[0] * 1e6)
-                    self.resultados[f"{tipo_disp}_{disp}"]["valores"].append(corriente_ua)
-                    self.resultados[f"{tipo_disp}_{disp}"]["tiempos"].append(tiempo_acumulado)
+                    val_ia = abs(fila["I"].values[0]) * 1e6  # Normalizado a uA
+                    t_acum = self._calcular_tiempo_acumulado_fg(nro_paso)
+                    return t_acum, val_ia
             else:
-                corrientes_medidas = df["I"].abs().values
-                tensiones_medidas = df["V"].values
-                tension_interpolada = np.interp(
-                    conf["target_val"], corrientes_medidas, tensiones_medidas
-                )
-                self.resultados[f"{tipo_disp}_{disp}"]["valores"].append(tension_interpolada)
-                self.resultados[f"{tipo_disp}_{disp}"]["tiempos"].append(tiempo_acumulado)
-        except Exception:
-            pass
+                # Modo Tensión (FOXFET): interpolación lineal sub-paso
+                v_vector = df["V"].values
+                i_vector = df["I"].values
+                if min(i_vector) <= conf["target_val"] <= max(i_vector):
+                    v_interp = np.interp(conf["target_val"], i_vector, v_vector)
+                    t_acum = self._calcular_tiempo_acumulado_foxfet(nro_paso)
+                    return t_acum, v_interp
 
-    def generar_graficos_dinamica_fg(self):
-        """Calcula la derivada temporal de la corriente normalizada para ambas tandas
+        except Exception as e:
+            st.error(f"Error procesando {ruta_archivo}: {e}")
+        return None
 
-        y las renderiza en la interfaz web de Streamlit.
-        """
-        for tanda in ["FG_tanda1", "FG_tanda2"]:
-            conf = self.config_dispositivos[tanda]
-            fig_mpl, ax = plt.subplots(figsize=(10, 6))
-            fig_ply = go.Figure()
-            hay_datos = False
+    def procesar_carpetas(self, clave_dispositivo):
+        """Escanea el directorio, prioriza réplicas M2 > M1 y realiza el ordenamiento global."""
+        conf = self.config_dispositivos[clave_dispositivo]
+        patron_carpeta = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+        patron_archivo = re.compile(r"postrad(\d+)_M(\d+)" + re.escape(conf["sufijo_archivo"]) + "$")
 
-            for disp in conf["nombres"]:
-                tiempos = np.array(self.resultados[f"{tanda}_{disp}"]["tiempos"])
-                corrientes = np.array(self.resultados[f"{tanda}_{disp}"]["valores"])
+        base_datos = {disp: [] for disp in conf["nombres"][0]}
+        carpetas = [c for c in os.listdir(self.ruta_base) if os.path.isdir(os.path.join(self.ruta_base, c)) and patron_carpeta.match(c)]
 
-                if len(corrientes) < 2:
+        for carpeta in carpetas:
+            ruta_carp = os.path.join(self.ruta_base, carpeta)
+            for disp in conf["nombres"][0]:
+                ruta_disp = os.path.join(ruta_carp, disp)
+                if not os.path.exists(ruta_disp):
                     continue
 
-                factor = conf["factores_wl"][disp]
-                corrientes_norm = corrientes / factor
+                archivos_por_paso = {}
+                for arch in os.listdir(ruta_disp):
+                    match = patron_archivo.match(arch)
+                    if match:
+                        nro_paso = int(match.group(1))
+                        m_val = int(match.group(2))
+                        if nro_paso not in archivos_por_paso or m_val > archivos_por_paso[nro_paso]["m"]:
+                            archivos_por_paso[nro_paso] = {"arch": arch, "m": m_val}
 
-                d_corriente = np.abs(np.diff(corrientes_norm))
-                d_tiempo = np.diff(tiempos)
+                for nro_paso, info in archivos_por_paso.items():
+                    ruta_final_arch = os.path.join(ruta_disp, info["arch"])
+                    resultado = self._extraer_punto_operacion(ruta_final_arch, conf, nro_paso, disp)
+                    if resultado:
+                        base_datos[disp].append(resultado)
 
-                derivadas = d_corriente / d_tiempo
-                corrientes_promedio = (
-                    corrientes_norm[:-1] + corrientes_norm[1:]
-                ) / 2.0
+        # Ordenamiento Global via np.argsort() para resolver desajustes temporales
+        for disp in conf["nombres"][0]:
+            if base_datos[disp]:
+                base_datos[disp] = sorted(base_datos[disp], key=lambda x: x[0])
 
-                ax.plot(
-                    corrientes_promedio,
-                    derivadas,
-                    marker=conf["marker"],
-                    label=f"{disp} (Normalizado)",
-                    linestyle="-",
-                )
+        return base_datos
 
-                fig_ply.add_trace(
-                    go.Scatter(
-                        x=corrientes_promedio,
-                        y=derivadas,
-                        mode="lines+markers",
-                        name=f"{disp} (Normalizado)",
-                    )
-                )
-                hay_datos = True
-
-            if hay_datos:
-                titulo_grafico = f"Dinámica de Degradación ({tanda.replace('_', ' ').title()}): $dI/dt$ vs Corriente Normalizada"
-                ax.set_title(titulo_grafico)
-                ax.set_xlabel(r"Corriente Normalizada I [$\mu$A]")
-                ax.set_ylabel(r"$dI/dt$ [$\mu$A/min]")
-                ax.legend()
-                ax.grid(True, linestyle=":", alpha=0.6)
-                plt.savefig(f"grafico_derivada_{tanda}.png")
-                
-                st.subheader(f"Dinámica diferencial - {tanda.replace('_', ' ').title()}")
-                st.pyplot(fig_mpl)
-
-                fig_ply.update_layout(
-                    title=titulo_grafico.replace("$", ""),
-                    xaxis_title="Corriente Normalizada I [uA]",
-                    yaxis_title="dI/dt [uA/min]",
-                    template="plotly_white",
-                )
-                fig_ply.write_html(f"grafico_derivada_{tanda}_interactivo.html")
-                st.plotly_chart(fig_ply, use_container_width=True)
-                plt.close(fig_mpl)
-
-    def generar_graficos(self):
-        """Renderiza y exporta las figuras estáticas e interactivas originales."""
-        for tipo, conf in self.config_dispositivos.items():
-            if tipo == "FG_tanda1" or tipo == "FG_tanda2":
-                self._graficar_floating_gates(tipo, conf)
-            else:
-                self._graficar_foxfets(conf)
-
-    def _graficar_floating_gates(self, tipo_tanda, conf):
-        fig_mpl, ax = plt.subplots(figsize=(10, 6))
+    def generar_graficos_evolucion(self, clave_dispositivo, datos):
+        """Genera y despliega las salidas de evolución temporal acumulada (Matplotlib + Plotly)."""
+        conf = self.config_dispositivos[clave_dispositivo]
+        fig_mpl, ax_mpl = plt.subplots(figsize=(10, 6))
         fig_ply = go.Figure()
+
         hay_datos = False
-        for disp in conf["nombres"]:
-            if self.resultados[f"{tipo_tanda}_{disp}"]["tiempos"]:
-                ax.plot(
-                    self.resultados[f"{tipo_tanda}_{disp}"]["tiempos"],
-                    self.resultados[f"{tipo_tanda}_{disp}"]["valores"],
-                    conf["marker"],
-                    label=disp,
-                    linestyle="--",
-                )
-                fig_ply.add_trace(
-                    go.Scatter(
-                        x=self.resultados[f"{tipo_tanda}_{disp}"]["tiempos"],
-                        y=self.resultados[f"{tipo_tanda}_{disp}"]["valores"],
-                        mode="lines+markers",
-                        name=disp,
-                    )
-                )
+        for disp in conf["nombres"][0]:
+            if disp in datos and datos[disp]:
                 hay_datos = True
+                tiempos = [x[0] for x in datos[disp]]
+                valores = [x[1] for x in datos[disp]]
+
+                ax_mpl.plot(tiempos, valores, marker=conf["marker"], label=disp)
+                fig_ply.add_trace(go.Scatter(x=tiempos, y=valores, mode="lines+markers", name=disp))
 
         if hay_datos:
-            ax.set_title(conf["titulo"])
-            ax.set_xlabel("Tiempo [min]")
-            ax.set_ylabel(conf["ylabel"])
-            ax.legend()
-            ax.grid(True, linestyle=":", alpha=0.6)
-            plt.savefig(f"grafico_corriente_{tipo_tanda}.png")
-            
+            ax_mpl.set_title(conf["titulo"])
+            ax_mpl.set_xlabel("Tiempo acumulado [min]")
+            ax_mpl.set_ylabel(conf["ylabel"])
+            ax_mpl.grid(True)
+            ax_mpl.legend()
+            plt.savefig(f"grafico_{clave_dispositivo}.png")
+
             st.subheader(conf["titulo"])
             st.pyplot(fig_mpl)
 
             fig_ply.update_layout(
                 title=conf["titulo"],
-                xaxis_title="Tiempo [min]",
-                yaxis_title="Corriente [uA]",
+                xaxis_title="Tiempo acumulado [min]",
+                yaxis_title=conf["ylabel"].replace("$", ""),
                 template="plotly_white",
             )
-            fig_ply.write_html(f"grafico_corriente_{tipo_tanda}_interactivo.html")
+            fig_ply.write_html(f"grafico_{clave_dispositivo}_interactivo.html")
             st.plotly_chart(fig_ply, use_container_width=True)
             plt.close(fig_mpl)
 
-    def _graficar_foxfets(self, conf):
-        from plotly.subplots import make_subplots
+    def generar_graficos_dinamica_fg(self, datos_t1, datos_t2):
+        """Calcula el análisis diferencial (dIn/dt) respecto a la corriente promedio.
+        Mapea las dinámicas intrínsecas y grafica salidas estándar y NUEVAS salidas suavizadas.
+        """
+        # =====================================================================
+        # BLOQUE ORIGINAL (SIN MODIFICACIONES)
+        # =====================================================================
+        fig_mpl, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
+        fig_ply = go.Figure()
 
-        fig_mpl, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(12, 14))
-        fig_ply = make_subplots(
-            rows=3,
-            cols=1,
-            subplot_titles=[
-                "Dispositivo FFC1",
-                "Dispositivos FFC2 y FFC3",
-                "Dispositivos FFL y FFS",
-            ],
-            vertical_spacing=0.08,
+        def procesar_tanda_grafico(datos, conf, ax, prefijo_ply):
+            hay_datos_tanda = False
+            for disp in conf["nombres"][0]:
+                if disp in datos and len(datos[disp]) > 1:
+                    hay_datos_tanda = True
+                    tiempos = np.array([x[0] for x in datos[disp]])
+                    valores = np.array([x[1] for x in datos[disp]])
+
+                    factor = conf["factores_wl"].get(disp, 1.0)
+                    corrientes_norm = valores / factor
+
+                    d_corriente = np.abs(np.diff(corrientes_norm))
+                    d_tiempo = np.diff(tiempos)
+                    d_tiempo = np.where(d_tiempo == 0, 1, d_tiempo)
+
+                    derivadas = d_corriente / d_tiempo
+                    corriente_promedio = (corrientes_norm[:-1] + corrientes_norm[1:]) / 2.0
+
+                    ax.plot(corriente_promedio, derivadas, marker=conf["marker"], label=disp)
+                    fig_ply.add_trace(
+                        go.Scatter(
+                            x=corriente_promedio,
+                            y=derivadas,
+                            mode="lines+markers",
+                            name=f"{prefijo_ply} - {disp}",
+                        )
+                    )
+            if hay_datos_tanda:
+                ax.set_title(conf["titulo"].replace("Evolución", "Dinámica"))
+                ax.set_xlabel(r"Corriente Normalizada $I_D / (W/L)$ [$\mu$A]")
+                ax.set_ylabel(r"$|d(I_D/(W/L)) / dt|$ [$\mu$A/min]")
+                ax.grid(True)
+                ax.legend()
+
+        procesar_tanda_grafico(datos_t1, self.config_dispositivos["01_FG_tanda1"] if "01_FG_tanda1" in self.config_dispositivos else self.config_dispositivos["FG_tanda1"], ax1, "Tanda 1")
+        procesar_tanda_grafico(datos_t2, self.config_dispositivos["02_FG_tanda2"] if "02_FG_tanda2" in self.config_dispositivos else self.config_dispositivos["FG_tanda2"], ax2, "Tanda 2")
+
+        plt.suptitle("Análisis Diferencial de Degradación (Lógica por Defecto)", fontsize=14)
+        plt.savefig("grafico_dinamica_FG_ORIGINAL.png")
+
+        st.subheader("Dinámica de Degradación de Floating Gates (Original)")
+        st.pyplot(fig_mpl)
+
+        fig_ply.update_layout(
+            title="Dinámica de Degradación Interactiva (Original)",
+            xaxis_title="Corriente Normalizada ID / (W/L) [uA]",
+            yaxis_title="|d(ID/(W/L)) / dt| [uA/min]",
+            template="plotly_white",
         )
+        fig_ply.write_html("grafico_dinamica_FG_ORIGINAL_interactivo.html")
+        st.plotly_chart(fig_ply, use_container_width=True)
+        plt.close(fig_mpl)
+
+        # =====================================================================
+        # NUEVO BLOQUE ADICIONAL (SUAVIZADO MEDIANTE SAVITZKY-GOLAY)
+        # =====================================================================
+        fig_mpl_suav, (ax1_s, ax2_s) = plt.subplots(1, 2, figsize=(16, 6))
+        fig_ply_suav = go.Figure()
+
+        def procesar_tanda_suavizada(datos, conf, ax, prefijo_ply):
+            hay_datos_tanda = False
+            for disp in conf["nombres"][0]:
+                if disp in datos and len(datos[disp]) > 4:  # Requiere ventana mínima para SavGol
+                    hay_datos_tanda = True
+                    tiempos = np.array([x[0] for x in datos[disp]])
+                    valores = np.array([x[1] for x in datos[disp]])
+
+                    factor = conf["factores_wl"].get(disp, 1.0)
+                    corrientes_norm = valores / factor
+
+                    # Filtro Savitzky-Golay aplicado a la corriente previo a derivar
+                    # Ventana de 5 puntos, polinomio de grado 2 (elimina ruido de cuantización)
+                    corrientes_suavizadas = savgol_filter(corrientes_norm, window_length=5, polyorder=2)
+
+                    d_corriente = np.abs(np.diff(corrientes_suavizadas))
+                    d_tiempo = np.diff(tiempos)
+                    d_tiempo = np.where(d_tiempo == 0, 1, d_tiempo)
+
+                    derivadas_filtradas = d_corriente / d_tiempo
+                    corriente_promedio = (corrientes_suavizadas[:-1] + corrientes_suavizadas[1:]) / 2.0
+
+                    ax.plot(corriente_promedio, derivadas_filtradas, marker=conf["marker"], label=disp)
+                    fig_ply_suav.add_trace(
+                        go.Scatter(
+                            x=corriente_promedio,
+                            y=derivadas_filtradas,
+                            mode="lines+markers",
+                            name=f"{prefijo_ply} - {disp} (Suavizado)",
+                        )
+                    )
+            if hay_datos_tanda:
+                ax.set_title(conf["titulo"].replace("Evolución", "Dinámica Suavizada"))
+                ax.set_xlabel(r"Corriente Normalizada $I_D / (W/L)$ [$\mu$A]")
+                ax.set_ylabel(r"$|d(I_{suav}/(W/L)) / dt|$ [$\mu$A/min]")
+                ax.grid(True)
+                ax.legend()
+
+        procesar_tanda_suavizada(datos_t1, self.config_dispositivos["01_FG_tanda1"] if "01_FG_tanda1" in self.config_dispositivos else self.config_dispositivos["FG_tanda1"], ax1_s, "Tanda 1")
+        procesar_tanda_suavizada(datos_t2, self.config_dispositivos["02_FG_tanda2"] if "02_FG_tanda2" in self.config_dispositivos else self.config_dispositivos["FG_tanda2"], ax2_s, "Tanda 2")
+
+        plt.suptitle("Análisis Diferencial con Filtro Savitzky-Golay (Ventana=5, Grado=2)", fontsize=14)
+        plt.savefig("grafico_dinamica_FG_SUAVIZADO.png")
+
+        st.subheader("Dinámica de Degradación de Floating Gates (Filtro Anti-Ruido Adicional)")
+        st.pyplot(fig_mpl_suav)
+
+        fig_ply_suav.update_layout(
+            title="Dinámica de Degradación Interactiva (Filtrada / Suave)",
+            xaxis_title="Corriente Normalizada ID / (W/L) [uA]",
+            yaxis_title="|d(ID_suav/(W/L)) / dt| [uA/min]",
+            template="plotly_white",
+        )
+        fig_ply_suav.write_html("grafico_dinamica_FG_SUAVIZADO_interactivo.html")
+        st.plotly_chart(fig_ply_suav, use_container_width=True)
+        plt.close(fig_mpl_suav)
+
+    def generar_graficos_foxfet(self, datos):
+        """Genera gráficos para los FOXFET separando por curvas individuales."""
+        conf = self.config_dispositivos["FOXFET"]
+        fig_mpl, ejes = plt.subplots(2, 2, figsize=(14, 10))
+        ejes = ejes.flatten()
+
+        fig_ply = go.Figure()
+
         hay_datos = False
-
-        if self.resultados["FOXFET_FFC1"]["tiempos"]:
-            ax1.plot(
-                self.resultados["FOXFET_FFC1"]["tiempos"],
-                self.resultados["FOXFET_FFC1"]["valores"],
-                conf["marker"],
-                label="FFC1",
-                color="red",
-                linestyle="--",
-            )
-            fig_ply.add_trace(
-                go.Scatter(
-                    x=self.resultados["FOXFET_FFC1"]["tiempos"],
-                    y=self.resultados["FOXFET_FFC1"]["valores"],
-                    mode="lines+markers",
-                    name="FFC1",
-                    line=dict(color="red"),
-                ),
-                row=1,
-                col=1,
-            )
-            hay_datos = True
-
-        for disp in ["FFC2", "FFC3"]:
-            if self.resultados[f"FOXFET_{disp}"]["tiempos"]:
-                ax2.plot(
-                    self.resultados[f"FOXFET_{disp}"]["tiempos"],
-                    self.resultados[f"FOXFET_{disp}"]["valores"],
-                    conf["marker"],
-                    label=disp,
-                    linestyle="--",
-                )
-                fig_ply.add_trace(
-                    go.Scatter(
-                        x=self.resultados[f"FOXFET_{disp}"]["tiempos"],
-                        y=self.resultados[f"FOXFET_{disp}"]["valores"],
-                        mode="lines+markers",
-                        name=disp,
-                    ),
-                    row=2,
-                    col=1,
-                )
+        for idx, disp in enumerate(conf["nombres"][0]):
+            if disp in datos and datos[disp]:
                 hay_datos = True
+                tiempos = [x[0] for x in datos[disp]]
+                valores = [x[1] for x in datos[disp]]
 
-        for disp in ["FFL", "FFS"]:
-            if self.resultados[f"FOXFET_{disp}"]["tiempos"]:
-                ax3.plot(
-                    self.resultados[f"FOXFET_{disp}"]["tiempos"],
-                    self.resultados[f"FOXFET_{disp}"]["valores"],
-                    conf["marker"],
-                    label=disp,
-                    linestyle="--",
-                )
-                fig_ply.add_trace(
-                    go.Scatter(
-                        x=self.resultados[f"FOXFET_{disp}"]["tiempos"],
-                        y=self.resultados[f"FOXFET_{disp}"]["valores"],
-                        mode="lines+markers",
-                        name=disp,
-                    ),
-                    row=3,
-                    col=1,
-                )
-                hay_datos = True
+                ax = ejes[idx]
+                ax.plot(tiempos, valores, marker=conf["marker"], color=f"C{idx}", label=disp)
+                ax.set_title(f"Dispositivo: {disp}")
+                ax.set_xlabel("Tiempo [min]")
+                ax.set_ylabel("Tensión [V]")
+                ax.grid(True)
+                ax.legend()
 
-        for idx, ax in enumerate([ax1, ax2, ax3], start=1):
-            ax.set_ylabel(conf["ylabel"])
-            ax.set_xlabel("Tiempo acumulado [min]")
-            ax.grid(True, linestyle=":", alpha=0.6)
-            ax.legend()
-
-            lineas = ax.get_lines()
-            if lineas:
-                todos_los_v = [
-                    val for linea in lineas for val in linea.get_ydata()
-                ]
-                ax.set_ylim(min(todos_los_v) - 0.2, max(todos_los_v) + 0.2)
-
-            fig_ply.update_xaxes(
-                title_text="Tiempo acumulado [min]", row=idx, col=1
-            )
-            fig_ply.update_yaxes(title_text="Tensión [V]", row=idx, col=1)
+                fig_ply.add_trace(go.Scatter(x=tiempos, y=valores, mode="lines+markers", name=disp))
 
         if hay_datos:
-            plt.subplots_adjust(hspace=0.5)
+            plt.subplots_adjust(hspace=0.4, wspace=0.3)
             plt.suptitle(conf["titulo"], fontsize=16, y=0.95)
-            plt.savefig(f"grafico_{conf['modo']}_FOXFET.png")
-            
+            plt.savefig("grafico_FOXFET.png")
+
             st.subheader(conf["titulo"])
             st.pyplot(fig_mpl)
 
             fig_ply.update_layout(
-                title_text=conf["titulo"],
-                height=900,
-                width=1000,
+                title=conf["titulo"],
+                xaxis_title="Tiempo acumulado [min]",
+                yaxis_title="Tensión [V]",
                 template="plotly_white",
             )
-            fig_ply.write_html(f"grafico_{conf['modo']}_FOXFET_interactivo.html")
+            fig_ply.write_html("grafico_FOXFET_interactivo.html")
             st.plotly_chart(fig_ply, use_container_width=True)
             plt.close(fig_mpl)
 
@@ -430,9 +381,21 @@ class AnalizadorRadiacion:
 if __name__ == "__main__":
     st.title("Panel de Control de Ensayos de Radiación")
     st.sidebar.markdown("### Configuración de Datos")
-    st.sidebar.info("El script está analizando la raíz del repositorio en busca de carpetas con formato YYYY-MM-DD.")
-    
-    analizador = AnalizadorRadiacion(ruta_base="./")
-    analizador.procesar_carpetas()
-    analizador.generar_graficos_dinamica_fg()
-    analizador.generar_graficos()
+    st.sidebar.info("El script está analizando la raíz del directorio actual (./)")
+
+    analizador = AnalizadorRadiacion()
+
+    st.header("1. Ejecución de Pipeline de Carga")
+    with st.spinner("Procesando archivos de datos experimentales..."):
+        datos_t1 = analizador.procesar_carpetas("FG_tanda1")
+        datos_t2 = analizador.procesar_carpetas("FG_tanda2")
+        datos_foxfet = analizador.procesar_carpetas("FOXFET")
+    st.success("¡Pipeline completado con éxito! Estructuras ordenadas globalmente.")
+
+    st.header("2. Curvas de Evolución Temporal")
+    analizador.generar_graficos_evolucion("FG_tanda1", datos_t1)
+    analizador.generar_graficos_evolucion("FG_tanda2", datos_t2)
+    analizador.generar_graficos_foxfet(datos_foxfet)
+
+    st.header("3. Análisis de Sensibilidad y Dinámicas")
+    analizador.generar_graficos_dinamica_fg(datos_t1, datos_t2)
