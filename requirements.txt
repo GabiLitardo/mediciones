@@ -2,4 +2,5 @@ pandas
 matplotlib
 numpy
 plotly
+scipy
 streamlit
