@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-import streamlit as str
+import streamlit as st
 
 
 class AnalizadorRadiacion:
@@ -245,8 +245,8 @@ class AnalizadorRadiacion:
                 ax.grid(True, linestyle=":", alpha=0.6)
                 plt.savefig(f"grafico_derivada_{tanda}.png")
                 
-                str.subheader(f"Dinámica diferencial - {tanda.replace('_', ' ').title()}")
-                str.pyplot(fig_mpl)
+                st.subheader(f"Dinámica diferencial - {tanda.replace('_', ' ').title()}")
+                st.pyplot(fig_mpl)
 
                 fig_ply.update_layout(
                     title=titulo_grafico.replace("$", ""),
@@ -255,7 +255,7 @@ class AnalizadorRadiacion:
                     template="plotly_white",
                 )
                 fig_ply.write_html(f"grafico_derivada_{tanda}_interactivo.html")
-                str.plotly_chart(fig_ply, use_container_width=True)
+                st.plotly_chart(fig_ply, use_container_width=True)
                 plt.close(fig_mpl)
 
     def generar_graficos(self):
@@ -297,8 +297,8 @@ class AnalizadorRadiacion:
             ax.grid(True, linestyle=":", alpha=0.6)
             plt.savefig(f"grafico_corriente_{tipo_tanda}.png")
             
-            str.subheader(conf["titulo"])
-            str.pyplot(fig_mpl)
+            st.subheader(conf["titulo"])
+            st.pyplot(fig_mpl)
 
             fig_ply.update_layout(
                 title=conf["titulo"],
@@ -307,7 +307,7 @@ class AnalizadorRadiacion:
                 template="plotly_white",
             )
             fig_ply.write_html(f"grafico_corriente_{tipo_tanda}_interactivo.html")
-            str.plotly_chart(fig_ply, use_container_width=True)
+            st.plotly_chart(fig_ply, use_container_width=True)
             plt.close(fig_mpl)
 
     def _graficar_foxfets(self, conf):
@@ -413,8 +413,8 @@ class AnalizadorRadiacion:
             plt.suptitle(conf["titulo"], fontsize=16, y=0.95)
             plt.savefig(f"grafico_{conf['modo']}_FOXFET.png")
             
-            str.subheader(conf["titulo"])
-            str.pyplot(fig_mpl)
+            st.subheader(conf["titulo"])
+            st.pyplot(fig_mpl)
 
             fig_ply.update_layout(
                 title_text=conf["titulo"],
@@ -423,14 +423,14 @@ class AnalizadorRadiacion:
                 template="plotly_white",
             )
             fig_ply.write_html(f"grafico_{conf['modo']}_FOXFET_interactivo.html")
-            str.plotly_chart(fig_ply, use_container_width=True)
+            st.plotly_chart(fig_ply, use_container_width=True)
             plt.close(fig_mpl)
 
 
 if __name__ == "__main__":
-    str.title("Panel de Control de Ensayos de Radiación")
-    str.sidebar.markdown("### Configuración de Datos")
-    str.sidebar.info("El script está analizando la raíz del repositorio en busca de carpetas con formato YYYY-MM-DD.")
+    st.title("Panel de Control de Ensayos de Radiación")
+    st.sidebar.markdown("### Configuración de Datos")
+    st.sidebar.info("El script está analizando la raíz del repositorio en busca de carpetas con formato YYYY-MM-DD.")
     
     analizador = AnalizadorRadiacion(ruta_base="./")
     analizador.procesar_carpetas()
