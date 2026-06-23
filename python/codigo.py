@@ -1,6 +1,7 @@
 from pathlib import Path
 import numpy as np
 import streamlit as st
+import matplotlib.pyplot as plt
 
 directorio_base = Path(".")
 # Buscamos y guardamos la lista de rutas en 'lista_de_rutas'
