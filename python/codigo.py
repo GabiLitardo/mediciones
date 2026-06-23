@@ -110,7 +110,6 @@ def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
         tiempos = []
         valores = []
         
-        # Recuperamos las corrientes y tiempos igual que antes
         for nro in range(0, 100):
             sufijo = ".ri" if tipo_tanda == "FG_tanda1" else "_2.ri"
             prefijo_archivo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_"
@@ -141,7 +140,6 @@ def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
                     valores.append(np.abs(corrientes[idx[0]] * 1e6))
                     tiempos.append(t)
                         
-        # Calculamos la tasa de cambio vs corriente promedio si hay datos
         if tiempos:
             indices_finales = np.argsort(tiempos)
             tiempos_ord = np.array(tiempos)[indices_finales]
@@ -158,9 +156,11 @@ def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
                 dt = tiempos_ord[k+1] - tiempos_ord[k]
                 if dt > 0:
                     tasa = np.abs(corrientes_norm[k+1] - corrientes_norm[k]) / dt
-                    promedio_i = (corrientes_ord[k+1] + corrientes_ord[k]) / 2.0
+                    # CORRECCIÓN: Promedio de las dos corrientes NORMALIZADAS para el Eje X
+                    promedio_i_norm = (corrientes_norm[k+1] + corrientes_norm[k]) / 2.0
+                    
                     eje_y_tasas.append(tasa)
-                    eje_x_promedios.append(promedio_i)
+                    eje_x_promedios.append(promedio_i_norm)
             
             if eje_x_promedios:
                 ax.plot(eje_x_promedios, eje_y_tasas, "o--", label=disp)
@@ -168,7 +168,7 @@ def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
             
     if hay_datos:
         ax.set_title(titulo)
-        ax.set_xlabel("Corriente Promedio $I_D$ [$\mu$A]")
+        ax.set_xlabel("Corriente Promedio Normalizada $I_{D\_norm}$ [u.a.]")
         ax.set_ylabel("Tasa de Cambio [($\mu$A/unid_norm)/min]")
         ax.grid(True, linestyle=":", alpha=0.6)
         ax.legend()
@@ -208,13 +208,13 @@ graficar_dispositivos(
 st.header("Análisis de Sensibilidad de Floating Gates")
 
 graficar_sensibilidad_fg(
-    titulo="Sensibilidad Floating Gates Tanda 1 (Tasa de Cambio vs $I_D$ Promedio)",
+    titulo="Sensibilidad Floating Gates Tanda 1 (Tasa de Cambio vs $I_D$ Promedio Normalizado)",
     lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3"],
     tipo_tanda="FG_tanda1"
 )
 
 graficar_sensibilidad_fg(
-    titulo="Sensibilidad Floating Gates Tanda 2 (Tasa de Cambio vs $I_D$ Promedio)",
+    titulo="Sensibilidad Floating Gates Tanda 2 (Tasa de Cambio vs $I_D$ Promedio Normalizado)",
     lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
     tipo_tanda="FG_tanda2"
 )
