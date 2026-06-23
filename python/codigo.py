@@ -21,27 +21,30 @@ def matchear_archivos(nombre_archivo_generico):
 def graficar_dispositivos(titulo, ylabel, lista_dispositivos, tipo_tanda):
     fig, ax = plt.subplots(figsize=(10, 5))
     hay_datos = False    
+    
     for disp in lista_dispositivos:
         tiempos = []
         valores = []
+        
         # Iteramos de forma directa por los números de postrad del ensayo
         for nro in range(0, 100):
+            # Seteamos el prefijo y sufijo según la tecnología
             if tipo_tanda == "FG_tanda1":
-                lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3"]
-                sufijo=".ri"
-                nombre_buscar=f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_"
-            if tipo_tanda == "FG_tanda2":
-                lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"]
-                sufijo="_2.ri"
-                nombre_buscar=f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_"
-            if tipo_tanda == "FOXFET":
-                lista_dispositivos=["FFC1", "FFC2", "FFC3", "FFL", "FFS"]
-                sufijo=".ri"
-                nombre_buscar=f"MOSISV72M_DIE4_{disp}_IV_VD=5V_postrad{nro}_"
+                sufijo = ".ri"
+                prefijo_archivo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_"
+            elif tipo_tanda == "FG_tanda2":
+                sufijo = "_2.ri"
+                prefijo_archivo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_"
+            elif tipo_tanda == "FOXFET":
+                sufijo = ".ri"
+                prefijo_archivo = f"MOSISV72M_DIE4_{disp}_IV_VD=5V_postrad{nro}_"
+                
             archivo_encontrado = None    
+            
             # Buscamos dándole prioridad a M2 sobre M1
             for m_ver in ["M2", "M1"]:
-                nombre_buscar+=m_ver + sufijo
+                nombre_buscar = f"{prefijo_archivo}{m_ver}{sufijo}"
+                
                 datos = matchear_archivos(nombre_buscar)
                 if datos:
                     archivo_encontrado = datos[0]
