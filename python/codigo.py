@@ -17,6 +17,7 @@ for ruta_archivo in lista_de_rutas:
     super_arreglo.append(datos)
 
 st.write(f"¡Hecho! Se cargaron {len(super_arreglo)} mediciones.")
+st.write(super_arreglo.size)
 
 (V, I) = super_arreglo[0]
 
