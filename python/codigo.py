@@ -2,6 +2,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import streamlit as st
+import plotly.graph_objects as go
 
 # =====================================================================
 # 1. UNICA FUNCIÓN OBLIGATORIA (PARA CARGAR LOS ARCHIVOS)
@@ -16,10 +17,11 @@ def matchear_archivos(nombre_archivo_generico):
     return mediciones
 
 # =====================================================================
-# 2. FUNCIÓN DE EVOLUCIÓN TEMPORAL (COMO ESTABA ANTES)
+# 2. FUNCIÓN DE EVOLUCIÓN TEMPORAL (CON ENFOQUE HÍBRIDO: MPL + PLOTLY)
 # =====================================================================
 def graficar_dispositivos(titulo, ylabel, lista_dispositivos, tipo_tanda):
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig_mpl, ax = plt.subplots(figsize=(10, 5))
+    fig_ply = go.Figure()
     hay_datos = False    
     
     for disp in lista_dispositivos:
@@ -85,23 +87,34 @@ def graficar_dispositivos(titulo, ylabel, lista_dispositivos, tipo_tanda):
             indices_finales = np.argsort(tiempos)
             tiempos_ordenados = np.array(tiempos)[indices_finales]
             valores_ordenados = np.array(valores)[indices_finales]
+            
+            # Gráfico estático
             ax.plot(tiempos_ordenados, valores_ordenados, "o--", label=disp)
+            # Gráfico interactivo
+            fig_ply.add_trace(go.Scatter(x=tiempos_ordenados, y=valores_ordenados, mode='lines+markers', name=disp))
             hay_datos = True
             
     if hay_datos:
+        # Renderizado Matplotlib
         ax.set_title(titulo)
         ax.set_xlabel("Tiempo Acumulado [min]")
         ax.set_ylabel(ylabel)
         ax.grid(True, linestyle=":", alpha=0.6)
         ax.legend()
-        st.pyplot(fig)
-    plt.close(fig)
+        st.pyplot(fig_mpl)
+        
+        # Renderizado Plotly
+        fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title=ylabel.replace("$", ""), template="plotly_white")
+        st.plotly_chart(fig_ply, use_container_width=True)
+        
+    plt.close(fig_mpl)
 
 # =====================================================================
-# 3. FUNCIÓN PARA LA SENSIBILIDAD EN EJE X NORMALIZADO
+# 3. SENSIBILIDAD EN EJE X NORMALIZADO (MPL + PLOTLY)
 # =====================================================================
 def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig_mpl, ax = plt.subplots(figsize=(10, 5))
+    fig_ply = go.Figure()
     hay_datos = False    
     
     factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2": 1.0}
@@ -162,22 +175,30 @@ def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
             
             if eje_x_promedios:
                 ax.plot(eje_x_promedios, eje_y_tasas, "o--", label=disp)
+                fig_ply.add_trace(go.Scatter(x=eje_x_promedios, y=eje_y_tasas, mode='lines+markers', name=disp))
                 hay_datos = True
             
     if hay_datos:
+        # Renderizado Matplotlib
         ax.set_title(titulo)
         ax.set_xlabel("Corriente Promedio Normalizada $I_{D\_norm}$ [u.a.]")
         ax.set_ylabel("Tasa de Cambio [($\mu$A/unid_norm)/min]")
         ax.grid(True, linestyle=":", alpha=0.6)
         ax.legend()
-        st.pyplot(fig)
-    plt.close(fig)
+        st.pyplot(fig_mpl)
+        
+        # Renderizado Plotly
+        fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Normalizada I_D_norm [u.a.]", yaxis_title="Tasa de Cambio [(uA/unid_norm)/min]", template="plotly_white")
+        st.plotly_chart(fig_ply, use_container_width=True)
+        
+    plt.close(fig_mpl)
 
 # =====================================================================
-# 4. NUEVA FUNCIÓN: SENSIBILIDAD TOTALMENTE ABSOLUTA (SIN NORMALIZAR NADA)
+# 4. SENSIBILIDAD TOTALMENTE ABSOLUTA (MPL + PLOTLY)
 # =====================================================================
 def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig_mpl, ax = plt.subplots(figsize=(10, 5))
+    fig_ply = go.Figure()
     hay_datos = False    
     
     for disp in lista_dispositivos:
@@ -225,9 +246,7 @@ def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
             for k in range(len(corrientes_ord) - 1):
                 dt = tiempos_ord[k+1] - tiempos_ord[k]
                 if dt > 0:
-                    # CORRECCIÓN: Tasa calculada directamente con la corriente absoluta (sin normalizar)
                     tasa_abs = np.abs(corrientes_ord[k+1] - corrientes_ord[k]) / dt
-                    # Promedio de las corrientes absolutas
                     promedio_i_abs = (corrientes_ord[k+1] + corrientes_ord[k]) / 2.0
                     
                     eje_y_tasas_abs.append(tasa_abs)
@@ -235,21 +254,28 @@ def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
             
             if eje_x_promedios_abs:
                 ax.plot(eje_x_promedios_abs, eje_y_tasas_abs, "o--", label=disp)
+                fig_ply.add_trace(go.Scatter(x=eje_x_promedios_abs, y=eje_y_tasas_abs, mode='lines+markers', name=disp))
                 hay_datos = True
             
     if hay_datos:
+        # Renderizado Matplotlib
         ax.set_title(titulo)
         ax.set_xlabel("Corriente Promedio Absoluta $I_D$ [$\mu$A]")
         ax.set_ylabel("Tasa de Cambio Absoluta [$\mu$A/min]")
         ax.grid(True, linestyle=":", alpha=0.6)
         ax.legend()
-        st.pyplot(fig)
-    plt.close(fig)
+        st.pyplot(fig_mpl)
+        
+        # Renderizado Plotly
+        fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Absoluta I_D [uA]", yaxis_title="Tasa de Cambio Absoluta [uA/min]", template="plotly_white")
+        st.plotly_chart(fig_ply, use_container_width=True)
+        
+    plt.close(fig_mpl)
 
 # =====================================================================
-# 5. EJECUCIÓN SECUENCIAL DIRECTA (SIN NINGUN MAIN)
+# 5. EJECUCIÓN SECUENCIAL DIRECTA
 # =====================================================================
-st.title("Panel Simplificado de Ensayos de Radiación")
+st.title("Panel Simplificado e Interactivo de Ensayos de Radiación")
 
 # --- SECCIÓN ORIGINAL DE EVOLUCIÓN TEMPORAL ---
 st.header("Evolución Temporal Absoluta")
@@ -290,7 +316,7 @@ graficar_sensibilidad_fg(
     tipo_tanda="FG_tanda2"
 )
 
-# --- NUEVA SECCIÓN: ANÁLISIS DE SENSIBILIDAD ABSOLUTA (SIN NORMALIZAR NADA) ---
+# --- SECCIÓN DE ANÁLISIS DE SENSIBILIDAD ABSOLUTA ---
 st.header("Análisis de Sensibilidad de Floating Gates (Totalmente Absoluta)")
 
 graficar_sensibilidad_fg_absoluta(
