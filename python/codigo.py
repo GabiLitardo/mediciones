@@ -16,3 +16,9 @@ for ruta_archivo in lista_de_rutas:
     super_arreglo.append(datos)
 
 st.write(f"¡Hecho! Se cargaron {len(super_arreglo)} mediciones.")
+
+plt.plot(V, 1e6 * I, color="red")
+
+plt.xlabel("V [V]")
+plt.ylabel(r"I [$\mu$A]")
+st.pyplot(fig)
