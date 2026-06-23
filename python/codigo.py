@@ -276,6 +276,8 @@ def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
 # 5. EJECUCIÓN SECUENCIAL DIRECTA
 # =====================================================================
 # --- SECCIÓN ORIGINAL DE EVOLUCIÓN TEMPORAL ---
+st.title("Resumen Mediciones Litardo-Chaves")
+
 st.header("Evolución Temporal")
 
 graficar_dispositivos(
