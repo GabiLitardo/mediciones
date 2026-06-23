@@ -181,14 +181,14 @@ def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
     if hay_datos:
         # Renderizado Matplotlib
         ax.set_title(titulo)
-        ax.set_xlabel("Corriente Promedio Normalizada $I_{D\_norm}$ [u.a.]")
-        ax.set_ylabel("Tasa de Cambio [($\mu$A/unid_norm)/min]")
+        ax.set_xlabel(r"Corriente Promedio Normalizada $I_{D\_norm}$ [$\mu$A]")
+        ax.set_ylabel("Tasa de Cambio")
         ax.grid(True, linestyle=":", alpha=0.6)
         ax.legend()
         st.pyplot(fig_mpl)
         
         # Renderizado Plotly
-        fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Normalizada I_D_norm [u.a.]", yaxis_title="Tasa de Cambio [(uA/unid_norm)/min]", template="plotly_white")
+        fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Normalizada", yaxis_title="Tasa de Cambio", template="plotly_white")
         st.plotly_chart(fig_ply, use_container_width=True)
         
     plt.close(fig_mpl)
