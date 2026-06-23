@@ -16,13 +16,12 @@ def matchear_archivos (nombre_archivo_generico):
     return mediciones
 
 
-matchear_archivos("MOSISV72M_DIE4_PFGIW1_VG=0_postrad*_M1_2.ri")
-st.write(f"¡Hecho! Se cargaron {len(super_arreglo)} mediciones.")
-st.write(f"{len(super_arreglo)}")
+mediciones = matchear_archivos("MOSISV72M_DIE4_PFGIW1_VG=0_postrad*_M1_2.ri")
+st.write(f"¡Hecho! Se cargaron {len(mediciones)} mediciones.")
 
-arreglito = super_arreglo[0]
-V = arreglito[:, 0]
-I = arreglito[:, 1]
+medicion = mediciones[0]
+V = medicion[:, 0]
+I = medicion[:, 1]
 
 fig = plt.figure()
 plt.plot(V, 1e6 * I, color="red")
