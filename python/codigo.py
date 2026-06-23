@@ -19,7 +19,9 @@ for ruta_archivo in lista_de_rutas:
 st.write(f"¡Hecho! Se cargaron {len(super_arreglo)} mediciones.")
 st.write(f"{len(super_arreglo)}")
 
-(V, I) = super_arreglo[0]
+arreglito = super_arreglo[0]
+V = arreglito[:, 0]
+I = arreglito[:, 1]
 
 fig = plt.figure()
 plt.plot(V, 1e6 * I, color="red")
