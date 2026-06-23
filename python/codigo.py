@@ -174,13 +174,11 @@ def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
     plt.close(fig)
 
 # =====================================================================
-# 4. NUEVA FUNCIÓN: SENSIBILIDAD EN FUNCIÓN DE CORRIENTE ABSOLUTA (X SIN NORMALIZAR)
+# 4. NUEVA FUNCIÓN: SENSIBILIDAD TOTALMENTE ABSOLUTA (SIN NORMALIZAR NADA)
 # =====================================================================
 def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
     fig, ax = plt.subplots(figsize=(10, 5))
     hay_datos = False    
-    
-    factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2": 1.0}
     
     for disp in lista_dispositivos:
         tiempos = []
@@ -221,31 +219,28 @@ def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
             tiempos_ord = np.array(tiempos)[indices_finales]
             corrientes_ord = np.array(valores)[indices_finales]
             
-            factor = factores_normalizacion.get(disp, 1.0)
-            corrientes_norm = corrientes_ord / factor
-            
             eje_x_promedios_abs = []
-            eje_y_tasas = []
+            eje_y_tasas_abs = []
             
-            for k in range(len(corrientes_norm) - 1):
+            for k in range(len(corrientes_ord) - 1):
                 dt = tiempos_ord[k+1] - tiempos_ord[k]
                 if dt > 0:
-                    # La tasa se sigue calculando sobre la corriente normalizada
-                    tasa = np.abs(corrientes_norm[k+1] - corrientes_norm[k]) / dt
-                    # NUEVO: El eje X toma el promedio de las corrientes reales (absolutas) sin normalizar
+                    # CORRECCIÓN: Tasa calculada directamente con la corriente absoluta (sin normalizar)
+                    tasa_abs = np.abs(corrientes_ord[k+1] - corrientes_ord[k]) / dt
+                    # Promedio de las corrientes absolutas
                     promedio_i_abs = (corrientes_ord[k+1] + corrientes_ord[k]) / 2.0
                     
-                    eje_y_tasas.append(tasa)
+                    eje_y_tasas_abs.append(tasa_abs)
                     eje_x_promedios_abs.append(promedio_i_abs)
             
             if eje_x_promedios_abs:
-                ax.plot(eje_x_promedios_abs, eje_y_tasas, "o--", label=disp)
+                ax.plot(eje_x_promedios_abs, eje_y_tasas_abs, "o--", label=disp)
                 hay_datos = True
             
     if hay_datos:
         ax.set_title(titulo)
         ax.set_xlabel("Corriente Promedio Absoluta $I_D$ [$\mu$A]")
-        ax.set_ylabel("Tasa de Cambio [($\mu$A/unid_norm)/min]")
+        ax.set_ylabel("Tasa de Cambio Absoluta [$\mu$A/min]")
         ax.grid(True, linestyle=":", alpha=0.6)
         ax.legend()
         st.pyplot(fig)
@@ -295,17 +290,17 @@ graficar_sensibilidad_fg(
     tipo_tanda="FG_tanda2"
 )
 
-# --- NUEVA SECCIÓN: ANÁLISIS DE SENSIBILIDAD ABSOLUTA (SIN NORMALIZAR X) ---
-st.header("Análisis de Sensibilidad de Floating Gates (Eje X Absoluto)")
+# --- NUEVA SECCIÓN: ANÁLISIS DE SENSIBILIDAD ABSOLUTA (SIN NORMALIZAR NADA) ---
+st.header("Análisis de Sensibilidad de Floating Gates (Totalmente Absoluta)")
 
 graficar_sensibilidad_fg_absoluta(
-    titulo="Sensibilidad Floating Gates Tanda 1 (Tasa vs $I_D$ Promedio Absoluto)",
+    titulo="Sensibilidad Absoluta Floating Gates Tanda 1 (Tasa Absoluta vs $I_D$ Promedio Absoluto)",
     lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3"],
     tipo_tanda="FG_tanda1"
 )
 
 graficar_sensibilidad_fg_absoluta(
-    titulo="Sensibilidad Floating Gates Tanda 2 (Tasa vs $I_D$ Promedio Absoluto)",
+    titulo="Sensibilidad Absoluta Floating Gates Tanda 2 (Tasa Absoluta vs $I_D$ Promedio Absoluto)",
     lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
     tipo_tanda="FG_tanda2"
 )
