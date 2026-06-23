@@ -8,6 +8,7 @@ import streamlit as st
 from scipy.signal import savgol_filter
 
 
+
 class AnalizadorRadiacion:
     """Clase para el procesamiento y visualización de datos de irradiación
     en dispositivos Floating Gate (FG) y FOXFET.
