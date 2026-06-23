@@ -12,7 +12,7 @@ super_arreglo = []
 
 # Recorremos la lista de rutas explícitamente
 for ruta_archivo in lista_de_rutas:
-    datos = np.genfromtxt(ruta_archivo, skip_header=2, usecols=(0, 1))
+    datos = np.genfromtxt(ruta_archivo, skip_header=2, usecols=(0, 1), encoding="cp1252")
     super_arreglo.append(datos)
 
 st.write(f"¡Hecho! Se cargaron {len(super_arreglo)} mediciones.")
