@@ -28,7 +28,6 @@ def graficar_dispositivos(titulo, ylabel, lista_dispositivos, tipo_tanda):
         
         # Iteramos de forma directa por los números de postrad del ensayo
         for nro in range(0, 100):
-            # Seteamos el prefijo y sufijo según la tecnología
             if tipo_tanda == "FG_tanda1":
                 sufijo = ".ri"
                 prefijo_archivo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_"
@@ -100,6 +99,13 @@ def graficar_dispositivos(titulo, ylabel, lista_dispositivos, tipo_tanda):
             tiempos_ordenados = np.array(tiempos)[indices_finales]
             valores_ordenados = np.array(valores)[indices_finales]
             
+            # -----------------------------------------------------
+            # C) CÁLCULO DE SENSIBILIDAD AUTOMÁTICO PARA FG
+            # -----------------------------------------------------
+            if tipo_tanda.startswith("FG"):
+                # Restamos el valor inicial para graficar directamente el Delta ID
+                valores_ordenados = valores_ordenados - valores_ordenados[0]
+            
             ax.plot(tiempos_ordenados, valores_ordenados, "o--", label=disp)
             hay_datos = True
             
@@ -118,23 +124,23 @@ def graficar_dispositivos(titulo, ylabel, lista_dispositivos, tipo_tanda):
 st.title("Panel Simplificado de Ensayos de Radiación")
 st.write("Generando gráficos secuenciales de forma directa...")
 
-# 1. Gráfico Floating Gates Tanda 1
+# 1. Gráfico Sensibilidad Floating Gates Tanda 1
 graficar_dispositivos(
-    titulo="Evolución Floating Gates Tanda 1 (I @ V = -4.5 V)",
-    ylabel=r"$I_D$ [$\mu$A]",
+    titulo="Sensibilidad Floating Gates Tanda 1 ($\Delta I_D$ @ V = -4.5 V)",
+    ylabel=r"$\Delta I_D$ [$\mu$A]",
     lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3"],
     tipo_tanda="FG_tanda1"
 )
 
-# 2. Gráfico Floating Gates Tanda 2
+# 2. Gráfico Sensibilidad Floating Gates Tanda 2
 graficar_dispositivos(
-    titulo="Evolución Floating Gates Tanda 2 (I @ V = -4.5 V)",
-    ylabel=r"$I_D$ [$\mu$A]",
+    titulo="Sensibilidad Floating Gates Tanda 2 ($\Delta I_D$ @ V = -4.5 V)",
+    ylabel=r"$\Delta I_D$ [$\mu$A]",
     lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
     tipo_tanda="FG_tanda2"
 )
 
-# 3. Gráfico FOXFETs
+# 3. Gráfico FOXFETs (Valores absolutos)
 graficar_dispositivos(
     titulo="Evolución FOXFETs (Tensión interpolada @ I = 10 uA)",
     ylabel="Tensión [V]",
