@@ -22,6 +22,14 @@ def graficar_dispositivos(titulo, ylabel, lista_dispositivos, tipo_tanda):
     fig, ax = plt.subplots(figsize=(10, 5))
     hay_datos = False    
     
+    # Diccionario con los factores de normalización específicos para cada FG
+    factores_normalizacion = {
+        "PFGIW1": 4.0,
+        "PFGIW2": 1.0,
+        "PFGIW3": 56.0,
+        "PFGIP2": 1.0
+    }
+    
     for disp in lista_dispositivos:
         tiempos = []
         valores = []
@@ -79,14 +87,12 @@ def graficar_dispositivos(titulo, ylabel, lista_dispositivos, tipo_tanda):
                 corrientes = archivo_encontrado[:, 1]
                 
                 if tipo_tanda == "FOXFET":
-                    # Tensión interpolada a corriente de 10 uA (1e-5 A)
                     corrientes_abs = np.abs(corrientes)
                     indices_orden = np.argsort(corrientes_abs)
                     v_interp = np.interp(1e-5, corrientes_abs[indices_orden], voltajes[indices_orden])
                     valores.append(v_interp)
                     tiempos.append(t)
                 else:
-                    # Corriente absoluta en uA a voltaje constante de -4.5 V
                     idx = np.where(np.round(voltajes, 1) == -4.5)[0]
                     if len(idx) > 0:
                         corriente_ua = np.abs(corrientes[idx[0]] * 1e6)
@@ -100,18 +106,49 @@ def graficar_dispositivos(titulo, ylabel, lista_dispositivos, tipo_tanda):
             valores_ordenados = np.array(valores)[indices_finales]
             
             # -----------------------------------------------------
-            # C) CÁLCULO DE SENSIBILIDAD AUTOMÁTICO PARA FG
+            # C) CÁLCULO DE SENSIBILIDAD REAL PARA FLOATING GATES
             # -----------------------------------------------------
             if tipo_tanda.startswith("FG"):
-                # Restamos el valor inicial para graficar directamente el Delta ID
-                valores_ordenados = valores_ordenados - valores_ordenados[0]
+                # 1. Normalizar la corriente por el factor asignado a este dispositivo
+                factor = factores_normalizacion.get(disp, 1.0)
+                corrientes_norm = valores_ordenados / factor
+                
+                eje_x_promedios = []
+                eje_y_tasas = []
+                
+                # 2. Iterar punto a punto calculando las tasas entre irradiaciones sucesivas
+                for k in range(len(corrientes_norm) - 1):
+                    dt = tiempos_ordenados[k+1] - tiempos_ordenados[k]
+                    
+                    if dt > 0:  # Evitamos división por cero si hubiera tiempos duplicados
+                        # Diferencia de corriente normalizada en módulo dividido tiempo de exposición
+                        tasa = np.abs(corrientes_norm[k+1] - corrientes_norm[k]) / dt
+                        # Promedio de las dos corrientes originales (sin normalizar)
+                        promedio_i = (valores_ordenados[k+1] + valores_ordenados[k]) / 2.0
+                        
+                        eje_y_tasas.append(tasa)
+                        eje_x_promedios.append(promedio_i)
+                
+                # Reemplazamos los arreglos para graficar Tasa vs Corriente Promedio
+                x_graficar = eje_x_promedios
+                y_graficar = eje_y_tasas
+            else:
+                # Si es FOXFET, el gráfico sigue siendo tradicional: Tiempo (X) vs Tensión (Y)
+                x_graficar = tiempos_ordenados
+                y_graficar = valores_ordenados
             
-            ax.plot(tiempos_ordenados, valores_ordenados, "o--", label=disp)
-            hay_datos = True
+            if len(x_graficar) > 0:
+                ax.plot(x_graficar, y_graficar, "o--", label=disp)
+                hay_datos = True
             
     if hay_datos:
         ax.set_title(titulo)
-        ax.set_xlabel("Tiempo Acumulado [min]")
+        # Cambiamos las etiquetas dinámicamente según el tipo de gráfico generado
+        if tipo_tanda.startswith("FG"):
+            ax.set_xlabel("Corriente Promedio $I_D$ [$\mu$A]")
+        else:
+            ax.set_xlabel("Tiempo Acumulado [min]")
+            
         ax.set_ylabel(ylabel)
         ax.grid(True, linestyle=":", alpha=0.6)
         ax.legend()
@@ -126,21 +163,21 @@ st.write("Generando gráficos secuenciales de forma directa...")
 
 # 1. Gráfico Sensibilidad Floating Gates Tanda 1
 graficar_dispositivos(
-    titulo="Sensibilidad Floating Gates Tanda 1 ($\Delta I_D$ @ V = -4.5 V)",
-    ylabel=r"$\Delta I_D$ [$\mu$A]",
+    titulo="Sensibilidad Floating Gates Tanda 1 (Tasa de Cambio vs $I_D$ Promedio)",
+    ylabel="Tasa de Cambio [$\mu$A/min]",
     lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3"],
     tipo_tanda="FG_tanda1"
 )
 
 # 2. Gráfico Sensibilidad Floating Gates Tanda 2
 graficar_dispositivos(
-    titulo="Sensibilidad Floating Gates Tanda 2 ($\Delta I_D$ @ V = -4.5 V)",
-    ylabel=r"$\Delta I_D$ [$\mu$A]",
+    titulo="Sensibilidad Floating Gates Tanda 2 (Tasa de Cambio vs $I_D$ Promedio)",
+    ylabel="Tasa de Cambio [$\mu$A/min]",
     lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
     tipo_tanda="FG_tanda2"
 )
 
-# 3. Gráfico FOXFETs (Valores absolutos)
+# 3. Gráfico FOXFETs (Valores absolutos tradicionales)
 graficar_dispositivos(
     titulo="Evolución FOXFETs (Tensión interpolada @ I = 10 uA)",
     ylabel="Tensión [V]",
