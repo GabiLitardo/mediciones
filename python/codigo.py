@@ -275,10 +275,8 @@ def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
 # =====================================================================
 # 5. EJECUCIÓN SECUENCIAL DIRECTA
 # =====================================================================
-st.title("Panel Simplificado e Interactivo de Ensayos de Radiación")
-
 # --- SECCIÓN ORIGINAL DE EVOLUCIÓN TEMPORAL ---
-st.header("Evolución Temporal Absoluta")
+st.header("Evolución Temporal")
 
 graficar_dispositivos(
     titulo="Evolución Floating Gates Tanda 1 (I @ V = -4.5 V)",
@@ -302,31 +300,31 @@ graficar_dispositivos(
 )
 
 # --- SECCIÓN DE ANÁLISIS DE SENSIBILIDAD NORMALIZADA ---
-st.header("Análisis de Sensibilidad de Floating Gates (Eje X Normalizado)")
+st.header("Análisis de Sensibilidad de Floating Gates")
 
 graficar_sensibilidad_fg(
-    titulo="Sensibilidad Floating Gates Tanda 1 (Tasa vs $I_D$ Promedio Normalizado)",
+    titulo="Sensibilidad Floating Gates Tanda 1",
     lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3"],
     tipo_tanda="FG_tanda1"
 )
 
 graficar_sensibilidad_fg(
-    titulo="Sensibilidad Floating Gates Tanda 2 (Tasa vs $I_D$ Promedio Normalizado)",
+    titulo="Sensibilidad Floating Gates Tanda 2",
     lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
     tipo_tanda="FG_tanda2"
 )
 
 # --- SECCIÓN DE ANÁLISIS DE SENSIBILIDAD ABSOLUTA ---
-st.header("Análisis de Sensibilidad de Floating Gates (Totalmente Absoluta)")
+st.header("Análisis de Sensibilidad absoluta de Floating Gates")
 
 graficar_sensibilidad_fg_absoluta(
-    titulo="Sensibilidad Absoluta Floating Gates Tanda 1 (Tasa Absoluta vs $I_D$ Promedio Absoluto)",
+    titulo="Sensibilidad Absoluta Floating Gates Tanda 1",
     lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3"],
     tipo_tanda="FG_tanda1"
 )
 
 graficar_sensibilidad_fg_absoluta(
-    titulo="Sensibilidad Absoluta Floating Gates Tanda 2 (Tasa Absoluta vs $I_D$ Promedio Absoluto)",
+    titulo="Sensibilidad Absoluta Floating Gates Tanda 2",
     lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
     tipo_tanda="FG_tanda2"
 )
