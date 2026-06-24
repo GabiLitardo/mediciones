@@ -2,6 +2,8 @@
 import streamlit as st
 # Importamos las funciones de graficado desde nuestro archivo graficos.py
 from graficos import graficar_dispositivos, graficar_sensibilidad_fg, graficar_sensibilidad_fg_absoluta
+    from graficos import mostrar_calibracion_vg_400ua
+
 
 st.title("Resumen mediciones Chaves-Litardo")
 
@@ -71,7 +73,6 @@ if mostrar_sensibilidad:
         tipo_tanda="FG_tanda2"
     )
     st.markdown("---")
-    from graficos import mostrar_calibracion_vg_400ua
     mostrar_calibracion_vg_400ua()
 
 # =====================================================================
