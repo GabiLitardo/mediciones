@@ -240,7 +240,6 @@ def graficar_sensibilidad_vg_tanda1(titulo):
     fig_ply = go.Figure()
     hay_datos = False    
     
-    # Solo los tres dispositivos solicitados
     lista_dispositivos = ["PFGIW1", "PFGIW2"] 
     
     for disp in lista_dispositivos:
@@ -279,41 +278,39 @@ def graficar_sensibilidad_vg_tanda1(titulo):
             tiempos_ord = np.array(tiempos)[indices_finales]
             corrientes_ord = np.array(valores)[indices_finales]
             
-            eje_x_promedios_abs = []
+            eje_x_promedios_vg = []
             eje_y_tasas_vg = []
             
             for k in range(len(corrientes_ord) - 1):
                 dt = tiempos_ord[k+1] - tiempos_ord[k]
                 if dt > 0:
                     try:
-                        # Convertimos las corrientes absolutas (en Amperios para la función) a Vg
                         vg_k = obtener_vg_por_corriente(disp, corrientes_ord[k] * 1e-6)
                         vg_k1 = obtener_vg_por_corriente(disp, corrientes_ord[k+1] * 1e-6)
                         
-                        # Tasa de cambio en el eje Y utilizando la diferencia de Vg
                         tasa_vg = np.abs(vg_k1 - vg_k) / dt
-                        promedio_i_abs = (corrientes_ord[k+1] + corrientes_ord[k]) / 2.0
+                        # CAMBIO: Ahora el eje X es el promedio de las tensiones Vg interpoladas
+                        promedio_vg = (vg_k1 + vg_k) / 2.0
                         
                         eje_y_tasas_vg.append(tasa_vg)
-                        eje_x_promedios_abs.append(promedio_i_abs)
+                        eje_x_promedios_vg.append(promedio_vg)
                     except Exception:
-                        # Si una corriente queda fuera del rango de interpolación del STD, se ignora el punto
                         continue
             
-            if eje_x_promedios_abs:
-                ax.plot(eje_x_promedios_abs, eje_y_tasas_vg, "o--", label=disp)
-                fig_ply.add_trace(go.Scatter(x=eje_x_promedios_abs, y=eje_y_tasas_vg, mode='lines+markers', name=disp))
+            if eje_x_promedios_vg:
+                ax.plot(eje_x_promedios_vg, eje_y_tasas_vg, "o--", label=disp)
+                fig_ply.add_trace(go.Scatter(x=eje_x_promedios_vg, y=eje_y_tasas_vg, mode='lines+markers', name=disp))
                 hay_datos = True
             
     if hay_datos:
         ax.set_title(titulo)
-        ax.set_xlabel("Corriente Promedio Absoluta $I_D$ [$\mu$A]")
+        ax.set_xlabel("Tensión Promedio $V_G$ [V]")
         ax.set_ylabel("Tasa de Cambio $\Delta V_G / \Delta t$ [V/min]")
         ax.grid(True, linestyle=":", alpha=0.6)
         ax.legend()
         st.pyplot(fig_mpl)
         
-        fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Absoluta I_D [uA]", yaxis_title="Tasa de Cambio Delta V_G / Delta t [V/min]", template="plotly_white")
+        fig_ply.update_layout(title=titulo, xaxis_title="Tensión Promedio V_G [V]", yaxis_title="Tasa de Cambio Delta V_G / Delta t [V/min]", template="plotly_white")
         st.plotly_chart(fig_ply, use_container_width=True)
     plt.close(fig_mpl)
 
@@ -324,7 +321,6 @@ def graficar_sensibilidad_vg_tanda2(titulo):
     fig_ply = go.Figure()
     hay_datos = False    
     
-    # Solo los tres dispositivos solicitados (PFGIW3 no entra)
     lista_dispositivos = ["PFGIW1", "PFGIW2", "PFGIP2"]
     
     for disp in lista_dispositivos:
@@ -363,7 +359,7 @@ def graficar_sensibilidad_vg_tanda2(titulo):
             tiempos_ord = np.array(tiempos)[indices_finales]
             corrientes_ord = np.array(valores)[indices_finales]
             
-            eje_x_promedios_abs = []
+            eje_x_promedios_vg = []
             eje_y_tasas_vg = []
             
             for k in range(len(corrientes_ord) - 1):
@@ -374,26 +370,27 @@ def graficar_sensibilidad_vg_tanda2(titulo):
                         vg_k1 = obtener_vg_por_corriente(disp, corrientes_ord[k+1] * 1e-6)
                         
                         tasa_vg = np.abs(vg_k1 - vg_k) / dt
-                        promedio_i_abs = (corrientes_ord[k+1] + corrientes_ord[k]) / 2.0
+                        # CAMBIO: Ahora el eje X es el promedio de las tensiones Vg interpoladas
+                        promedio_vg = (vg_k1 + vg_k) / 2.0
                         
                         eje_y_tasas_vg.append(tasa_vg)
-                        eje_x_promedios_abs.append(promedio_i_abs)
+                        eje_x_promedios_vg.append(promedio_vg)
                     except Exception:
                         continue
             
-            if eje_x_promedios_abs:
-                ax.plot(eje_x_promedios_abs, eje_y_tasas_vg, "o--", label=disp)
-                fig_ply.add_trace(go.Scatter(x=eje_x_promedios_abs, y=eje_y_tasas_vg, mode='lines+markers', name=disp))
+            if eje_x_promedios_vg:
+                ax.plot(eje_x_promedios_vg, eje_y_tasas_vg, "o--", label=disp)
+                fig_ply.add_trace(go.Scatter(x=eje_x_promedios_vg, y=eje_y_tasas_vg, mode='lines+markers', name=disp))
                 hay_datos = True
             
     if hay_datos:
         ax.set_title(titulo)
-        ax.set_xlabel("Corriente Promedio Absoluta $I_D$ [$\mu$A]")
+        ax.set_xlabel("Tensión Promedio $V_G$ [V]")
         ax.set_ylabel("Tasa de Cambio $\Delta V_G / \Delta t$ [V/min]")
         ax.grid(True, linestyle=":", alpha=0.6)
         ax.legend()
         st.pyplot(fig_mpl)
         
-        fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Absoluta I_D [uA]", yaxis_title="Tasa de Cambio Delta V_G / Delta t [V/min]", template="plotly_white")
+        fig_ply.update_layout(title=titulo, xaxis_title="Tensión Promedio V_G [V]", yaxis_title="Tasa de Cambio Delta V_G / Delta t [V/min]", template="plotly_white")
         st.plotly_chart(fig_ply, use_container_width=True)
     plt.close(fig_mpl)
