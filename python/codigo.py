@@ -1,332 +1,81 @@
-from pathlib import Path
-import matplotlib.pyplot as plt
-import numpy as np
+# codigo.py
 import streamlit as st
-import plotly.graph_objects as go
+# Importamos las funciones de graficado desde nuestro archivo graficos.py
+from graficos import graficar_dispositivos, graficar_sensibilidad_fg, graficar_sensibilidad_fg_absoluta
+
+st.title("Panel de Ensayos de Radiación (Modularizado)")
+st.write("Seleccioná las secciones que querés visualizar en el panel:")
 
 # =====================================================================
-# 1. UNICA FUNCIÓN OBLIGATORIA (PARA CARGAR LOS ARCHIVOS)
+# CONFIGURACIÓN DE CHECKBOXES EN LA BARRA LATERAL (O EN EL CUERPO)
 # =====================================================================
-def matchear_archivos(nombre_archivo_generico):
-    directorio_base = Path(".")
-    lista_de_rutas = directorio_base.glob("**/" + nombre_archivo_generico)
-    mediciones = []
-    for ruta_archivo in lista_de_rutas:
-        medicion = np.genfromtxt(ruta_archivo, skip_header=2, usecols=(0, 1), encoding="cp1252")
-        mediciones.append(medicion)
-    return mediciones
+mostrar_evolucion = st.checkbox("1. Evolución Temporal Absoluta", value=True)
+mostrar_sensibilidad = st.checkbox("2. Análisis de Sensibilidad (Floating Gates)", value=False)
+mostrar_ruido = st.checkbox("3. Análisis de Ruido (Pendiente)", value=False)
 
 # =====================================================================
-# 2. FUNCIÓN DE EVOLUCIÓN TEMPORAL (CON ENFOQUE HÍBRIDO: MPL + PLOTLY)
+# SECCIÓN 1: EVOLUCIÓN TEMPORAL
 # =====================================================================
-def graficar_dispositivos(titulo, ylabel, lista_dispositivos, tipo_tanda):
-    fig_mpl, ax = plt.subplots(figsize=(10, 5))
-    fig_ply = go.Figure()
-    hay_datos = False    
+if mostrar_evolucion:
+    st.markdown("---")
+    st.header("Evolución Temporal Absoluta")
     
-    for disp in lista_dispositivos:
-        tiempos = []
-        valores = []
-        
-        for nro in range(0, 100):
-            if tipo_tanda == "FG_tanda1":
-                sufijo = ".ri"
-                prefijo_archivo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_"
-            elif tipo_tanda == "FG_tanda2":
-                sufijo = "_2.ri"
-                prefijo_archivo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_"
-            elif tipo_tanda == "FOXFET":
-                sufijo = ".ri"
-                prefijo_archivo = f"MOSISV72M_DIE4_{disp}_IV_VD=5V_postrad{nro}_"
-                
-            archivo_encontrado = None    
-            for m_ver in ["M2", "M1"]:
-                nombre_buscar = f"{prefijo_archivo}{m_ver}{sufijo}"
-                datos = matchear_archivos(nombre_buscar)
-                if datos:
-                    archivo_encontrado = datos[0]
-                    break
-            
-            if archivo_encontrado is not None:
-                t = 0
-                for i in range(1, nro + 1):
-                    if tipo_tanda == "FOXFET":
-                        if i <= 32: t += 10
-                        elif i <= 44: t += 15
-                        elif i <= 47: t += 20
-                        elif i <= 50: t += 25
-                        elif i <= 52: t += 30
-                        elif i <= 53: t += 35
-                        else: t += 10
-                    else:
-                        if i <= 9: t += 10
-                        elif i <= 21: t += 15
-                        elif i <= 24: t += 20
-                        elif i <= 27: t += 25
-                        elif i <= 29: t += 30
-                        elif i <= 30: t += 35
-                        else: t += 10
-                
-                voltajes = archivo_encontrado[:, 0]
-                corrientes = archivo_encontrado[:, 1]
-                
-                if tipo_tanda == "FOXFET":
-                    corrientes_abs = np.abs(corrientes)
-                    indices_orden = np.argsort(corrientes_abs)
-                    v_interp = np.interp(1e-5, corrientes_abs[indices_orden], voltajes[indices_orden])
-                    valores.append(v_interp)
-                    tiempos.append(t)
-                else:
-                    idx = np.where(np.round(voltajes, 1) == -4.5)[0]
-                    if len(idx) > 0:
-                        corriente_ua = np.abs(corrientes[idx[0]] * 1e6)
-                        valores.append(corriente_ua)
-                        tiempos.append(t)
-                        
-        if tiempos:
-            indices_finales = np.argsort(tiempos)
-            tiempos_ordenados = np.array(tiempos)[indices_finales]
-            valores_ordenados = np.array(valores)[indices_finales]
-            
-            # Gráfico estático
-            ax.plot(tiempos_ordenados, valores_ordenados, "o--", label=disp)
-            # Gráfico interactivo
-            fig_ply.add_trace(go.Scatter(x=tiempos_ordenados, y=valores_ordenados, mode='lines+markers', name=disp))
-            hay_datos = True
-            
-    if hay_datos:
-        # Renderizado Matplotlib
-        ax.set_title(titulo)
-        ax.set_xlabel("Tiempo Acumulado [min]")
-        ax.set_ylabel(ylabel)
-        ax.grid(True, linestyle=":", alpha=0.6)
-        ax.legend()
-        st.pyplot(fig_mpl)
-        
-        # Renderizado Plotly
-        fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title=ylabel.replace("$", ""), template="plotly_white")
-        st.plotly_chart(fig_ply, use_container_width=True)
-        
-    plt.close(fig_mpl)
+    graficar_dispositivos(
+        titulo="Evolución Floating Gates Tanda 1 (I @ V = -4.5 V)",
+        ylabel=r"$I_D$ [$\mu$A]",
+        lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3"],
+        tipo_tanda="FG_tanda1"
+    )
+
+    graficar_dispositivos(
+        titulo="Evolución Floating Gates Tanda 2 (I @ V = -4.5 V)",
+        ylabel=r"$I_D$ [$\mu$A]",
+        lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
+        tipo_tanda="FG_tanda2"
+    )
+
+    graficar_dispositivos(
+        titulo="Evolución FOXFETs (Tensión interpolada @ I = 10 uA)",
+        ylabel="Tensión [V]",
+        lista_dispositivos=["FFC1", "FFC2", "FFC3", "FFL", "FFS"],
+        tipo_tanda="FOXFET"
+    )
 
 # =====================================================================
-# 3. SENSIBILIDAD EN EJE X NORMALIZADO (MPL + PLOTLY)
+# SECCIÓN 2: SENSIBILIDAD
 # =====================================================================
-def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
-    fig_mpl, ax = plt.subplots(figsize=(10, 5))
-    fig_ply = go.Figure()
-    hay_datos = False    
+if mostrar_sensibilidad:
+    st.markdown("---")
+    st.header("Análisis de Sensibilidad de Floating Gates")
     
-    factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2": 1.0}
+    st.subheader("Eje X Normalizado")
+    graficar_sensibilidad_fg(
+        titulo="Sensibilidad FG Tanda 1 (Tasa vs $I_D$ Promedio Normalizado)",
+        lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3"],
+        tipo_tanda="FG_tanda1"
+    )
+    graficar_sensibilidad_fg(
+        titulo="Sensibilidad FG Tanda 2 (Tasa vs $I_D$ Promedio Normalizado)",
+        lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
+        tipo_tanda="FG_tanda2"
+    )
     
-    for disp in lista_dispositivos:
-        tiempos = []
-        valores = []
-        
-        for nro in range(0, 100):
-            sufijo = ".ri" if tipo_tanda == "FG_tanda1" else "_2.ri"
-            prefijo_archivo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_"
-                
-            archivo_encontrado = None    
-            for m_ver in ["M2", "M1"]:
-                nombre_buscar = f"{prefijo_archivo}{m_ver}{sufijo}"
-                datos = matchear_archivos(nombre_buscar)
-                if datos:
-                    archivo_encontrado = datos[0]
-                    break
-            
-            if archivo_encontrado is not None:
-                t = 0
-                for i in range(1, nro + 1):
-                    if i <= 9: t += 10
-                    elif i <= 21: t += 15
-                    elif i <= 24: t += 20
-                    elif i <= 27: t += 25
-                    elif i <= 29: t += 30
-                    elif i <= 30: t += 35
-                    else: t += 10
-                
-                voltajes = archivo_encontrado[:, 0]
-                corrientes = archivo_encontrado[:, 1]
-                idx = np.where(np.round(voltajes, 1) == -4.5)[0]
-                if len(idx) > 0:
-                    valores.append(np.abs(corrientes[idx[0]] * 1e6))
-                    tiempos.append(t)
-                        
-        if tiempos:
-            indices_finales = np.argsort(tiempos)
-            tiempos_ord = np.array(tiempos)[indices_finales]
-            corrientes_ord = np.array(valores)[indices_finales]
-            
-            factor = factores_normalizacion.get(disp, 1.0)
-            corrientes_norm = corrientes_ord / factor
-            
-            eje_x_promedios = []
-            eje_y_tasas = []
-            
-            for k in range(len(corrientes_norm) - 1):
-                dt = tiempos_ord[k+1] - tiempos_ord[k]
-                if dt > 0:
-                    tasa = np.abs(corrientes_norm[k+1] - corrientes_norm[k]) / dt
-                    promedio_i_norm = (corrientes_norm[k+1] + corrientes_norm[k]) / 2.0
-                    
-                    eje_y_tasas.append(tasa)
-                    eje_x_promedios.append(promedio_i_norm)
-            
-            if eje_x_promedios:
-                ax.plot(eje_x_promedios, eje_y_tasas, "o--", label=disp)
-                fig_ply.add_trace(go.Scatter(x=eje_x_promedios, y=eje_y_tasas, mode='lines+markers', name=disp))
-                hay_datos = True
-            
-    if hay_datos:
-        # Renderizado Matplotlib
-        ax.set_title(titulo)
-        ax.set_xlabel(r"Corriente Promedio Normalizada $I_{D\_norm}$ [$\mu$A]")
-        ax.set_ylabel("Tasa de Cambio")
-        ax.grid(True, linestyle=":", alpha=0.6)
-        ax.legend()
-        st.pyplot(fig_mpl)
-        
-        # Renderizado Plotly
-        fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Normalizada", yaxis_title="Tasa de Cambio", template="plotly_white")
-        st.plotly_chart(fig_ply, use_container_width=True)
-        
-    plt.close(fig_mpl)
+    st.subheader("Eje X Absoluto")
+    graficar_sensibilidad_fg_absoluta(
+        titulo="Sensibilidad Absoluta FG Tanda 1 (Tasa Absoluta vs $I_D$ Promedio Absoluto)",
+        lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3"],
+        tipo_tanda="FG_tanda1"
+    )
+    graficar_sensibilidad_fg_absoluta(
+        titulo="Sensibilidad Absoluta FG Tanda 2 (Tasa Absoluta vs $I_D$ Promedio Absoluto)",
+        lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
+        tipo_tanda="FG_tanda2"
+    )
 
 # =====================================================================
-# 4. SENSIBILIDAD TOTALMENTE ABSOLUTA (MPL + PLOTLY)
+# SECCIÓN 3: RUIDO (PENDIENTE)
 # =====================================================================
-def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
-    fig_mpl, ax = plt.subplots(figsize=(10, 5))
-    fig_ply = go.Figure()
-    hay_datos = False    
-    
-    for disp in lista_dispositivos:
-        tiempos = []
-        valores = []
-        
-        for nro in range(0, 100):
-            sufijo = ".ri" if tipo_tanda == "FG_tanda1" else "_2.ri"
-            prefijo_archivo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_"
-                
-            archivo_encontrado = None    
-            for m_ver in ["M2", "M1"]:
-                nombre_buscar = f"{prefijo_archivo}{m_ver}{sufijo}"
-                datos = matchear_archivos(nombre_buscar)
-                if datos:
-                    archivo_encontrado = datos[0]
-                    break
-            
-            if archivo_encontrado is not None:
-                t = 0
-                for i in range(1, nro + 1):
-                    if i <= 9: t += 10
-                    elif i <= 21: t += 15
-                    elif i <= 24: t += 20
-                    elif i <= 27: t += 25
-                    elif i <= 29: t += 30
-                    elif i <= 30: t += 35
-                    else: t += 10
-                
-                voltajes = archivo_encontrado[:, 0]
-                corrientes = archivo_encontrado[:, 1]
-                idx = np.where(np.round(voltajes, 1) == -4.5)[0]
-                if len(idx) > 0:
-                    valores.append(np.abs(corrientes[idx[0]] * 1e6))
-                    tiempos.append(t)
-                        
-        if tiempos:
-            indices_finales = np.argsort(tiempos)
-            tiempos_ord = np.array(tiempos)[indices_finales]
-            corrientes_ord = np.array(valores)[indices_finales]
-            
-            eje_x_promedios_abs = []
-            eje_y_tasas_abs = []
-            
-            for k in range(len(corrientes_ord) - 1):
-                dt = tiempos_ord[k+1] - tiempos_ord[k]
-                if dt > 0:
-                    tasa_abs = np.abs(corrientes_ord[k+1] - corrientes_ord[k]) / dt
-                    promedio_i_abs = (corrientes_ord[k+1] + corrientes_ord[k]) / 2.0
-                    
-                    eje_y_tasas_abs.append(tasa_abs)
-                    eje_x_promedios_abs.append(promedio_i_abs)
-            
-            if eje_x_promedios_abs:
-                ax.plot(eje_x_promedios_abs, eje_y_tasas_abs, "o--", label=disp)
-                fig_ply.add_trace(go.Scatter(x=eje_x_promedios_abs, y=eje_y_tasas_abs, mode='lines+markers', name=disp))
-                hay_datos = True
-            
-    if hay_datos:
-        # Renderizado Matplotlib
-        ax.set_title(titulo)
-        ax.set_xlabel("Corriente Promedio Absoluta $I_D$ [$\mu$A]")
-        ax.set_ylabel("Tasa de Cambio Absoluta [$\mu$A/min]")
-        ax.grid(True, linestyle=":", alpha=0.6)
-        ax.legend()
-        st.pyplot(fig_mpl)
-        
-        # Renderizado Plotly
-        fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Absoluta I_D [uA]", yaxis_title="Tasa de Cambio Absoluta [uA/min]", template="plotly_white")
-        st.plotly_chart(fig_ply, use_container_width=True)
-        
-    plt.close(fig_mpl)
-
-# =====================================================================
-# 5. EJECUCIÓN SECUENCIAL DIRECTA
-# =====================================================================
-# --- SECCIÓN ORIGINAL DE EVOLUCIÓN TEMPORAL ---
-st.title("Resumen Mediciones Litardo-Chaves")
-
-st.header("Evolución Temporal")
-
-graficar_dispositivos(
-    titulo="Evolución Floating Gates Tanda 1 (I @ V = -4.5 V)",
-    ylabel=r"$I_D$ [$\mu$A]",
-    lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3"],
-    tipo_tanda="FG_tanda1"
-)
-
-graficar_dispositivos(
-    titulo="Evolución Floating Gates Tanda 2 (I @ V = -4.5 V)",
-    ylabel=r"$I_D$ [$\mu$A]",
-    lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
-    tipo_tanda="FG_tanda2"
-)
-
-graficar_dispositivos(
-    titulo="Evolución FOXFETs (Tensión interpolada @ I = 10 uA)",
-    ylabel="Tensión [V]",
-    lista_dispositivos=["FFC1", "FFC2", "FFC3", "FFL", "FFS"],
-    tipo_tanda="FOXFET"
-)
-
-# --- SECCIÓN DE ANÁLISIS DE SENSIBILIDAD NORMALIZADA ---
-st.header("Análisis de Sensibilidad de Floating Gates")
-
-graficar_sensibilidad_fg(
-    titulo="Sensibilidad Floating Gates Tanda 1",
-    lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3"],
-    tipo_tanda="FG_tanda1"
-)
-
-graficar_sensibilidad_fg(
-    titulo="Sensibilidad Floating Gates Tanda 2",
-    lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
-    tipo_tanda="FG_tanda2"
-)
-
-# --- SECCIÓN DE ANÁLISIS DE SENSIBILIDAD ABSOLUTA ---
-st.header("Análisis de Sensibilidad absoluta de Floating Gates")
-
-graficar_sensibilidad_fg_absoluta(
-    titulo="Sensibilidad Absoluta Floating Gates Tanda 1",
-    lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3"],
-    tipo_tanda="FG_tanda1"
-)
-
-graficar_sensibilidad_fg_absoluta(
-    titulo="Sensibilidad Absoluta Floating Gates Tanda 2",
-    lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
-    tipo_tanda="FG_tanda2"
-)
+if mostrar_ruido:
+    st.markdown("---")
+    st.header("Análisis de Ruido")
+    st.info("Esta sección está vacía por el momento. ¡La completamos cuando quieras!")
