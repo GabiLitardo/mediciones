@@ -4,8 +4,8 @@ from graficos import (
     graficar_dispositivos, 
     graficar_sensibilidad_fg, 
     graficar_sensibilidad_fg_absoluta,
-    graficar_sensibilidad_vg_tanda1,    # <-- Nuevo
-    graficar_sensibilidad_vg_tanda2     # <-- Nuevo
+    graficar_evolucion_vg_tanda1,    # <-- Nuevo
+    graficar_evolucion_vg_tanda2     # <-- Nuevo
 )
 
 st.title("Resumen mediciones Chaves-Litardo")
@@ -14,6 +14,9 @@ mostrar_evolucion = st.checkbox("1. Análisis temporal", value=True)
 mostrar_sensibilidad = st.checkbox("2. Análisis de Sensibilidad a radiación", value=False)
 mostrar_ruido = st.checkbox("3. Análisis de Ruido", value=False)
 
+# =====================================================================
+# SECCIÓN 1: EVOLUCIÓN TEMPORAL
+# =====================================================================
 if mostrar_evolucion:
     st.markdown("---")
     st.header("Evolución Temporal")
@@ -39,6 +42,18 @@ if mostrar_evolucion:
         tipo_tanda="FOXFET"
     )
 
+    # --- AGREGADO: NUEVOS GRÁFICOS TEMPORALES EN TENSIÓN VFG ---
+    st.subheader("Evolución del Voltaje de Compuerta Equivalente ($V_{FG}$)")
+    graficar_evolucion_vg_tanda1(
+        titulo="Descarga Temporal de Floating Gates Tanda 1 en Voltaje"
+    )
+    graficar_evolucion_vg_tanda2(
+        titulo="Descarga Temporal de Floating Gates Tanda 2 en Voltaje"
+    )
+
+# =====================================================================
+# SECCIÓN 2: SENSIBILIDAD (RESETEADA A LO ANTERIOR)
+# =====================================================================
 if mostrar_sensibilidad:
     st.markdown("---")
     st.header("Análisis de Sensibilidad")
@@ -65,15 +80,6 @@ if mostrar_sensibilidad:
         titulo="Sensibilidad Absoluta FG Tanda 2 (Tasa Absoluta vs $I_D$ Promedio Absoluto)",
         lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
         tipo_tanda="FG_tanda2"
-    )
-
-    # --- NUEVA SUBSECCIÓN: SENSIBILIDAD EN RELACIÓN A DELTA VG ---
-    st.subheader("Sensibilidad en función de $\Delta V_G$")
-    graficar_sensibilidad_vg_tanda1(
-        titulo="Sensibilidad VG Tanda 1 (Tasa $\Delta V_G/\Delta t$ vs $V_G$ Promedio)"
-    )
-    graficar_sensibilidad_vg_tanda2(
-        titulo="Sensibilidad VG Tanda 2 (Tasa $\Delta V_G/\Delta t$ vs $V_G$ Promedio)"
     )
 
 if mostrar_ruido:
