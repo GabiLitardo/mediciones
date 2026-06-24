@@ -234,19 +234,166 @@ def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
         st.plotly_chart(fig_ply, use_container_width=True)
     plt.close(fig_mpl)
 
-def mostrar_calibracion_vg_100ua():
-    st.subheader("Mapeo de Tensión $V_G$ para $I_D = 100\ \mu$A")
-    st.write("Voltajes de compuerta ($V_G$) requeridos en los transistores estándar de referencia:")
+# --- SENSIBILIDAD EN DELTA VG (TANDA 1) ---
+def graficar_sensibilidad_vg_tanda1(titulo):
+    fig_mpl, ax = plt.subplots(figsize=(10, 5))
+    fig_ply = go.Figure()
+    hay_datos = False    
     
-    dispositivos = ["PFGIW1", "PFGIW2", "PFGIP2"]
-    corriente_target_amp = 100e-6  # 100 uA en Amperios
+    # Solo los tres dispositivos solicitados
+    lista_dispositivos = ["PFGIW1", "PFGIW2"] 
     
-    col1, col2, col3 = st.columns(3)
-    metricas = [col1, col2, col3]
+    for disp in lista_dispositivos:
+        tiempos, valores = [], []
+        for nro in range(0, 100):
+            prefijo_archivo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_"
+            
+            archivo_encontrado = None    
+            for m_ver in ["M2", "M1"]:
+                nombre_buscar = f"{prefijo_archivo}{m_ver}.ri"
+                datos = matchear_archivos(nombre_buscar)
+                if datos:
+                    archivo_encontrado = datos[0]
+                    break
+            
+            if archivo_encontrado is not None:
+                t = 0
+                for i in range(1, nro + 1):
+                    if i <= 9: t += 10
+                    elif i <= 21: t += 15
+                    elif i <= 24: t += 20
+                    elif i <= 27: t += 25
+                    elif i <= 29: t += 30
+                    elif i <= 30: t += 35
+                    else: t += 10
+                
+                voltajes = archivo_encontrado[:, 0]
+                corrientes = archivo_encontrado[:, 1]
+                idx = np.where(np.round(voltajes, 1) == -4.5)[0]
+                if len(idx) > 0:
+                    valores.append(np.abs(corrientes[idx[0]] * 1e6))
+                    tiempos.append(t)
+                        
+        if tiempos:
+            indices_finales = np.argsort(tiempos)
+            tiempos_ord = np.array(tiempos)[indices_finales]
+            corrientes_ord = np.array(valores)[indices_finales]
+            
+            eje_x_promedios_abs = []
+            eje_y_tasas_vg = []
+            
+            for k in range(len(corrientes_ord) - 1):
+                dt = tiempos_ord[k+1] - tiempos_ord[k]
+                if dt > 0:
+                    try:
+                        # Convertimos las corrientes absolutas (en Amperios para la función) a Vg
+                        vg_k = obtener_vg_por_corriente(disp, corrientes_ord[k] * 1e-6)
+                        vg_k1 = obtener_vg_por_corriente(disp, corrientes_ord[k+1] * 1e-6)
+                        
+                        # Tasa de cambio en el eje Y utilizando la diferencia de Vg
+                        tasa_vg = np.abs(vg_k1 - vg_k) / dt
+                        promedio_i_abs = (corrientes_ord[k+1] + corrientes_ord[k]) / 2.0
+                        
+                        eje_y_tasas_vg.append(tasa_vg)
+                        eje_x_promedios_abs.append(promedio_i_abs)
+                    except Exception:
+                        # Si una corriente queda fuera del rango de interpolación del STD, se ignora el punto
+                        continue
+            
+            if eje_x_promedios_abs:
+                ax.plot(eje_x_promedios_abs, eje_y_tasas_vg, "o--", label=disp)
+                fig_ply.add_trace(go.Scatter(x=eje_x_promedios_abs, y=eje_y_tasas_vg, mode='lines+markers', name=disp))
+                hay_datos = True
+            
+    if hay_datos:
+        ax.set_title(titulo)
+        ax.set_xlabel("Corriente Promedio Absoluta $I_D$ [$\mu$A]")
+        ax.set_ylabel("Tasa de Cambio $\Delta V_G / \Delta t$ [V/min]")
+        ax.grid(True, linestyle=":", alpha=0.6)
+        ax.legend()
+        st.pyplot(fig_mpl)
+        
+        fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Absoluta I_D [uA]", yaxis_title="Tasa de Cambio Delta V_G / Delta t [V/min]", template="plotly_white")
+        st.plotly_chart(fig_ply, use_container_width=True)
+    plt.close(fig_mpl)
+
+
+# --- SENSIBILIDAD EN DELTA VG (TANDA 2) ---
+def graficar_sensibilidad_vg_tanda2(titulo):
+    fig_mpl, ax = plt.subplots(figsize=(10, 5))
+    fig_ply = go.Figure()
+    hay_datos = False    
     
-    for idx, disp in enumerate(dispositivos):
-        try:
-            vg_val = obtener_vg_por_corriente(disp, corriente_target_amp)
-            metricas[idx].metric(label=f"$V_G$ asociado a {disp}", value=f"{vg_val:.4f} V")
-        except Exception as e:
-            metricas[idx].error(f"Error {disp}: {e}")
+    # Solo los tres dispositivos solicitados (PFGIW3 no entra)
+    lista_dispositivos = ["PFGIW1", "PFGIW2", "PFGIP2"]
+    
+    for disp in lista_dispositivos:
+        tiempos, valores = [], []
+        for nro in range(0, 100):
+            prefijo_archivo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_"
+            
+            archivo_encontrado = None    
+            for m_ver in ["M2", "M1"]:
+                nombre_buscar = f"{prefijo_archivo}{m_ver}_2.ri"
+                datos = matchear_archivos(nombre_buscar)
+                if datos:
+                    archivo_encontrado = datos[0]
+                    break
+            
+            if archivo_encontrado is not None:
+                t = 0
+                for i in range(1, nro + 1):
+                    if i <= 9: t += 10
+                    elif i <= 21: t += 15
+                    elif i <= 24: t += 20
+                    elif i <= 27: t += 25
+                    elif i <= 29: t += 30
+                    elif i <= 30: t += 35
+                    else: t += 10
+                
+                voltajes = archivo_encontrado[:, 0]
+                corrientes = archivo_encontrado[:, 1]
+                idx = np.where(np.round(voltajes, 1) == -4.5)[0]
+                if len(idx) > 0:
+                    valores.append(np.abs(corrientes[idx[0]] * 1e6))
+                    tiempos.append(t)
+                        
+        if tiempos:
+            indices_finales = np.argsort(tiempos)
+            tiempos_ord = np.array(tiempos)[indices_finales]
+            corrientes_ord = np.array(valores)[indices_finales]
+            
+            eje_x_promedios_abs = []
+            eje_y_tasas_vg = []
+            
+            for k in range(len(corrientes_ord) - 1):
+                dt = tiempos_ord[k+1] - tiempos_ord[k]
+                if dt > 0:
+                    try:
+                        vg_k = obtener_vg_por_corriente(disp, corrientes_ord[k] * 1e-6)
+                        vg_k1 = obtener_vg_por_corriente(disp, corrientes_ord[k+1] * 1e-6)
+                        
+                        tasa_vg = np.abs(vg_k1 - vg_k) / dt
+                        promedio_i_abs = (corrientes_ord[k+1] + corrientes_ord[k]) / 2.0
+                        
+                        eje_y_tasas_vg.append(tasa_vg)
+                        eje_x_promedios_abs.append(promedio_i_abs)
+                    except Exception:
+                        continue
+            
+            if eje_x_promedios_abs:
+                ax.plot(eje_x_promedios_abs, eje_y_tasas_vg, "o--", label=disp)
+                fig_ply.add_trace(go.Scatter(x=eje_x_promedios_abs, y=eje_y_tasas_vg, mode='lines+markers', name=disp))
+                hay_datos = True
+            
+    if hay_datos:
+        ax.set_title(titulo)
+        ax.set_xlabel("Corriente Promedio Absoluta $I_D$ [$\mu$A]")
+        ax.set_ylabel("Tasa de Cambio $\Delta V_G / \Delta t$ [V/min]")
+        ax.grid(True, linestyle=":", alpha=0.6)
+        ax.legend()
+        st.pyplot(fig_mpl)
+        
+        fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Absoluta I_D [uA]", yaxis_title="Tasa de Cambio Delta V_G / Delta t [V/min]", template="plotly_white")
+        st.plotly_chart(fig_ply, use_container_width=True)
+    plt.close(fig_mpl)
