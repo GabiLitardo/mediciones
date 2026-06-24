@@ -1,22 +1,19 @@
 # codigo.py
 import streamlit as st
-# Importamos las funciones de graficado desde nuestro archivo graficos.py
-from graficos import graficar_dispositivos, graficar_sensibilidad_fg, graficar_sensibilidad_fg_absoluta
-from graficos import mostrar_calibracion_vg_100ua
-
+from graficos import (
+    graficar_dispositivos, 
+    graficar_sensibilidad_fg, 
+    graficar_sensibilidad_fg_absoluta,
+    graficar_sensibilidad_vg_tanda1,    # <-- Nuevo
+    graficar_sensibilidad_vg_tanda2     # <-- Nuevo
+)
 
 st.title("Resumen mediciones Chaves-Litardo")
 
-# =====================================================================
-# CONFIGURACIÓN DE CHECKBOXES EN LA BARRA LATERAL (O EN EL CUERPO)
-# =====================================================================
 mostrar_evolucion = st.checkbox("1. Análisis temporal", value=True)
 mostrar_sensibilidad = st.checkbox("2. Análisis de Sensibilidad a radiación", value=False)
 mostrar_ruido = st.checkbox("3. Análisis de Ruido", value=False)
 
-# =====================================================================
-# SECCIÓN 1: EVOLUCIÓN TEMPORAL
-# =====================================================================
 if mostrar_evolucion:
     st.markdown("---")
     st.header("Evolución Temporal")
@@ -42,9 +39,6 @@ if mostrar_evolucion:
         tipo_tanda="FOXFET"
     )
 
-# =====================================================================
-# SECCIÓN 2: SENSIBILIDAD
-# =====================================================================
 if mostrar_sensibilidad:
     st.markdown("---")
     st.header("Análisis de Sensibilidad")
@@ -72,12 +66,16 @@ if mostrar_sensibilidad:
         lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
         tipo_tanda="FG_tanda2"
     )
-    st.markdown("---")
-    mostrar_calibracion_vg_100ua()
 
-# =====================================================================
-# SECCIÓN 3: RUIDO (PENDIENTE)
-# =====================================================================
+    # --- NUEVA SUBSECCIÓN: SENSIBILIDAD EN RELACIÓN A DELTA VG ---
+    st.subheader("Sensibilidad en función de $\Delta V_G$")
+    graficar_sensibilidad_vg_tanda1(
+        titulo="Sensibilidad VG Tanda 1 (Tasa $\Delta V_G/\Delta t$ vs $I_D$ Promedio Absoluto)"
+    )
+    graficar_sensibilidad_vg_tanda2(
+        titulo="Sensibilidad VG Tanda 2 (Tasa $\Delta V_G/\Delta t$ vs $I_D$ Promedio Absoluto)"
+    )
+
 if mostrar_ruido:
     st.markdown("---")
     st.header("Análisis de Ruido")
