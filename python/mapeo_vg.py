@@ -3,9 +3,9 @@ import numpy as np
 
 def obtener_vg_por_corriente(dispositivo, corriente_buscada):
     # Selección de archivo según la geometría W/L declarada para cada referencia
-    if dispositivo in ["PFGIW1", "PFGIP2"]:
+    if dispositivo in ["PFGIW2", "PFGIP2"]:
         nombre_archivo = "MOSISV72M_DIE4_PMOS_STD1_IV_VD=-4.5V_M1.ri"
-    elif dispositivo == "PFGIW2":
+    elif dispositivo == "PFGIW1":
         nombre_archivo = "MOSISV72M_DIE4_PMOS_STD2_IV_VD=-4.5V_M1.ri"
     else:
         raise ValueError("Dispositivo no válido. Elegir entre PFGIW1, PFGIW2 o PFGIP2.")
@@ -32,13 +32,3 @@ def obtener_vg_por_corriente(dispositivo, corriente_buscada):
     # Interpolación unidimensional
     vg_interpolado = np.interp(corriente_buscada, corrientes_ord, voltajes_ord)
     return vg_interpolado
-
-# --- Ejemplo de uso interno para testeo ---
-if __name__ == "__main__":
-    try:
-        # Ejemplo buscando la tensión para una corriente de 10 uA (1e-5 A) en el PFGIW1
-        corriente_test = 1e-5
-        vg_resultado = obtener_vg_por_corriente("PFGIW1", corriente_test)
-        print(f"Para una corriente de {corriente_test} A, el Vg asociado es: {vg_resultado:.4f} V")
-    except Exception as e:
-        print(f"Error: {e}")
