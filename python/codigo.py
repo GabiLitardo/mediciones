@@ -2,7 +2,7 @@
 import streamlit as st
 # Importamos las funciones de graficado desde nuestro archivo graficos.py
 from graficos import graficar_dispositivos, graficar_sensibilidad_fg, graficar_sensibilidad_fg_absoluta
-from graficos import mostrar_calibracion_vg_400ua
+from graficos import mostrar_calibracion_vg_100ua
 
 
 st.title("Resumen mediciones Chaves-Litardo")
