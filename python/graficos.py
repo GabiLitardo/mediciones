@@ -234,12 +234,12 @@ def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
         st.plotly_chart(fig_ply, use_container_width=True)
     plt.close(fig_mpl)
 
-def mostrar_calibracion_vg_400ua():
-    st.subheader("Mapeo de Tensión $V_G$ para $I_D = 400\ \mu$A")
+def mostrar_calibracion_vg_100ua():
+    st.subheader("Mapeo de Tensión $V_G$ para $I_D = 100\ \mu$A")
     st.write("Voltajes de compuerta ($V_G$) requeridos en los transistores estándar de referencia:")
     
     dispositivos = ["PFGIW1", "PFGIW2", "PFGIP2"]
-    corriente_target_amp = 400e-6  # 400 uA en Amperios
+    corriente_target_amp = 100e-6  # 100 uA en Amperios
     
     col1, col2, col3 = st.columns(3)
     metricas = [col1, col2, col3]
