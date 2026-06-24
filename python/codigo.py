@@ -73,7 +73,7 @@ if mostrar_sensibilidad:
         tipo_tanda="FG_tanda2"
     )
     st.markdown("---")
-    mostrar_calibracion_vg_400ua()
+    mostrar_calibracion_vg_100ua()
 
 # =====================================================================
 # SECCIÓN 3: RUIDO (PENDIENTE)
