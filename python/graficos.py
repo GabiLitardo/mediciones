@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import streamlit as st
 import plotly.graph_objects as go
-from procesamiento import matchear_archivos  # <-- Importamos tu lector de archivos
+from procesamiento import matchear_archivos
+from mapeo_vg import obtener_vg_por_corriente
 
 factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2": 1.0}
 
@@ -232,3 +233,20 @@ def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
         fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Absoluta I_D [uA]", yaxis_title="Tasa de Cambio Absoluta [uA/min]", template="plotly_white")
         st.plotly_chart(fig_ply, use_container_width=True)
     plt.close(fig_mpl)
+
+def mostrar_calibracion_vg_400ua():
+    st.subheader("Mapeo de Tensión $V_G$ para $I_D = 400\ \mu$A")
+    st.write("Voltajes de compuerta ($V_G$) requeridos en los transistores estándar de referencia:")
+    
+    dispositivos = ["PFGIW1", "PFGIW2", "PFGIP2"]
+    corriente_target_amp = 400e-6  # 400 uA en Amperios
+    
+    col1, col2, col3 = st.columns(3)
+    metricas = [col1, col2, col3]
+    
+    for idx, disp in enumerate(dispositivos):
+        try:
+            vg_val = obtener_vg_por_corriente(disp, corriente_target_amp)
+            metricas[idx].metric(label=f"$V_G$ asociado a {disp}", value=f"{vg_val:.4f} V")
+        except Exception as e:
+            metricas[idx].error(f"Error {disp}: {e}")
