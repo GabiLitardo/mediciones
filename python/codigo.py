@@ -70,6 +70,9 @@ if mostrar_sensibilidad:
         lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
         tipo_tanda="FG_tanda2"
     )
+    st.markdown("---")
+    from graficos import mostrar_calibracion_vg_400ua
+    mostrar_calibracion_vg_400ua()
 
 # =====================================================================
 # SECCIÓN 3: RUIDO (PENDIENTE)
