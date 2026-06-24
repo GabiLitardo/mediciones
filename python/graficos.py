@@ -234,8 +234,7 @@ def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
         st.plotly_chart(fig_ply, use_container_width=True)
     plt.close(fig_mpl)
 
-# --- SENSIBILIDAD EN DELTA VG (TANDA 1) ---
-def graficar_sensibilidad_vg_tanda1(titulo):
+def graficar_evolucion_vg_tanda1(titulo):
     fig_mpl, ax = plt.subplots(figsize=(10, 5))
     fig_ply = go.Figure()
     hay_datos = False    
@@ -270,53 +269,39 @@ def graficar_sensibilidad_vg_tanda1(titulo):
                 corrientes = archivo_encontrado[:, 1]
                 idx = np.where(np.round(voltajes, 1) == -4.5)[0]
                 if len(idx) > 0:
-                    valores.append(np.abs(corrientes[idx[0]] * 1e6))
-                    tiempos.append(t)
+                    corriente_ua = np.abs(corrientes[idx[0]] * 1e6)
+                    try:
+                        # Convertimos la corriente absoluta medida al Vg equivalente
+                        vg_val = obtener_vg_por_corriente(disp, corriente_ua * 1e-6)
+                        valores.append(vg_val)
+                        tiempos.append(t)
+                    except Exception:
+                        continue
                         
         if tiempos:
             indices_finales = np.argsort(tiempos)
-            tiempos_ord = np.array(tiempos)[indices_finales]
-            corrientes_ord = np.array(valores)[indices_finales]
+            tiempos_ordenados = np.array(tiempos)[indices_finales]
+            valores_ordenados = np.array(valores)[indices_finales]
             
-            eje_x_promedios_vg = []
-            eje_y_tasas_vg = []
-            
-            for k in range(len(corrientes_ord) - 1):
-                dt = tiempos_ord[k+1] - tiempos_ord[k]
-                if dt > 0:
-                    try:
-                        vg_k = obtener_vg_por_corriente(disp, corrientes_ord[k] * 1e-6)
-                        vg_k1 = obtener_vg_por_corriente(disp, corrientes_ord[k+1] * 1e-6)
-                        
-                        tasa_vg = np.abs(vg_k1 - vg_k) / dt
-                        # CAMBIO: Ahora el eje X es el promedio de las tensiones Vg interpoladas
-                        promedio_vg = (vg_k1 + vg_k) / 2.0
-                        
-                        eje_y_tasas_vg.append(tasa_vg)
-                        eje_x_promedios_vg.append(promedio_vg)
-                    except Exception:
-                        continue
-            
-            if eje_x_promedios_vg:
-                ax.plot(eje_x_promedios_vg, eje_y_tasas_vg, "o--", label=disp)
-                fig_ply.add_trace(go.Scatter(x=eje_x_promedios_vg, y=eje_y_tasas_vg, mode='lines+markers', name=disp))
-                hay_datos = True
+            ax.plot(tiempos_ordenados, valores_ordenados, "o--", label=disp)
+            fig_ply.add_trace(go.Scatter(x=tiempos_ordenados, y=valores_ordenados, mode='lines+markers', name=disp))
+            hay_datos = True
             
     if hay_datos:
         ax.set_title(titulo)
-        ax.set_xlabel("Tensión Promedio $V_G$ [V]")
-        ax.set_ylabel("Tasa de Cambio $\Delta V_G / \Delta t$ [V/min]")
+        ax.set_xlabel("Tiempo Acumulado [min]")
+        ax.set_ylabel("Tensión $V_{FG}$ [V]")
         ax.grid(True, linestyle=":", alpha=0.6)
         ax.legend()
         st.pyplot(fig_mpl)
         
-        fig_ply.update_layout(title=titulo, xaxis_title="Tensión Promedio V_G [V]", yaxis_title="Tasa de Cambio Delta V_G / Delta t [V/min]", template="plotly_white")
+        fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title="Tensión V_FG [V]", template="plotly_white")
         st.plotly_chart(fig_ply, use_container_width=True)
     plt.close(fig_mpl)
 
 
-# --- SENSIBILIDAD EN DELTA VG (TANDA 2) ---
-def graficar_sensibilidad_vg_tanda2(titulo):
+# --- EVOLUCIÓN TEMPORAL EN VOLTAJE VFG (TANDA 2) ---
+def graficar_evolucion_vg_tanda2(titulo):
     fig_mpl, ax = plt.subplots(figsize=(10, 5))
     fig_ply = go.Figure()
     hay_datos = False    
@@ -351,46 +336,31 @@ def graficar_sensibilidad_vg_tanda2(titulo):
                 corrientes = archivo_encontrado[:, 1]
                 idx = np.where(np.round(voltajes, 1) == -4.5)[0]
                 if len(idx) > 0:
-                    valores.append(np.abs(corrientes[idx[0]] * 1e6))
-                    tiempos.append(t)
+                    corriente_ua = np.abs(corrientes[idx[0]] * 1e6)
+                    try:
+                        vg_val = obtener_vg_por_corriente(disp, corriente_ua * 1e-6)
+                        valores.append(vg_val)
+                        tiempos.append(t)
+                    except Exception:
+                        continue
                         
         if tiempos:
             indices_finales = np.argsort(tiempos)
-            tiempos_ord = np.array(tiempos)[indices_finales]
-            corrientes_ord = np.array(valores)[indices_finales]
+            tiempos_ordenados = np.array(tiempos)[indices_finales]
+            valores_ordenados = np.array(valores)[indices_finales]
             
-            eje_x_promedios_vg = []
-            eje_y_tasas_vg = []
-            
-            for k in range(len(corrientes_ord) - 1):
-                dt = tiempos_ord[k+1] - tiempos_ord[k]
-                if dt > 0:
-                    try:
-                        vg_k = obtener_vg_por_corriente(disp, corrientes_ord[k] * 1e-6)
-                        vg_k1 = obtener_vg_por_corriente(disp, corrientes_ord[k+1] * 1e-6)
-                        
-                        tasa_vg = np.abs(vg_k1 - vg_k) / dt
-                        # CAMBIO: Ahora el eje X es el promedio de las tensiones Vg interpoladas
-                        promedio_vg = (vg_k1 + vg_k) / 2.0
-                        
-                        eje_y_tasas_vg.append(tasa_vg)
-                        eje_x_promedios_vg.append(promedio_vg)
-                    except Exception:
-                        continue
-            
-            if eje_x_promedios_vg:
-                ax.plot(eje_x_promedios_vg, eje_y_tasas_vg, "o--", label=disp)
-                fig_ply.add_trace(go.Scatter(x=eje_x_promedios_vg, y=eje_y_tasas_vg, mode='lines+markers', name=disp))
-                hay_datos = True
+            ax.plot(tiempos_ordenados, valores_ordenados, "o--", label=disp)
+            fig_ply.add_trace(go.Scatter(x=tiempos_ordenados, y=valores_ordenados, mode='lines+markers', name=disp))
+            hay_datos = True
             
     if hay_datos:
         ax.set_title(titulo)
-        ax.set_xlabel("Tensión Promedio $V_G$ [V]")
-        ax.set_ylabel("Tasa de Cambio $\Delta V_G / \Delta t$ [V/min]")
+        ax.set_xlabel("Tiempo Acumulado [min]")
+        ax.set_ylabel("Tensión $V_{FG}$ [V]")
         ax.grid(True, linestyle=":", alpha=0.6)
         ax.legend()
         st.pyplot(fig_mpl)
         
-        fig_ply.update_layout(title=titulo, xaxis_title="Tensión Promedio V_G [V]", yaxis_title="Tasa de Cambio Delta V_G / Delta t [V/min]", template="plotly_white")
+        fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title="Tensión V_FG [V]", template="plotly_white")
         st.plotly_chart(fig_ply, use_container_width=True)
     plt.close(fig_mpl)
