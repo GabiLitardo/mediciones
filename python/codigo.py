@@ -70,10 +70,10 @@ if mostrar_sensibilidad:
     # --- NUEVA SUBSECCIÓN: SENSIBILIDAD EN RELACIÓN A DELTA VG ---
     st.subheader("Sensibilidad en función de $\Delta V_G$")
     graficar_sensibilidad_vg_tanda1(
-        titulo="Sensibilidad VG Tanda 1 (Tasa $\Delta V_G/\Delta t$ vs $I_D$ Promedio Absoluto)"
+        titulo="Sensibilidad VG Tanda 1 (Tasa $\Delta V_G/\Delta t$ vs $V_G$ Promedio)"
     )
     graficar_sensibilidad_vg_tanda2(
-        titulo="Sensibilidad VG Tanda 2 (Tasa $\Delta V_G/\Delta t$ vs $I_D$ Promedio Absoluto)"
+        titulo="Sensibilidad VG Tanda 2 (Tasa $\Delta V_G/\Delta t$ vs $V_G$ Promedio)"
     )
 
 if mostrar_ruido:
