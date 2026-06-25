@@ -4,8 +4,8 @@ from graficos import (
     graficar_dispositivos, 
     graficar_sensibilidad_fg, 
     graficar_sensibilidad_fg_absoluta,
-    graficar_evolucion_vg_tanda1,    # <-- Nuevo
-    graficar_evolucion_vg_tanda2     # <-- Nuevo
+    graficar_evolucion_vg_tanda1,
+    graficar_evolucion_vg_tanda2
 )
 
 st.title("Resumen mediciones Chaves-Litardo")
