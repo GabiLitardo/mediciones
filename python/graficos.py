@@ -19,29 +19,24 @@ def calcular_fit_doble_exponencial_cached(disp_name, tipo_tanda, tiempos_list, c
     t_arr = np.array(tiempos_list)
     i_arr = np.array(corrientes_list)
     try:
-        # Estimaciones iniciales para el fit de 5 parámetros:
-        # I_inf estimado al final, dividimos la amplitud inicial en dos componentes (A y B)
         I_inf_est = i_arr[-1]
         Amp_total = i_arr[0] - I_inf_est
         
-        # p0 = [I_inf, A, tau1, B, tau2]
         p0 = [I_inf_est, Amp_total * 0.5, 30.0, Amp_total * 0.5, 300.0]
-        
-        # Seteamos límites (bounds) para forzar a que las constantes de tiempo y amplitudes sean positivas
-        # (I_inf, A, tau1, B, tau2)
         lower_bounds = [0, 0, 1.0, 0, 10.0]
         upper_bounds = [np.inf, np.inf, 200.0, np.inf, 2000.0]
         
         popt, _ = curve_fit(
-            modelo_doble_exponencial, 
-            t_arr, 
-            i_arr, 
-            p0=p0, 
-            bounds=(lower_bounds, upper_bounds), 
-            maxfev=10000
+            modelo_doble_exponencial, t_arr, i_arr, 
+            p0=p0, bounds=(lower_bounds, upper_bounds), maxfev=10000
         )
+        
+        # --- AGREGÁ ESTA LÍNEA PARA DEBUGGEAR EN LA TERMINAL ---
+        print(f"📊 PARÁMETROS {disp_name}: I_inf={popt[0]:.2f}, A={popt[1]:.2f}, tau1={popt[2]:.1f}, B={popt[3]:.2f}, tau2={popt[4]:.1f}")
+        
         return popt.tolist()
-    except:
+    except Exception as e:
+        print(f"❌ Falló fit para {disp_name}: {e}")
         return None
 
 # --- EVOLUCIÓN TEMPORAL ABSOLUTA (CORRIENTES) ---
