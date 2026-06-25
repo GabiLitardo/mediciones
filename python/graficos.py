@@ -240,6 +240,13 @@ def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
             if popt is not None:
                 I_inf_opt, A_opt, tau1_opt, B_opt, tau2_opt = popt
                 
+                # --- AGREGAMOS ESTOS STRINGS PARA VERLOS EN LA PÁGINA ---
+                st.write(f"📊 **{disp}** -> Parámetros calculados:")
+                st.write(f"Amplitud Rápida (A): {A_opt:.4f} | Tau Rápido (τ₁): {tau1_opt:.2f} min")
+                st.write(f"Amplitud Lenta (B): {B_opt:.4f} | Tau Lento (τ₂): {tau2_opt:.2f} min")
+                st.write(f"Corriente Final (I_inf): {I_inf_opt:.4f}")
+                st.markdown("---")
+                
                 # Generamos base temporal continua suave
                 tiempos_continuos = np.linspace(tiempos_ord.min(), tiempos_ord.max(), 200)
                 
