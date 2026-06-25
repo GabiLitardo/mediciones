@@ -10,17 +10,36 @@ from scipy.optimize import curve_fit
 factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2": 1.0}
 
 # --- MODELO TEÓRICO DE DESCARGA EXPONENCIAL ---
-def modelo_exponencial(t, I_inf, I_0, tau):
-    return I_inf + (I_0 - I_inf) * np.exp(-t / tau)
-
+def modelo_doble_exponencial(t, I_inf, A, tau1, B, tau2):
+    return I_inf + A * np.exp(-t / tau1) + B * np.exp(-t / tau2)
+    
 # --- FUNCIÓN DE FIT CON CACHÉ (CORRE UNA SOLA VEZ) ---
 @st.cache_data
-def calcular_fit_exponencial_cached(disp_name, tipo_tanda, tiempos_list, corrientes_list):
+def calcular_fit_doble_exponencial_cached(disp_name, tipo_tanda, tiempos_list, corrientes_list):
     t_arr = np.array(tiempos_list)
     i_arr = np.array(corrientes_list)
     try:
-        p0 = [i_arr[-1], i_arr[0], 100.0]
-        popt, _ = curve_fit(modelo_exponencial, t_arr, i_arr, p0=p0, maxfev=5000)
+        # Estimaciones iniciales para el fit de 5 parámetros:
+        # I_inf estimado al final, dividimos la amplitud inicial en dos componentes (A y B)
+        I_inf_est = i_arr[-1]
+        Amp_total = i_arr[0] - I_inf_est
+        
+        # p0 = [I_inf, A, tau1, B, tau2]
+        p0 = [I_inf_est, Amp_total * 0.5, 30.0, Amp_total * 0.5, 300.0]
+        
+        # Seteamos límites (bounds) para forzar a que las constantes de tiempo y amplitudes sean positivas
+        # (I_inf, A, tau1, B, tau2)
+        lower_bounds = [0, 0, 1.0, 0, 10.0]
+        upper_bounds = [np.inf, np.inf, 200.0, np.inf, 2000.0]
+        
+        popt, _ = curve_fit(
+            modelo_doble_exponencial, 
+            t_arr, 
+            i_arr, 
+            p0=p0, 
+            bounds=(lower_bounds, upper_bounds), 
+            maxfev=10000
+        )
         return popt.tolist()
     except:
         return None
@@ -218,20 +237,32 @@ def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
             factor = factores_normalizacion.get(disp, 1.0)
             corrientes_norm = corrientes_ord / factor
             
-            popt = calcular_fit_exponencial_cached(
+            # Llamamos al nuevo fit de doble exponencial
+            popt = calcular_fit_doble_exponencial_cached(
                 disp, tipo_tanda, tiempos_ord.tolist(), corrientes_norm.tolist()
             )
             
             if popt is not None:
-                I_inf_opt, I_0_opt, tau_opt = popt
-                tiempos_continuos = np.linspace(tiempos_ord.min(), tiempos_ord.max(), 200)
-                eje_y_tasas = np.abs(-(I_0_opt - I_inf_opt) / tau_opt * np.exp(-tiempos_continuos / tau_opt))
-                eje_x_promedios = modelo_exponencial(tiempos_continuos, I_inf_opt, I_0_opt, tau_opt)
+                I_inf_opt, A_opt, tau1_opt, B_opt, tau2_opt = popt
                 
-                ax.plot(eje_x_promedios, eje_y_tasas, "-", label=f"{disp} ($\\tau$={tau_opt:.1f} min)")
-                fig_ply.add_trace(go.Scatter(x=eje_x_promedios, y=eje_y_tasas, mode='lines', name=f"{disp} (Fit)"))
+                # Generamos base temporal continua suave
+                tiempos_continuos = np.linspace(tiempos_ord.min(), tiempos_ord.max(), 200)
+                
+                # Derivada analítica de la doble exponencial: dI/dt = | - (A/tau1)*e^(-t/tau1) - (B/tau2)*e^(-t/tau2) |
+                eje_y_tasas = np.abs(
+                    -(A_opt / tau1_opt) * np.exp(-tiempos_continuos / tau1_opt) 
+                    -(B_opt / tau2_opt) * np.exp(-tiempos_continuos / tau2_opt)
+                )
+                
+                # Eje X continuo evaluado en el modelo
+                eje_x_promedios = modelo_doble_exponencial(tiempos_continuos, I_inf_opt, A_opt, tau1_opt, B_opt, tau2_opt)
+                
+                label_curva = f"{disp} (\\tau_1={tau1_opt:.1f}, \\tau_2={tau2_opt:.1f} min)"
+                ax.plot(eje_x_promedios, eje_y_tasas, "-", label=label_curva)
+                fig_ply.add_trace(go.Scatter(x=eje_x_promedios, y=eje_y_tasas, mode='lines', name=f"{disp} (Doble Fit)"))
                 hay_datos = True
             else:
+                # Fallback ruidoso tradicional por si no converge
                 eje_x_promedios, eje_y_tasas = [], []
                 for k in range(len(corrientes_norm) - 1):
                     dt = tiempos_ord[k+1] - tiempos_ord[k]
