@@ -9,34 +9,13 @@ from scipy.optimize import curve_fit
 
 factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2": 1.0}
 
-# --- MODELO TEÓRICO DE DESCARGA EXPONENCIAL ---
-def modelo_doble_exponencial(t, I_inf, A, tau1, B, tau2):
-    return I_inf + A * np.exp(-t / tau1) + B * np.exp(-t / tau2)
-    
-# --- FUNCIÓN DE FIT CON CACHÉ (CORRE UNA SOLA VEZ) ---
 @st.cache_data
-def calcular_fit_doble_exponencial_cached(disp_name, tipo_tanda, tiempos_list, corrientes_list):
-    t_arr = np.array(tiempos_list)
-    i_arr = np.array(corrientes_list)
+def calcular_fit_polinomico_cached(disp_name, tipo_tanda, tiempos_list, corrientes_list):
     try:
-        I_inf_est = i_arr[-1]
-        Amp_total = i_arr[0] - I_inf_est
-        
-        p0 = [I_inf_est, Amp_total * 0.5, 30.0, Amp_total * 0.5, 300.0]
-        lower_bounds = [0, 0, 1.0, 0, 10.0]
-        upper_bounds = [np.inf, np.inf, 200.0, np.inf, 2000.0]
-        
-        popt, _ = curve_fit(
-            modelo_doble_exponencial, t_arr, i_arr, 
-            p0=p0, bounds=(lower_bounds, upper_bounds), maxfev=10000
-        )
-        
-        # --- AGREGÁ ESTA LÍNEA PARA DEBUGGEAR EN LA TERMINAL ---
-        print(f"📊 PARÁMETROS {disp_name}: I_inf={popt[0]:.2f}, A={popt[1]:.2f}, tau1={popt[2]:.1f}, B={popt[3]:.2f}, tau2={popt[4]:.1f}")
-        
-        return popt.tolist()
-    except Exception as e:
-        print(f"❌ Falló fit para {disp_name}: {e}")
+        # np.polyfit encuentra los coeficientes [a, b, c, d] exactos que minimizan el ECM
+        coeficientes = np.polyfit(tiempos_list, corrientes_list, deg=3)
+        return coeficientes.tolist()  # Retorna [a, b, c, d]
+    except:
         return None
 
 # --- EVOLUCIÓN TEMPORAL ABSOLUTA (CORRIENTES) ---
@@ -232,39 +211,28 @@ def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
             factor = factores_normalizacion.get(disp, 1.0)
             corrientes_norm = corrientes_ord / factor
             
-            # Llamamos al nuevo fit de doble exponencial
-            popt = calcular_fit_doble_exponencial_cached(
+            # Obtenemos los coeficientes del polinomio congelados en caché
+            coefs = calcular_fit_polinomico_cached(
                 disp, tipo_tanda, tiempos_ord.tolist(), corrientes_norm.tolist()
             )
             
-            if popt is not None:
-                I_inf_opt, A_opt, tau1_opt, B_opt, tau2_opt = popt
+            if coefs is not None:
+                a, b, c, d = coefs
                 
-                # --- AGREGAMOS ESTOS STRINGS PARA VERLOS EN LA PÁGINA ---
-                st.write(f"📊 **{disp}** -> Parámetros calculados:")
-                st.write(f"Amplitud Rápida (A): {A_opt:.4f} | Tau Rápido (τ₁): {tau1_opt:.2f} min")
-                st.write(f"Amplitud Lenta (B): {B_opt:.4f} | Tau Lento (τ₂): {tau2_opt:.2f} min")
-                st.write(f"Corriente Final (I_inf): {I_inf_opt:.4f}")
-                st.markdown("---")
-                
-                # Generamos base temporal continua suave
+                # Creamos el vector de tiempo continuo para evaluar la curva suave
                 tiempos_continuos = np.linspace(tiempos_ord.min(), tiempos_ord.max(), 200)
                 
-                # Derivada analítica de la doble exponencial: dI/dt = | - (A/tau1)*e^(-t/tau1) - (B/tau2)*e^(-t/tau2) |
-                eje_y_tasas = np.abs(
-                    -(A_opt / tau1_opt) * np.exp(-tiempos_continuos / tau1_opt) 
-                    -(B_opt / tau2_opt) * np.exp(-tiempos_continuos / tau2_opt)
-                )
+                # Derivada analítica exacta: dI/dt = |3a*t^2 + 2b*t + c|
+                eje_y_tasas = np.abs(3 * a * (tiempos_continuos ** 2) + 2 * b * tiempos_continuos + c)
                 
-                # Eje X continuo evaluado en el modelo
-                eje_x_promedios = modelo_doble_exponencial(tiempos_continuos, I_inf_opt, A_opt, tau1_opt, B_opt, tau2_opt)
+                # Eje X continuo: evaluamos el polinomio original para obtener la corriente promedio fitteada
+                eje_x_promedios = a * (tiempos_continuos ** 3) + b * (tiempos_continuos ** 2) + c * tiempos_continuos + d
                 
-                label_curva = f"{disp} (\\tau_1={tau1_opt:.1f}, \\tau_2={tau2_opt:.1f} min)"
-                ax.plot(eje_x_promedios, eje_y_tasas, "-", label=label_curva)
-                fig_ply.add_trace(go.Scatter(x=eje_x_promedios, y=eje_y_tasas, mode='lines', name=f"{disp} (Doble Fit)"))
+                ax.plot(eje_x_promedios, eje_y_tasas, "-", label=f"{disp} (Poly Fit g3)")
+                fig_ply.add_trace(go.Scatter(x=eje_x_promedios, y=eje_y_tasas, mode='lines', name=f"{disp} (Poly)"))
                 hay_datos = True
             else:
-                # Fallback ruidoso tradicional por si no converge
+                # Fallback tradicional por si las moscas
                 eje_x_promedios, eje_y_tasas = [], []
                 for k in range(len(corrientes_norm) - 1):
                     dt = tiempos_ord[k+1] - tiempos_ord[k]
