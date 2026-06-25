@@ -124,7 +124,7 @@ def graficar_dispositivos(titulo, ylabel, lista_dispositivos, tipo_tanda):
         st.pyplot(fig_mpl)
         
         fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title=ylabel.replace("$", ""), template="plotly_white")
-        st.plotly_chart(fig_ply, use_container_width=True)
+        st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
 
 # --- EVOLUCIÓN TEMPORAL UNIFICADA EN VOLTAJE VFG ---
@@ -188,7 +188,7 @@ def graficar_evolucion_vg(titulo, lista_dispositivos, tipo_tanda):
         st.pyplot(fig_mpl)
         
         fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title="Tensión V_FG [V]", template="plotly_white")
-        st.plotly_chart(fig_ply, use_container_width=True)
+        st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
 
 # --- SENSIBILIDAD EJE X NORMALIZADO (CON FIT EXPONENCIAL) ---
@@ -286,7 +286,7 @@ def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
         st.pyplot(fig_mpl)
         
         fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Normalizada I_D_norm [u.a.]", yaxis_title="Tasa de Cambio [(uA/unid_norm)/min]", template="plotly_white")
-        st.plotly_chart(fig_ply, use_container_width=True)
+        st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
 
 # --- SENSIBILIDAD EJE X ABSOLUTO ---
@@ -355,5 +355,5 @@ def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
         st.pyplot(fig_mpl)
         
         fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Absoluta I_D [uA]", yaxis_title="Tasa de Cambio Absoluta [uA/min]", template="plotly_white")
-        st.plotly_chart(fig_ply, use_container_width=True)
+        st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
