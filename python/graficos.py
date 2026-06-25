@@ -19,6 +19,17 @@ def calcular_fit_polinomico_cached(disp_name, tipo_tanda, tiempos_list, corrient
         return None
 
 # --- EVOLUCIÓN TEMPORAL ABSOLUTA (CORRIENTES) ---
+¡Qué desconfiado! Está perfecto, en ciencia no se le cree a nadie sin ver los datos puestos sobre la mesa. Vamos a sacarnos la duda al toque.
+
+Para que veas exactamente qué está haciendo el polinomio de grado 3 por atrás, vamos a ir a la sección de Evolución Temporal (donde graficamos la corriente cruda vs. tiempo) y le vamos a superponer la línea continua del fit a cada dispositivo. Si el polinomio está haciendo bien su laburo, la línea continua tiene que pasar suavemente justo por el medio de todos tus puntos cruzados, ignorando los barullos del ruido.
+
+Vamos a modificar únicamente la función graficar_dispositivos en tu graficos.py para agregar este control visual.
+
+Modificación en graficos.py
+Buscá la función graficar_dispositivos y reemplazala por esta versión que calcula el polinomio y te dibuja la línea continua del fit superpuesta:
+
+Python
+# --- EVOLUCIÓN TEMPORAL ABSOLUTA (CON CONTROL VISUAL DE FIT SUPERPUESTO) ---
 def graficar_dispositivos(titulo, ylabel, lista_dispositivos, tipo_tanda):
     fig_mpl, ax = plt.subplots(figsize=(10, 5))
     fig_ply = go.Figure()
@@ -85,8 +96,26 @@ def graficar_dispositivos(titulo, ylabel, lista_dispositivos, tipo_tanda):
             tiempos_ordenados = np.array(tiempos)[indices_finales]
             valores_ordenados = np.array(valores)[indices_finales]
             
-            ax.plot(tiempos_ordenados, valores_ordenados, "o--", label=disp)
-            fig_ply.add_trace(go.Scatter(x=tiempos_ordenados, y=valores_ordenados, mode='lines+markers', name=disp))
+            # 1. Graficamos los puntos crudos medidos (en Matplotlib usamos 'x' y en Plotly marcadores solos)
+            ax.plot(tiempos_ordenados, valores_ordenados, "x", label=f"{disp} (Medido)")
+            fig_ply.add_trace(go.Scatter(x=tiempos_ordenados, y=valores_ordenados, mode='markers', name=f"{disp} (Medido)"))
+            
+            # 2. Si es Floating Gate, calculamos y superponemos la curva continua del polinomio
+            if tipo_tanda != "FOXFET":
+                try:
+                    # Usamos la misma función con caché que creamos antes
+                    coefs = calcular_fit_polinomico_cached(disp, tipo_tanda, tiempos_ordenados.tolist(), valores_ordenados.tolist())
+                    if coefs is not None:
+                        a, b, c, d = coefs
+                        t_continuo = np.linspace(tiempos_ordenados.min(), tiempos_ordenados.max(), 200)
+                        i_fitteada = a * (t_continuo ** 3) + b * (t_continuo ** 2) + c * t_continuo + d
+                        
+                        # Dibujamos la línea sólida del ajuste para auditarlo visualmente
+                        ax.plot(t_continuo, i_fitteada, "-", label=f"{disp} (Fit Poly g3)")
+                        fig_ply.add_trace(go.Scatter(x=t_continuo, y=i_fitteada, mode='lines', name=f"{disp} (Fit Poly)"))
+                except:
+                    pass
+                    
             hay_datos = True
             
     if hay_datos:
@@ -100,7 +129,6 @@ def graficar_dispositivos(titulo, ylabel, lista_dispositivos, tipo_tanda):
         fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title=ylabel.replace("$", ""), template="plotly_white")
         st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
-
 # --- EVOLUCIÓN TEMPORAL UNIFICADA EN VOLTAJE VFG ---
 def graficar_evolucion_vg(titulo, lista_dispositivos, tipo_tanda):
     fig_mpl, ax = plt.subplots(figsize=(10, 5))
