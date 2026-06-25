@@ -189,8 +189,8 @@ def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
             
     if hay_datos:
         ax.set_title(titulo)
-        ax.set_xlabel("Corriente Promedio Normalizada $I_{D\_norm}$ [u.a.]")
-        ax.set_ylabel("Tasa de Cambio [($\mu$A/unid_norm)/min]")
+        ax.set_xlabel(r"Corriente Promedio Normalizada $I_{D\_norm}$ [$\mu$A]")
+        ax.set_ylabel(r"Tasa de Cambio [($\mu$A)/min]")
         ax.grid(True, linestyle=":", alpha=0.6)
         ax.legend()
         st.pyplot(fig_mpl)
@@ -258,8 +258,8 @@ def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
             
     if hay_datos:
         ax.set_title(titulo)
-        ax.set_xlabel("Corriente Promedio Absoluta $I_D$ [$\mu$A]")
-        ax.set_ylabel("Tasa de Cambio Absoluta [$\mu$A/min]")
+        ax.set_xlabel(r"Corriente Promedio Absoluta $I_D$ [$\mu$A]")
+        ax.set_ylabel(r"Tasa de Cambio Absoluta [$\mu$A/min]")
         ax.grid(True, linestyle=":", alpha=0.6)
         ax.legend()
         st.pyplot(fig_mpl)
