@@ -13,12 +13,13 @@ def modelo_exponencial(t, I_inf, I_0, tau):
     return I_inf + (I_0 - I_inf) * np.exp(-t / tau)
 
 @st.cache_data
-def calcular_fit_exponencial(tiempos_ord, corrientes_norm):
+def calcular_fit_exponencial_cached(disp_name, tipo_tanda, tiempos_list, corrientes_list):
+    t_arr = np.array(tiempos_list)
+    i_arr = np.array(corrientes_list)
     try:
-        # Estimación inicial sensata [I_inf, I_0, tau]
-        p0 = [corrientes_norm[-1], corrientes_norm[0], 100.0]
-        popt, _ = curve_fit(modelo_exponencial, tiempos_ord, corrientes_norm, p0=p0, maxfev=5000)
-        return popt  # Retorna [I_inf_opt, I_0_opt, tau_opt]
+        p0 = [i_arr[-1], i_arr[0], 100.0]
+        popt, _ = curve_fit(modelo_exponencial, t_arr, i_arr, p0=p0, maxfev=5000)
+        return popt.tolist()
     except:
         return None
 
@@ -152,8 +153,12 @@ def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
             factor = factores_normalizacion.get(disp, 1.0)
             corrientes_norm = corrientes_ord / factor
             
-            # Llamamos a la función con caché. Si ya se calculó, devuelve el Tau al instante
-            popt = calcular_fit_exponencial(tiempos_ord, corrientes_norm)
+            popt = calcular_fit_exponencial_cached(
+                disp, 
+                tipo_tanda, 
+                tiempos_ord.tolist(), 
+                corrientes_norm.tolist()
+            )
             
             if popt is not None:
                 I_inf_opt, I_0_opt, tau_opt = popt
