@@ -9,28 +9,13 @@ from scipy.optimize import curve_fit
 
 factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2": 1.0}
 
-# =====================================================================
-# NUEVO AJUSTE FÍSICO EXPONENCIAL
-# =====================================================================
-
-def modelo_exponencial_fg(t, I_final, I_0, tau):
-    return I_final + (I_0 - I_final) * np.exp(-t / tau)
-
 @st.cache_data
-def calcular_fit_exponencial_V2(tiempos_list, corrientes_list):
+def calcular_fit_polinomico_cached(disp_name, tipo_tanda, tiempos_list, corrientes_list):
     try:
-        t_arr = np.array(tiempos_list)
-        i_arr = np.array(corrientes_list)
-        
-        i_0_est = i_arr[0]                  
-        i_final_est = i_arr[-1]             
-        tau_est = t_arr.max() / 2.0         
-        
-        p0 = [i_final_est, i_0_est, tau_est]
-        
-        popt, pcov = curve_fit(modelo_exponencial_fg, t_arr, i_arr, p0=p0, maxfev=5000)
-        return popt.tolist()  
-    except Exception as e:
+        # np.polyfit encuentra los coeficientes [a, b, c, d] exactos que minimizan el ECM
+        coeficientes = np.polyfit(tiempos_list, corrientes_list, deg=3)
+        return coeficientes.tolist()  # Retorna [a, b, c, d]
+    except:
         return None
 
 # --- EVOLUCIÓN TEMPORAL ABSOLUTA (CORRIENTES) ---
@@ -100,18 +85,25 @@ def graficar_dispositivos(titulo, ylabel, lista_dispositivos, tipo_tanda):
             tiempos_ordenados = np.array(tiempos)[indices_finales]
             valores_ordenados = np.array(valores)[indices_finales]
             
+            # 1. Graficamos los puntos crudos medidos (en Matplotlib usamos 'x' y en Plotly marcadores solos)
             ax.plot(tiempos_ordenados, valores_ordenados, "x", label=f"{disp} (Medido)")
             fig_ply.add_trace(go.Scatter(x=tiempos_ordenados, y=valores_ordenados, mode='markers', name=f"{disp} (Medido)"))
             
+            # 2. Si es Floating Gate, calculamos y superponemos la curva continua del polinomio
             if tipo_tanda != "FOXFET":
-                popt = calcular_fit_exponencial_V2(tiempos_ordenados.tolist(), valores_ordenados.tolist())
-                if popt is not None:
-                    i_final_opt, i_0_opt, tau_opt = popt
-                    t_continuo = np.linspace(tiempos_ordenados.min(), tiempos_ordenados.max(), 200)
-                    i_fitteada = modelo_exponencial_fg(t_continuo, i_final_opt, i_0_opt, tau_opt)
-                    
-                    ax.plot(t_continuo, i_fitteada, "-", label=f"{disp} (Fit Exponencial)")
-                    fig_ply.add_trace(go.Scatter(x=t_continuo, y=i_fitteada, mode='lines', name=f"{disp} (Fit Exp)"))
+                try:
+                    # Usamos la misma función con caché que creamos antes
+                    coefs = calcular_fit_polinomico_cached(disp, tipo_tanda, tiempos_ordenados.tolist(), valores_ordenados.tolist())
+                    if coefs is not None:
+                        a, b, c, d = coefs
+                        t_continuo = np.linspace(tiempos_ordenados.min(), tiempos_ordenados.max(), 200)
+                        i_fitteada = a * (t_continuo ** 3) + b * (t_continuo ** 2) + c * t_continuo + d
+                        
+                        # Dibujamos la línea sólida del ajuste para auditarlo visualmente
+                        ax.plot(t_continuo, i_fitteada, "-", label=f"{disp} (Fit Poly g3)")
+                        fig_ply.add_trace(go.Scatter(x=t_continuo, y=i_fitteada, mode='lines', name=f"{disp} (Fit Poly)"))
+                except:
+                    pass
                     
             hay_datos = True
             
@@ -126,9 +118,8 @@ def graficar_dispositivos(titulo, ylabel, lista_dispositivos, tipo_tanda):
         fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title=ylabel.replace("$", ""), template="plotly_white")
         st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
-
-
-# --- EVOLUCIÓN TEMPORAL UNIFICADA EN VOLTAJE VFG (TU FUNCIÓN RECUPERADA) ---
+    
+# --- EVOLUCIÓN TEMPORAL UNIFICADA EN VOLTAJE VFG ---
 def graficar_evolucion_vg(titulo, lista_dispositivos, tipo_tanda):
     fig_mpl, ax = plt.subplots(figsize=(10, 5))
     fig_ply = go.Figure()
@@ -192,8 +183,7 @@ def graficar_evolucion_vg(titulo, lista_dispositivos, tipo_tanda):
         st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
 
-
-# --- SENSIBILIDAD EJE X NORMALIZADO ---
+# --- SENSIBILIDAD EJE X NORMALIZADO (CON FIT EXPONENCIAL) ---
 def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
     fig_mpl, ax = plt.subplots(figsize=(10, 5))
     fig_ply = go.Figure()
@@ -239,18 +229,41 @@ def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
             factor = factores_normalizacion.get(disp, 1.0)
             corrientes_norm = corrientes_ord / factor
             
-            popt = calcular_fit_exponencial_V2(tiempos_ord.tolist(), corrientes_norm.tolist())
+            # Obtenemos los coeficientes del polinomio congelados en caché
+            coefs = calcular_fit_polinomico_cached(
+                disp, tipo_tanda, tiempos_ord.tolist(), corrientes_norm.tolist()
+            )
             
-            if popt is not None:
-                i_final_opt, i_0_opt, tau_opt = popt
+            if coefs is not None:
+                a, b, c, d = coefs
+                
+                # Creamos el vector de tiempo continuo para evaluar la curva suave
                 tiempos_continuos = np.linspace(tiempos_ord.min(), tiempos_ord.max(), 200)
                 
-                eje_y_tasas = np.abs(-((i_0_opt - i_final_opt) / tau_opt) * np.exp(-tiempos_continuos / tau_opt))
-                eje_x_promedios = modelo_exponencial_fg(tiempos_continuos, i_final_opt, i_0_opt, tau_opt)
+                # Derivada analítica exacta: dI/dt = |3a*t^2 + 2b*t + c|
+                eje_y_tasas = np.abs(3 * a * (tiempos_continuos ** 2) + 2 * b * tiempos_continuos + c)
                 
-                ax.plot(eje_x_promedios, eje_y_tasas, "-", label=f"{disp} (Exp Fit)")
-                fig_ply.add_trace(go.Scatter(x=eje_x_promedios, y=eje_y_tasas, mode='lines', name=f"{disp} (Exp)"))
+                # Eje X continuo: evaluamos el polinomio original para obtener la corriente promedio fitteada
+                eje_x_promedios = a * (tiempos_continuos ** 3) + b * (tiempos_continuos ** 2) + c * tiempos_continuos + d
+                
+                ax.plot(eje_x_promedios, eje_y_tasas, "-", label=f"{disp} (Poly Fit g3)")
+                fig_ply.add_trace(go.Scatter(x=eje_x_promedios, y=eje_y_tasas, mode='lines', name=f"{disp} (Poly)"))
                 hay_datos = True
+            else:
+                # Fallback tradicional por si las moscas
+                eje_x_promedios, eje_y_tasas = [], []
+                for k in range(len(corrientes_norm) - 1):
+                    dt = tiempos_ord[k+1] - tiempos_ord[k]
+                    if dt > 0:
+                        tasa = np.abs(corrientes_norm[k+1] - corrientes_norm[k]) / dt
+                        promedio_i_norm = (corrientes_norm[k+1] + corrientes_norm[k]) / 2.0
+                        eje_y_tasas.append(tasa)
+                        eje_x_promedios.append(promedio_i_norm)
+                
+                if eje_x_promedios:
+                    ax.plot(eje_x_promedios, eje_y_tasas, "o--", label=disp)
+                    fig_ply.add_trace(go.Scatter(x=eje_x_promedios, y=eje_y_tasas, mode='lines+markers', name=disp))
+                    hay_datos = True
             
     if hay_datos:
         ax.set_title(titulo)
@@ -307,18 +320,40 @@ def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
             tiempos_ord = np.array(tiempos)[indices_finales]
             corrientes_ord = np.array(valores)[indices_finales]
             
-            popt = calcular_fit_exponencial_V2(tiempos_ord.tolist(), corrientes_ord.tolist())
+            # Reutilizamos el fit polinómico con caché (acá pasamos las corrientes absolutas, sin normalizar)
+            coefs = calcular_fit_polinomico_cached(
+                disp, f"{tipo_tanda}_abs", tiempos_ord.tolist(), corrientes_ord.tolist()
+            )
             
-            if popt is not None:
-                i_final_opt, i_0_opt, tau_opt = popt
+            if coefs is not None:
+                a, b, c, d = coefs
+                
                 tiempos_continuos = np.linspace(tiempos_ord.min(), tiempos_ord.max(), 200)
                 
-                eje_y_tasas_abs = np.abs(-((i_0_opt - i_final_opt) / tau_opt) * np.exp(-tiempos_continuos / tau_opt))
-                eje_x_promedios_abs = modelo_exponencial_fg(tiempos_continuos, i_final_opt, i_0_opt, tau_opt)
+                # Derivada analítica absoluta de la corriente dI_abs/dt
+                eje_y_tasas_abs = np.abs(3 * a * (tiempos_continuos ** 2) + 2 * b * tiempos_continuos + c)
                 
-                ax.plot(eje_x_promedios_abs, eje_y_tasas_abs, "-", label=f"{disp} (Exp Fit)")
-                fig_ply.add_trace(go.Scatter(x=eje_x_promedios_abs, y=eje_y_tasas_abs, mode='lines', name=f"{disp} (Exp)"))
+                # Eje X continuo: corrientes absolutas promedio estimadas por el polinomio
+                eje_x_promedios_abs = a * (tiempos_continuos ** 3) + b * (tiempos_continuos ** 2) + c * tiempos_continuos + d
+                
+                ax.plot(eje_x_promedios_abs, eje_y_tasas_abs, "-", label=f"{disp} (Poly Fit g3)")
+                fig_ply.add_trace(go.Scatter(x=eje_x_promedios_abs, y=eje_y_tasas_abs, mode='lines', name=f"{disp} (Poly)"))
                 hay_datos = True
+            else:
+                # Fallback tradicional por si el fit falla
+                eje_x_promedios_abs, eje_y_tasas_abs = [], []
+                for k in range(len(corrientes_ord) - 1):
+                    dt = tiempos_ord[k+1] - tiempos_ord[k]
+                    if dt > 0:
+                        tasa_abs = np.abs(corrientes_ord[k+1] - corrientes_ord[k]) / dt
+                        promedio_i_abs = (corrientes_ord[k+1] + corrientes_ord[k]) / 2.0
+                        eje_y_tasas_abs.append(tasa_abs)
+                        eje_x_promedios_abs.append(promedio_i_abs)
+                
+                if eje_x_promedios_abs:
+                    ax.plot(eje_x_promedios_abs, eje_y_tasas_abs, "o--", label=disp)
+                    fig_ply.add_trace(go.Scatter(x=eje_x_promedios_abs, y=eje_y_tasas_abs, mode='lines+markers', name=disp))
+                    hay_datos = True
             
     if hay_datos:
         ax.set_title(titulo)
