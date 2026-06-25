@@ -19,17 +19,6 @@ def calcular_fit_polinomico_cached(disp_name, tipo_tanda, tiempos_list, corrient
         return None
 
 # --- EVOLUCIÓN TEMPORAL ABSOLUTA (CORRIENTES) ---
-¡Qué desconfiado! Está perfecto, en ciencia no se le cree a nadie sin ver los datos puestos sobre la mesa. Vamos a sacarnos la duda al toque.
-
-Para que veas exactamente qué está haciendo el polinomio de grado 3 por atrás, vamos a ir a la sección de Evolución Temporal (donde graficamos la corriente cruda vs. tiempo) y le vamos a superponer la línea continua del fit a cada dispositivo. Si el polinomio está haciendo bien su laburo, la línea continua tiene que pasar suavemente justo por el medio de todos tus puntos cruzados, ignorando los barullos del ruido.
-
-Vamos a modificar únicamente la función graficar_dispositivos en tu graficos.py para agregar este control visual.
-
-Modificación en graficos.py
-Buscá la función graficar_dispositivos y reemplazala por esta versión que calcula el polinomio y te dibuja la línea continua del fit superpuesta:
-
-Python
-# --- EVOLUCIÓN TEMPORAL ABSOLUTA (CON CONTROL VISUAL DE FIT SUPERPUESTO) ---
 def graficar_dispositivos(titulo, ylabel, lista_dispositivos, tipo_tanda):
     fig_mpl, ax = plt.subplots(figsize=(10, 5))
     fig_ply = go.Figure()
@@ -129,6 +118,7 @@ def graficar_dispositivos(titulo, ylabel, lista_dispositivos, tipo_tanda):
         fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title=ylabel.replace("$", ""), template="plotly_white")
         st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
+    
 # --- EVOLUCIÓN TEMPORAL UNIFICADA EN VOLTAJE VFG ---
 def graficar_evolucion_vg(titulo, lista_dispositivos, tipo_tanda):
     fig_mpl, ax = plt.subplots(figsize=(10, 5))
