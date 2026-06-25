@@ -234,21 +234,21 @@ def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
         st.plotly_chart(fig_ply, use_container_width=True)
     plt.close(fig_mpl)
 
-def graficar_evolucion_vg_tanda1(titulo):
+def graficar_evolucion_vg(titulo, lista_dispositivos, tipo_tanda):
     fig_mpl, ax = plt.subplots(figsize=(10, 5))
     fig_ply = go.Figure()
     hay_datos = False    
     
-    lista_dispositivos = ["PFGIW1", "PFGIW2"] 
-    
     for disp in lista_dispositivos:
         tiempos, valores = [], []
         for nro in range(0, 100):
+            # Seteamos el sufijo según la tanda de Floating Gates
+            sufijo = ".ri" if tipo_tanda == "FG_tanda1" else "_2.ri"
             prefijo_archivo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_"
             
             archivo_encontrado = None    
             for m_ver in ["M2", "M1"]:
-                nombre_buscar = f"{prefijo_archivo}{m_ver}.ri"
+                nombre_buscar = f"{prefijo_archivo}{m_ver}{sufijo}"
                 datos = matchear_archivos(nombre_buscar)
                 if datos:
                     archivo_encontrado = datos[0]
@@ -272,72 +272,6 @@ def graficar_evolucion_vg_tanda1(titulo):
                     corriente_ua = np.abs(corrientes[idx[0]] * 1e6)
                     try:
                         # Convertimos la corriente absoluta medida al Vg equivalente
-                        vg_val = obtener_vg_por_corriente(disp, corriente_ua * 1e-6)
-                        valores.append(vg_val)
-                        tiempos.append(t)
-                    except Exception:
-                        continue
-                        
-        if tiempos:
-            indices_finales = np.argsort(tiempos)
-            tiempos_ordenados = np.array(tiempos)[indices_finales]
-            valores_ordenados = np.array(valores)[indices_finales]
-            
-            ax.plot(tiempos_ordenados, valores_ordenados, "o--", label=disp)
-            fig_ply.add_trace(go.Scatter(x=tiempos_ordenados, y=valores_ordenados, mode='lines+markers', name=disp))
-            hay_datos = True
-            
-    if hay_datos:
-        ax.set_title(titulo)
-        ax.set_xlabel("Tiempo Acumulado [min]")
-        ax.set_ylabel("Tensión $V_{FG}$ [V]")
-        ax.grid(True, linestyle=":", alpha=0.6)
-        ax.legend()
-        st.pyplot(fig_mpl)
-        
-        fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title="Tensión V_FG [V]", template="plotly_white")
-        st.plotly_chart(fig_ply, use_container_width=True)
-    plt.close(fig_mpl)
-
-
-# --- EVOLUCIÓN TEMPORAL EN VOLTAJE VFG (TANDA 2) ---
-def graficar_evolucion_vg_tanda2(titulo):
-    fig_mpl, ax = plt.subplots(figsize=(10, 5))
-    fig_ply = go.Figure()
-    hay_datos = False    
-    
-    lista_dispositivos = ["PFGIW1", "PFGIW2", "PFGIP2"]
-    
-    for disp in lista_dispositivos:
-        tiempos, valores = [], []
-        for nro in range(0, 100):
-            prefijo_archivo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_"
-            
-            archivo_encontrado = None    
-            for m_ver in ["M2", "M1"]:
-                nombre_buscar = f"{prefijo_archivo}{m_ver}_2.ri"
-                datos = matchear_archivos(nombre_buscar)
-                if datos:
-                    archivo_encontrado = datos[0]
-                    break
-            
-            if archivo_encontrado is not None:
-                t = 0
-                for i in range(1, nro + 1):
-                    if i <= 9: t += 10
-                    elif i <= 21: t += 15
-                    elif i <= 24: t += 20
-                    elif i <= 27: t += 25
-                    elif i <= 29: t += 30
-                    elif i <= 30: t += 35
-                    else: t += 10
-                
-                voltajes = archivo_encontrado[:, 0]
-                corrientes = archivo_encontrado[:, 1]
-                idx = np.where(np.round(voltajes, 1) == -4.5)[0]
-                if len(idx) > 0:
-                    corriente_ua = np.abs(corrientes[idx[0]] * 1e6)
-                    try:
                         vg_val = obtener_vg_por_corriente(disp, corriente_ua * 1e-6)
                         valores.append(vg_val)
                         tiempos.append(t)
