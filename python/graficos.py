@@ -320,19 +320,40 @@ def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
             tiempos_ord = np.array(tiempos)[indices_finales]
             corrientes_ord = np.array(valores)[indices_finales]
             
-            eje_x_promedios_abs, eje_y_tasas_abs = [], []
-            for k in range(len(corrientes_ord) - 1):
-                dt = tiempos_ord[k+1] - tiempos_ord[k]
-                if dt > 0:
-                    tasa_abs = np.abs(corrientes_ord[k+1] - corrientes_ord[k]) / dt
-                    promedio_i_abs = (corrientes_ord[k+1] + corrientes_ord[k]) / 2.0
-                    eje_y_tasas_abs.append(tasa_abs)
-                    eje_x_promedios_abs.append(promedio_i_abs)
+            # Reutilizamos el fit polinómico con caché (acá pasamos las corrientes absolutas, sin normalizar)
+            coefs = calcular_fit_polinomico_cached(
+                disp, f"{tipo_tanda}_abs", tiempos_ord.tolist(), corrientes_ord.tolist()
+            )
             
-            if eje_x_promedios_abs:
-                ax.plot(eje_x_promedios_abs, eje_y_tasas_abs, "o--", label=disp)
-                fig_ply.add_trace(go.Scatter(x=eje_x_promedios_abs, y=eje_y_tasas_abs, mode='lines+markers', name=disp))
+            if coefs is not None:
+                a, b, c, d = coefs
+                
+                tiempos_continuos = np.linspace(tiempos_ord.min(), tiempos_ord.max(), 200)
+                
+                # Derivada analítica absoluta de la corriente dI_abs/dt
+                eje_y_tasas_abs = np.abs(3 * a * (tiempos_continuos ** 2) + 2 * b * tiempos_continuos + c)
+                
+                # Eje X continuo: corrientes absolutas promedio estimadas por el polinomio
+                eje_x_promedios_abs = a * (tiempos_continuos ** 3) + b * (tiempos_continuos ** 2) + c * tiempos_continuos + d
+                
+                ax.plot(eje_x_promedios_abs, eje_y_tasas_abs, "-", label=f"{disp} (Poly Fit g3)")
+                fig_ply.add_trace(go.Scatter(x=eje_x_promedios_abs, y=eje_y_tasas_abs, mode='lines', name=f"{disp} (Poly)"))
                 hay_datos = True
+            else:
+                # Fallback tradicional por si el fit falla
+                eje_x_promedios_abs, eje_y_tasas_abs = [], []
+                for k in range(len(corrientes_ord) - 1):
+                    dt = tiempos_ord[k+1] - tiempos_ord[k]
+                    if dt > 0:
+                        tasa_abs = np.abs(corrientes_ord[k+1] - corrientes_ord[k]) / dt
+                        promedio_i_abs = (corrientes_ord[k+1] + corrientes_ord[k]) / 2.0
+                        eje_y_tasas_abs.append(tasa_abs)
+                        eje_x_promedios_abs.append(promedio_i_abs)
+                
+                if eje_x_promedios_abs:
+                    ax.plot(eje_x_promedios_abs, eje_y_tasas_abs, "o--", label=disp)
+                    fig_ply.add_trace(go.Scatter(x=eje_x_promedios_abs, y=eje_y_tasas_abs, mode='lines+markers', name=disp))
+                    hay_datos = True
             
     if hay_datos:
         ax.set_title(titulo)
