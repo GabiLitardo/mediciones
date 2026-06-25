@@ -45,10 +45,10 @@ if mostrar_evolucion:
     # --- AGREGADO: NUEVOS GRÁFICOS TEMPORALES EN TENSIÓN VFG ---
     st.subheader("Evolución del Voltaje de Compuerta Equivalente ($V_{FG}$)")
     graficar_evolucion_vg_tanda1(
-        titulo="Descarga Temporal de Floating Gates Tanda 1 en Voltaje"
+        titulo="Descarga Temporal de Floating Gates Tanda 1 en Tensión"
     )
     graficar_evolucion_vg_tanda2(
-        titulo="Descarga Temporal de Floating Gates Tanda 2 en Voltaje"
+        titulo="Descarga Temporal de Floating Gates Tanda 2 en Tensión"
     )
 
 # =====================================================================
