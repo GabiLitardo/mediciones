@@ -55,4 +55,38 @@ if mostrar_evolucion:
         tipo_tanda="FG_tanda2"
     )
 
-# ... (el resto de codigo.py para la sección 2 y 3 queda exactamente igual) ...
+# =====================================================================
+# SECCIÓN 2: SENSIBILIDAD (RESETEADA A LO ANTERIOR)
+# =====================================================================
+if mostrar_sensibilidad:
+    st.markdown("---")
+    st.header("Análisis de Sensibilidad")
+
+    st.subheader("Normalizada")
+    graficar_sensibilidad_fg(
+        titulo="Sensibilidad FG Tanda 1 (Tasa vs $I_D$ Promedio Normalizado)",
+        lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3"],
+        tipo_tanda="FG_tanda1"
+    )
+    graficar_sensibilidad_fg(
+        titulo="Sensibilidad FG Tanda 2 (Tasa vs $I_D$ Promedio Normalizado)",
+        lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
+        tipo_tanda="FG_tanda2"
+    )
+
+    st.subheader("Sin normalizar")
+    graficar_sensibilidad_fg_absoluta(
+        titulo="Sensibilidad Absoluta FG Tanda 1 (Tasa Absoluta vs $I_D$ Promedio Absoluto)",
+        lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3"],
+        tipo_tanda="FG_tanda1"
+    )
+    graficar_sensibilidad_fg_absoluta(
+        titulo="Sensibilidad Absoluta FG Tanda 2 (Tasa Absoluta vs $I_D$ Promedio Absoluto)",
+        lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
+        tipo_tanda="FG_tanda2"
+    )
+
+if mostrar_ruido:
+    st.markdown("---")
+    st.header("Análisis de Ruido")
+    st.info("pendiente")
