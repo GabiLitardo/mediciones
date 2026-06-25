@@ -12,6 +12,16 @@ factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2"
 def modelo_exponencial(t, I_inf, I_0, tau):
     return I_inf + (I_0 - I_inf) * np.exp(-t / tau)
 
+@st.cache_data
+def calcular_fit_exponencial(tiempos_ord, corrientes_norm):
+    try:
+        # Estimación inicial sensata [I_inf, I_0, tau]
+        p0 = [corrientes_norm[-1], corrientes_norm[0], 100.0]
+        popt, _ = curve_fit(modelo_exponencial, tiempos_ord, corrientes_norm, p0=p0, maxfev=5000)
+        return popt  # Retorna [I_inf_opt, I_0_opt, tau_opt]
+    except:
+        return None
+
 # --- EVOLUCIÓN TEMPORAL ---
 def graficar_dispositivos(titulo, ylabel, lista_dispositivos, tipo_tanda):
     fig_mpl, ax = plt.subplots(figsize=(10, 5))
@@ -102,8 +112,6 @@ def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
     fig_ply = go.Figure()
     hay_datos = False    
     
-    factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2": 1.0}
-    
     for disp in lista_dispositivos:
         tiempos, valores = [], []
         for nro in range(0, 100):
@@ -144,34 +152,22 @@ def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
             factor = factores_normalizacion.get(disp, 1.0)
             corrientes_norm = corrientes_ord / factor
             
-            # -----------------------------------------------------------------
-            # FIT EXPONENCIAL DE LA CORRIENTE NORMALIZADA VS TIEMPO
-            # -----------------------------------------------------------------
-            try:
-                # Estimaciones iniciales lógicas para ayudar al algoritmo a converger:
-                # p0 = [I_inf_estimado, I_0_estimado, tau_estimado]
-                p0 = [corrientes_norm[-1], corrientes_norm[0], 100.0]
-                
-                # curve_fit encuentra los parámetros óptimos (I_inf, I_0, tau) minimizando el ECM
-                popt, _ = curve_fit(modelo_exponencial, tiempos_ord, corrientes_norm, p0=p0, maxfev=5000)
+            # Llamamos a la función con caché. Si ya se calculó, devuelve el Tau al instante
+            popt = calcular_fit_exponencial(tiempos_ord, corrientes_norm)
+            
+            if popt is not None:
                 I_inf_opt, I_0_opt, tau_opt = popt
                 
-                # Generamos una curva continua de tiempo para evaluar la derivada analítica
+                # Eje X e Y continuos calculados de forma analítica (Cero Ruido)
                 tiempos_continuos = np.linspace(tiempos_ord.min(), tiempos_ord.max(), 200)
-                
-                # Calculamos la derivada analítica absoluta en esos tiempos continuos:
                 eje_y_tasas = np.abs(-(I_0_opt - I_inf_opt) / tau_opt * np.exp(-tiempos_continuos / tau_opt))
-                
-                # Evaluamos el modelo para obtener la Corriente Normalizada Promedio/Continua para el Eje X
                 eje_x_promedios = modelo_exponencial(tiempos_continuos, I_inf_opt, I_0_opt, tau_opt)
                 
-                # Graficamos la curva limpia suavizada
-                ax.plot(eje_x_promedios, eje_y_tasas, "-", label=f"{disp} (Fit $\\tau$={tau_opt:.1f} min)")
+                ax.plot(eje_x_promedios, eje_y_tasas, "-", label=f"{disp} ($\\tau$={tau_opt:.1f} min)")
                 fig_ply.add_trace(go.Scatter(x=eje_x_promedios, y=eje_y_tasas, mode='lines', name=f"{disp} (Fit)"))
                 hay_datos = True
-                
-            except Exception as e:
-                # Si el fit falla por datos atípicos, usamos el método viejo de puntos para no romper el gráfico
+            else:
+                # Fallback por si falla el fit (usa el método ruidoso viejo para no romper el gráfico)
                 eje_x_promedios, eje_y_tasas = [], []
                 for k in range(len(corrientes_norm) - 1):
                     dt = tiempos_ord[k+1] - tiempos_ord[k]
@@ -182,7 +178,7 @@ def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
                         eje_x_promedios.append(promedio_i_norm)
                 
                 if eje_x_promedios:
-                    ax.plot(eje_x_promedios, eje_y_tasas, "o--", label=f"{disp} (Puntos crudos)")
+                    ax.plot(eje_x_promedios, eje_y_tasas, "o--", label=disp)
                     fig_ply.add_trace(go.Scatter(x=eje_x_promedios, y=eje_y_tasas, mode='lines+markers', name=disp))
                     hay_datos = True
             
@@ -197,7 +193,7 @@ def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
         fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Normalizada I_D_norm [u.a.]", yaxis_title="Tasa de Cambio [(uA/unid_norm)/min]", template="plotly_white")
         st.plotly_chart(fig_ply, use_container_width=True)
     plt.close(fig_mpl)
-
+    
 # --- SENSIBILIDAD EJE X ABSOLUTO ---
 def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
     fig_mpl, ax = plt.subplots(figsize=(10, 5))
