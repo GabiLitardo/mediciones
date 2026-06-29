@@ -235,7 +235,7 @@ def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
             )
             
             if coefs is not None:
-                a, b, c, d = coefs
+                a, b, c, d, e = coefs
                 
                 # Creamos el vector de tiempo continuo para evaluar la curva suave
                 tiempos_continuos = np.linspace(tiempos_ord.min(), tiempos_ord.max(), 200)
@@ -326,15 +326,15 @@ def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
             )
             
             if coefs is not None:
-                a, b, c, d = coefs
+                a, b, c, d, e = coefs
                 
                 tiempos_continuos = np.linspace(tiempos_ord.min(), tiempos_ord.max(), 200)
                 
                 # Derivada analítica absoluta de la corriente dI_abs/dt
-                eje_y_tasas_abs = np.abs(3 * a * (tiempos_continuos ** 2) + 2 * b * tiempos_continuos + c)
+                eje_y_tasas_abs = np.abs(4 * a * (tiempos_continuos ** 3) + 3 * b * (tiempos_continuos ** 2) + 2 * c * tiempos_continuos + d)
                 
                 # Eje X continuo: corrientes absolutas promedio estimadas por el polinomio
-                eje_x_promedios_abs = a * (tiempos_continuos ** 3) + b * (tiempos_continuos ** 2) + c * tiempos_continuos + d
+                eje_x_promedios_abs = a * (tiempos_continuos ** 4) + b * (tiempos_continuos ** 3) + c * (tiempos_continuos ** 2) + d * tiempos_continuos + e
                 
                 ax.plot(eje_x_promedios_abs, eje_y_tasas_abs, "-", label=f"{disp} (Poly Fit g4)")
                 fig_ply.add_trace(go.Scatter(x=eje_x_promedios_abs, y=eje_y_tasas_abs, mode='lines', name=f"{disp} (Poly)"))
