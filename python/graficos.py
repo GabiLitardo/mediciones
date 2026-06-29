@@ -100,7 +100,7 @@ def graficar_dispositivos(titulo, ylabel, lista_dispositivos, tipo_tanda):
                         i_fitteada = a * (t_continuo ** 4) + b * (t_continuo ** 3) + c * (t_continuo ** 2) + d * t_continuo + e
                         
                         # Dibujamos la línea sólida del ajuste para auditarlo visualmente
-                        ax.plot(t_continuo, i_fitteada, "-", label=f"{disp} (Fit Poly g3)")
+                        ax.plot(t_continuo, i_fitteada, "-", label=f"{disp} (Fit Poly g4)")
                         fig_ply.add_trace(go.Scatter(x=t_continuo, y=i_fitteada, mode='lines', name=f"{disp} (Fit Poly)"))
                 except:
                     pass
@@ -336,7 +336,7 @@ def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
                 # Eje X continuo: corrientes absolutas promedio estimadas por el polinomio
                 eje_x_promedios_abs = a * (tiempos_continuos ** 3) + b * (tiempos_continuos ** 2) + c * tiempos_continuos + d
                 
-                ax.plot(eje_x_promedios_abs, eje_y_tasas_abs, "-", label=f"{disp} (Poly Fit g3)")
+                ax.plot(eje_x_promedios_abs, eje_y_tasas_abs, "-", label=f"{disp} (Poly Fit g4)")
                 fig_ply.add_trace(go.Scatter(x=eje_x_promedios_abs, y=eje_y_tasas_abs, mode='lines', name=f"{disp} (Poly)"))
                 hay_datos = True
             else:
