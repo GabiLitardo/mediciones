@@ -13,7 +13,7 @@ factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2"
 def calcular_fit_polinomico_cached(disp_name, tipo_tanda, tiempos_list, corrientes_list):
     try:
         # np.polyfit encuentra los coeficientes [a, b, c, d] exactos que minimizan el ECM
-        coeficientes = np.polyfit(tiempos_list, corrientes_list, deg=4)
+        coeficientes = np.polyfit(tiempos_list, corrientes_list, deg=5)
         return coeficientes.tolist()  # Retorna [a, b, c, d]
     except:
         return None
@@ -95,12 +95,12 @@ def graficar_dispositivos(titulo, ylabel, lista_dispositivos, tipo_tanda):
                     # Usamos la misma función con caché que creamos antes
                     coefs = calcular_fit_polinomico_cached(disp, tipo_tanda, tiempos_ordenados.tolist(), valores_ordenados.tolist())
                     if coefs is not None:
-                        a, b, c, d, e = coefs
+                        a, b, c, d, e, f = coefs
                         t_continuo = np.linspace(tiempos_ordenados.min(), tiempos_ordenados.max(), 200)
-                        i_fitteada = a * (t_continuo ** 4) + b * (t_continuo ** 3) + c * (t_continuo ** 2) + d * t_continuo + e
+                        i_fitteada = a * (t_continuo ** 5) + b * (t_continuo ** 4) + c * (t_continuo ** 3) + d * (t_continuo ** 2) + e * t_continuo + f
                         
                         # Dibujamos la línea sólida del ajuste para auditarlo visualmente
-                        ax.plot(t_continuo, i_fitteada, "-", label=f"{disp} (Fit Poly g4)")
+                        ax.plot(t_continuo, i_fitteada, "-", label=f"{disp} (Fit Poly g5)")
                         fig_ply.add_trace(go.Scatter(x=t_continuo, y=i_fitteada, mode='lines', name=f"{disp} (Fit Poly)"))
                 except:
                     pass
@@ -235,18 +235,18 @@ def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
             )
             
             if coefs is not None:
-                a, b, c, d, e = coefs
+                a, b, c, d, e, f = coefs
                 
                 # Creamos el vector de tiempo continuo para evaluar la curva suave
                 tiempos_continuos = np.linspace(tiempos_ord.min(), tiempos_ord.max(), 200)
                 
-                # Derivada analítica exacta: dI/dt = |4a*t^3 + 3b*t^2 + 2c*t + d|
-                eje_y_tasas = np.abs(4 * a * (tiempos_continuos ** 3) + 3 * b * (tiempos_continuos ** 2) + 2 * c * tiempos_continuos + d)
+                # Derivada analítica exacta: dI/dt = |5a*t^4 + 4b*t^3 + 3c*t^2 + 2d*t + e|
+                eje_y_tasas = np.abs(5 * a * (tiempos_continuos ** 4) + 4 * b * (tiempos_continuos ** 3) + 3 * c * (tiempos_continuos ** 2) + 2 * d * tiempos_continuos + e)
                 
                 # Eje X continuo: evaluamos el polinomio original para obtener la corriente promedio fitteada
-                eje_x_promedios = a * (tiempos_continuos ** 4) + b * (tiempos_continuos ** 3) + c * (tiempos_continuos ** 2) + d * tiempos_continuos + e
+                eje_x_promedios = a * (tiempos_continuos ** 5) + b * (tiempos_continuos ** 4) + c * (tiempos_continuos ** 3) + d * (tiempos_continuos ** 2) + e * tiempos_continuos + f
                 
-                ax.plot(eje_x_promedios, eje_y_tasas, "-", label=f"{disp} (Poly Fit g4)")
+                ax.plot(eje_x_promedios, eje_y_tasas, "-", label=f"{disp} (Poly Fit g5)")
                 fig_ply.add_trace(go.Scatter(x=eje_x_promedios, y=eje_y_tasas, mode='lines', name=f"{disp} (Poly)"))
                 hay_datos = True
             else:
@@ -326,17 +326,17 @@ def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
             )
             
             if coefs is not None:
-                a, b, c, d, e = coefs
+                a, b, c, d, e, f = coefs
                 
                 tiempos_continuos = np.linspace(tiempos_ord.min(), tiempos_ord.max(), 200)
                 
                 # Derivada analítica absoluta de la corriente dI_abs/dt
-                eje_y_tasas_abs = np.abs(4 * a * (tiempos_continuos ** 3) + 3 * b * (tiempos_continuos ** 2) + 2 * c * tiempos_continuos + d)
+                eje_y_tasas_abs = np.abs(5 * a * (tiempos_continuos ** 4) + 4 * b * (tiempos_continuos ** 3) + 3 * c * (tiempos_continuos ** 2) + 2 * d * tiempos_continuos + e)
                 
                 # Eje X continuo: corrientes absolutas promedio estimadas por el polinomio
-                eje_x_promedios_abs = a * (tiempos_continuos ** 4) + b * (tiempos_continuos ** 3) + c * (tiempos_continuos ** 2) + d * tiempos_continuos + e
+                eje_x_promedios_abs = a * (tiempos_continuos ** 5) + b * (tiempos_continuos ** 4) + c * (tiempos_continuos ** 3) + d * (tiempos_continuos ** 2) + e * tiempos_continuos + f
                 
-                ax.plot(eje_x_promedios_abs, eje_y_tasas_abs, "-", label=f"{disp} (Poly Fit g4)")
+                ax.plot(eje_x_promedios_abs, eje_y_tasas_abs, "-", label=f"{disp} (Poly Fit g5)")
                 fig_ply.add_trace(go.Scatter(x=eje_x_promedios_abs, y=eje_y_tasas_abs, mode='lines', name=f"{disp} (Poly)"))
                 hay_datos = True
             else:
