@@ -17,21 +17,38 @@ def convertir_r_a_temp_steinhart(resistencia):
 
 def matchear_archivos_ruido(nombre_buscar):
     """
-    Busca el archivo en el repositorio y levanta la matriz numérica
-    soportando cualquier ensalada de espacios o tabs de GitHub.
+    Busca el archivo en el repositorio, normaliza en memoria cualquier 
+    conflicto de fin de línea (\r\n) o delimitadores mixtos, y carga los datos.
     """
     directorio_base = "."
     for root, dirs, files in os.walk(directorio_base):
         if nombre_buscar in files:
             ruta_completa = os.path.join(root, nombre_buscar)
             try:
-                # skip_header=3 remueve exactamente el texto inicial de tus archivos
-                # No le ponemos delimiter ni usecols para que digiera cualquier formato libre
-                datos = np.genfromtxt(ruta_completa, skip_header=3)
+                # Abrimos el archivo como texto puro para limpiar impurezas de formato
+                with open(ruta_completa, "r", encoding="utf-8") as f:
+                    lineas = f.readlines()
+                
+                # Salteamos las 3 líneas de encabezado
+                lineas_datos = lineas[3:]
+                
+                # Normalización total: quitamos \r\n y cambiamos tabulaciones por espacios
+                lineas_limpias = []
+                for linea in lineas_datos:
+                    linea_limpia = linea.strip().replace("\t", " ")
+                    if linea_limpia:  # Evitamos líneas vacías
+                        lineas_limpias.append(linea_limpia)
+                
+                # np.loadtxt lee la lista de strings normalizados sin trabarse jamás
+                datos = np.loadtxt(lineas_lines) if 'np.loadtxt' else np.array([list(map(float, l.split())) for l in lineas_limpias])
+                # Para asegurar compatibilidad directa con NumPy usando strings limpios:
+                datos = np.loadtxt(lineas_limpias)
+                
                 return datos
             except Exception as e:
-                # Si deseas debuggear qué falla, podés descomentar la línea de abajo:
-                # st.write(f"Error leyendo {nombre_buscar}: {e}")
+                # Si querés ver en la terminal qué archivo exacto está fallando, 
+                # podés descomentar la línea de abajo para debuggear:
+                # print(f"❌ Falló {nombre_buscar} debido a: {e}")
                 return None
     return None
 
