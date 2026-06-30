@@ -17,30 +17,39 @@ def convertir_r_a_temp_steinhart(resistencia):
 
 def matchear_archivos_ruido(nombre_buscar):
     """
-    Busca el archivo en el repositorio y levanta las primeras 3 columnas 
-    (Tiempo, Corriente, Resistencia) salteando correctamente las 4 líneas de cabecera.
+    Busca el archivo en el repositorio y levanta la matriz numérica
+    soportando cualquier ensalada de espacios o tabs de GitHub.
     """
     directorio_base = "."
     for root, dirs, files in os.walk(directorio_base):
         if nombre_buscar in files:
             ruta_completa = os.path.join(root, nombre_buscar)
             try:
-                # Cambiamos a skip_header=4 para limpiar por completo el texto inicial
-                datos = np.genfromtxt(ruta_completa, skip_header=4, usecols=(0, 1, 2))
+                # skip_header=3 remueve exactamente el texto inicial de tus archivos
+                # No le ponemos delimiter ni usecols para que digiera cualquier formato libre
+                datos = np.genfromtxt(ruta_completa, skip_header=3)
                 return datos
-            except:
+            except Exception as e:
+                # Si deseas debuggear qué falla, podés descomentar la línea de abajo:
+                # st.write(f"Error leyendo {nombre_buscar}: {e}")
                 return None
     return None
 
 def calcular_desvio_archivo(nombre_archivo):
     """Procesa un archivo de ruido, remueve la deriva térmica y devuelve el desvío en nA."""
     datos = matchear_archivos_ruido(nombre_archivo)
-    if datos is None or datos.size == 0 or len(datos.shape) < 2:
+    
+    if datos is None or datos.size == 0:
         return None
         
+    # Si por alguna razón se leyó como un vector unidimensional plano, lo salteamos
+    if len(datos.shape) < 2 or datos.shape[1] < 3:
+        return None
+
+    # Extraemos las columnas de la matriz ya levantada en memoria
     tiempo = datos[:, 0]
-    corriente_uA = np.abs(datos[:, 1]) * 1e6  # Módulo de ID en uA
-    resistencia = datos[:, 2]
+    corriente_uA = np.abs(datos[:, 1]) * 1e6  # Pasamos ID a módulo en uA
+    resistencia = datos[:, 2]                 # Columna del termistor
     
     # 1. Convertimos resistencia a temperatura (°C)
     temperatura_C = convertir_r_a_temp_steinhart(resistencia)
@@ -57,7 +66,7 @@ def calcular_desvio_archivo(nombre_archivo):
     return sigma_nA
 
 def mostrar_resumen_ruido():
-    """Barre los archivos normalizados y muestra los desvíos en Streamlit."""
+    """Barre los archivos de ruido y muestra los desvíos en la interfaz."""
     st.subheader("Resumen de Desvío Estándar del Ruido (nA)")
     
     lista_dispositivos = ["PFGIW1", "PFGIW2", "PFGIP2"]
@@ -68,6 +77,9 @@ def mostrar_resumen_ruido():
     for disp in lista_dispositivos:
         resultados[disp] = {}
         for curr in corrientes_nominales:
+            nombre_archivo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{curr}_M1.ri" 
+            # Nota: Si tus archivos terminan en _M1.txt o similar, ajustá el string de arriba
+            # Ejemplo basado en tu archivo de muestra: f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{curr}u_M1.txt"
             nombre_archivo = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{curr}u_M1.txt"
             
             sigma = calcular_desvio_archivo(nombre_archivo)
