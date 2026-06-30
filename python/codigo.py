@@ -6,6 +6,7 @@ from graficos import (
     graficar_sensibilidad_fg_absoluta,
     graficar_evolucion_vg
 )
+from ruido import mostrar_resumen_ruido
 
 st.title("Resumen mediciones Chaves-Litardo")
 
@@ -96,4 +97,4 @@ if mostrar_sensibilidad:
 if mostrar_ruido:
     st.markdown("---")
     st.header("Análisis de Ruido")
-    st.info("pendiente")
+    mostrar_resumen_ruido()
