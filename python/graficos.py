@@ -368,7 +368,7 @@ def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
     plt.close(fig_mpl)
 
 # --- SENSIBILIDAD EJE X NORMALIZADO ---
-def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
+def graficar_sensibilidad_fg2(titulo, lista_dispositivos, tipo_tanda):
     fig_mpl, ax = plt.subplots(figsize=(10, 5))
     fig_ply = go.Figure()
     hay_datos = False    
@@ -441,7 +441,7 @@ def graficar_sensibilidad_fg(titulo, lista_dispositivos, tipo_tanda):
 
 
 # --- SENSIBILIDAD EJE X ABSOLUTO ---
-def graficar_sensibilidad_fg_absoluta(titulo, lista_dispositivos, tipo_tanda):
+def graficar_sensibilidad_fg_absoluta2(titulo, lista_dispositivos, tipo_tanda):
     fig_mpl, ax = plt.subplots(figsize=(10, 5))
     fig_ply = go.Figure()
     hay_datos = False    
