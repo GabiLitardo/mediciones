@@ -17,17 +17,17 @@ def convertir_r_a_temp_steinhart(resistencia):
 
 def matchear_archivos_ruido(nombre_buscar):
     """
-    Busca el archivo y lo lee mostrando el error real en Streamlit 
-    si algo falla al parsear.
+    Busca el archivo en el repositorio y levanta la matriz numérica
+    soportando codificación Windows (CP1252) y cualquier mezcla de espacios o tabs.
     """
-    directorio_base = "."  # Definida en español
-    for root, dirs, files in os.walk(directorio_base):  # Usada en español
+    directorio_base = "."
+    for root, dirs, files in os.walk(directorio_base):
         if nombre_buscar in files:
             ruta_completa = os.path.join(root, nombre_buscar)
             
             try:
-                # Tu archivo tiene exactamente 4 líneas antes de los datos
-                datos = np.genfromtxt(ruta_completa, skip_header=4)
+                # Agregamos encoding="cp1252" para que digiera la "ó" de Medición sin romper
+                datos = np.genfromtxt(ruta_completa, skip_header=4, encoding="cp1252")
                 return datos
             except Exception as error_numpy:
                 st.error(f"⚠️ Error de NumPy en {nombre_buscar}: {error_numpy}")
