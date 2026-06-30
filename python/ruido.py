@@ -17,39 +17,26 @@ def convertir_r_a_temp_steinhart(resistencia):
 
 def matchear_archivos_ruido(nombre_buscar):
     """
-    Busca el archivo en el repositorio, normaliza en memoria cualquier 
-    conflicto de fin de línea (\r\n) o delimitadores mixtos, y carga los datos.
+    Busca el archivo y lo lee mostrando el error real en Streamlit 
+    si algo falla al parsear.
     """
     directorio_base = "."
-    for root, dirs, files in os.walk(directorio_base):
+    for root, dirs, files in os.walk(directory_base):
         if nombre_buscar in files:
             ruta_completa = os.path.join(root, nombre_buscar)
+            
+            # Quitamos el try-except genérico para ver qué explota
             try:
-                # Abrimos el archivo como texto puro para limpiar impurezas de formato
-                with open(ruta_completa, "r", encoding="utf-8") as f:
-                    lineas = f.readlines()
-                
-                # Salteamos las 3 líneas de encabezado
-                lineas_datos = lineas[3:]
-                
-                # Normalización total: quitamos \r\n y cambiamos tabulaciones por espacios
-                lineas_limpias = []
-                for linea in lineas_datos:
-                    linea_limpia = linea.strip().replace("\t", " ")
-                    if linea_limpia:  # Evitamos líneas vacías
-                        lineas_limpias.append(linea_limpia)
-                
-                # np.loadtxt lee la lista de strings normalizados sin trabarse jamás
-                datos = np.loadtxt(lineas_lines) if 'np.loadtxt' else np.array([list(map(float, l.split())) for l in lineas_limpias])
-                # Para asegurar compatibilidad directa con NumPy usando strings limpios:
-                datos = np.loadtxt(lineas_limpias)
-                
+                # Tu archivo tiene exactamente 4 líneas de texto antes de los números:
+                # 1. Fecha, 2. Vacía, 3. Explicación, 4. Títulos (Tiempo Corriente Tensión)
+                datos = np.genfromtxt(ruta_completa, skip_header=4)
                 return datos
-            except Exception as e:
-                # Si querés ver en la terminal qué archivo exacto está fallando, 
-                # podés descomentar la línea de abajo para debuggear:
-                # print(f"❌ Falló {nombre_buscar} debido a: {e}")
+            except Exception as error_numpy:
+                st.error(f"⚠️ Error de NumPy en {nombre_buscar}: {error_numpy}")
                 return None
+                
+    # Si ni siquiera encuentra el archivo por nombre
+    # st.warning(f"No se encontró el archivo físico: {nombre_buscar}")
     return None
 
 def calcular_desvio_archivo(nombre_archivo):
@@ -59,14 +46,13 @@ def calcular_desvio_archivo(nombre_archivo):
     if datos is None or datos.size == 0:
         return None
         
-    # Si por alguna razón se leyó como un vector unidimensional plano, lo salteamos
     if len(datos.shape) < 2 or datos.shape[1] < 3:
+        st.warning(f"Formato de matriz inválido en {nombre_archivo}: dimensión {datos.shape}")
         return None
 
-    # Extraemos las columnas de la matriz ya levantada en memoria
     tiempo = datos[:, 0]
-    corriente_uA = np.abs(datos[:, 1]) * 1e6  # Pasamos ID a módulo en uA
-    resistencia = datos[:, 2]                 # Columna del termistor
+    corriente_uA = np.abs(datos[:, 1]) * 1e6  
+    resistencia = datos[:, 2]                 
     
     # 1. Convertimos resistencia a temperatura (°C)
     temperatura_C = convertir_r_a_temp_steinhart(resistencia)
@@ -94,9 +80,6 @@ def mostrar_resumen_ruido():
     for disp in lista_dispositivos:
         resultados[disp] = {}
         for curr in corrientes_nominales:
-            nombre_archivo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{curr}_M1.ri" 
-            # Nota: Si tus archivos terminan en _M1.txt o similar, ajustá el string de arriba
-            # Ejemplo basado en tu archivo de muestra: f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{curr}u_M1.txt"
             nombre_archivo = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{curr}u_M1.txt"
             
             sigma = calcular_desvio_archivo(nombre_archivo)
