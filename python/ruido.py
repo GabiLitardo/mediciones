@@ -26,21 +26,19 @@ def matchear_archivos_ruido(nombre_buscar):
             ruta_completa = os.path.join(root, nombre_buscar)
             
             try:
-                # Abrimos como texto puro con la codificación de Windows que se banca la "ó"
+                # Abrimos con la codificación de Windows que se banca la "ó"
                 with open(ruta_completa, "r", encoding="cp1252") as f:
                     lineas = f.readlines()
                 
-                # Tu archivo tiene una línea en blanco al principio y texto 
                 # Filtramos las líneas de texto para quedarnos SOLO con las numéricas
                 lineas_datos = []
                 for linea in lineas:
-                    # Quitamos espacios en los extremos
                     l_limpia = linea.strip()
-                    # Si la línea empieza con un número, es un dato numérico válido
+                    # Si la línea empieza con un número o signo menos, es un dato numérico
                     if l_limpia and (l_limpia[0].isdigit() or l_limpia[0] == '-'):
                         lineas_datos.append(l_limpia)
                 
-                # np.loadtxt procesa la lista de strings e interpreta las 5 columnas limpias
+                # np.loadtxt procesa las 5 columnas de forma impecable
                 datos = np.loadtxt(lineas_datos)
                 return datos
                 
@@ -58,12 +56,12 @@ def calcular_desvio_archivo(nombre_archivo):
         return None
         
     if len(datos.shape) < 2 or datos.shape[1] < 3:
-        st.warning(f"Formato de matriz inválido en {nombre_archivo}: dimensión {datos.shape}")
         return None
 
-    tiempo = datos[:, 0] [cite: 2]
-    corriente_uA = np.abs(datos[:, 1]) * 1e6  # Columna 1 
-    resistencia = datos[:, 2]                 # Columna 2             
+    # Mapeo limpio de las columnas numéricas reales
+    tiempo = datos[:, 0]
+    corriente_uA = np.abs(datos[:, 1]) * 1e6  # Pasamos ID a módulo en uA
+    resistencia = datos[:, 2]                 # Columna del termistor
     
     # 1. Convertimos resistencia a temperatura (°C)
     temperatura_C = convertir_r_a_temp_steinhart(resistencia)
@@ -78,7 +76,7 @@ def calcular_desvio_archivo(nombre_archivo):
     # 4. Calculamos el desvío estándar muestral y lo pasamos a nanoamperios (nA)
     sigma_nA = np.std(corriente_ruido_uA, ddof=1) * 1000.0
     return sigma_nA
-
+    
 def mostrar_resumen_ruido():
     """Barre los archivos de ruido y muestra los desvíos en la interfaz."""
     st.subheader("Resumen de Desvío Estándar del Ruido (nA)")
