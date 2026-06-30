@@ -28,11 +28,11 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados):
                     coefs = calcular_fit_polinomico_cached(disp, "FG_tanda2", tiempos_ordenados.tolist(), valores_ordenados.tolist())
                 
                 if coefs is not None:
-                    a, b, c, d, e, f = coefs
+                    a, b, c, d, e = coefs
                     t_continuo = np.linspace(tiempos_ordenados.min(), tiempos_ordenados.max(), 200)
-                    i_fitteada = a * (t_continuo ** 5) + b * (t_continuo ** 4) + c * (t_continuo ** 3) + d * (t_continuo ** 2) + e * t_continuo + f
+                    i_fitteada = a * (t_continuo ** 4) + b * (t_continuo ** 3) + c * (t_continuo ** 2) + d * t_continuo + e
                     
-                    ax.plot(t_continuo, i_fitteada, "-", label=f"{disp} (Fit Poly g5)")
+                    ax.plot(t_continuo, i_fitteada, "-", label=f"{disp} (Fit Poly g4)")
                     fig_ply.add_trace(go.Scatter(x=t_continuo, y=i_fitteada, mode='lines', name=f"{disp} (Fit Poly)"))
             except:
                 pass
@@ -84,7 +84,7 @@ def graficar_sensibilidad_fg(titulo, datos_sensibilidad):
     hay_datos = False    
     
     for disp, datos in datos_sensibilidad.items():
-        ax.plot(datos["x"], datos["y"], "-", label=f"{disp} (Poly Fit g5)")
+        ax.plot(datos["x"], datos["y"], "-", label=f"{disp} (Poly Fit g4)")
         fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines', name=f"{disp} (Poly)"))
         hay_datos = True
             
