@@ -27,12 +27,15 @@ def matchear_archivos_ruido(nombre_buscar):
                 lineas_datos = []
                 for linea in lineas:
                     l_limpia = linea.strip()
+                    # Verificamos que no esté vacía y que empiece con número o signo menos
                     if l_limpia and (l_limpia[0].isdigit() or l_limpia[0] == '-'):
                         lineas_datos.append(l_limpia)
                 
+                if not lineas_datos:
+                    return None
+                    
                 datos = np.loadtxt(lineas_datos)
                 return datos
             except Exception as error_lectura:
-                st.error(f"⚠️ Error leyendo {nombre_buscar}: {error_lectura}")
                 return None
     return None
