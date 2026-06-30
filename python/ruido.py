@@ -55,9 +55,9 @@ def calcular_desvio_archivo(nombre_archivo):
         st.warning(f"Formato de matriz inválido en {nombre_archivo}: dimensión {datos.shape}")
         return None
 
-    tiempo = datos[:, 0]
-    corriente_uA = np.abs(datos[:, 1]) * 1e6  
-    resistencia = datos[:, 2]                 
+    tiempo = datos[:, 0] [cite: 1, 2]
+    corriente_uA = np.abs(datos[:, 1]) * 1e6  # Columna 1 
+    resistencia = datos[:, 2]                 # Columna 2                
     
     # 1. Convertimos resistencia a temperatura (°C)
     temperatura_C = convertir_r_a_temp_steinhart(resistencia)
