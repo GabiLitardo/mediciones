@@ -17,20 +17,23 @@ def convertir_r_a_temp_steinhart(resistencia):
 
 def calcular_desvio_archivo(nombre_archivo):
     """Procesa un archivo individual y devuelve su desvío estándar en nA."""
-    # Le pasamos el delimiter='\t' para que no colapse las columnas
     datos_lista = matchear_archivos(nombre_archivo)
     if not datos_lista:
         return None
         
     datos = datos_lista[0]
     
-    # Verificación de seguridad: si no es bidimensional, forzamos el split por tabulación
-    if len(datos.shape) < 2:
+    # --- AGREGÁ ESTO PARA AUDITAR QUÉ ESTÁ LEYENDO EXPERIMENTALMENTE ---
+    st.write(f"🔍 Archivo: `{nombre_archivo}` | Shape detectado: `{datos.shape}`")
+    
+    # Verificación estricta de dimensiones y columnas
+    if len(datos.shape) < 2 or datos.shape[1] < 3:
+        st.error(f"El archivo `{nombre_archivo}` no tiene al menos 3 columnas. Tiene shape: {datos.shape}")
         return None
 
     tiempo = datos[:, 0]
-    corriente_uA = np.abs(datos[:, 1]) * 1e6  # Módulo en microamperios
-    resistencia = datos[:, 2]                 # Columna del termistor 
+    corriente_uA = np.abs(datos[:, 1]) * 1e6  
+    resistencia = datos[:, 2]                 
     
     # 1. Convertimos a temperatura
     temperatura_C = convertir_r_a_temp_steinhart(resistencia)
