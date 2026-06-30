@@ -15,25 +15,7 @@ def convertir_r_a_temp_steinhart(resistencia):
     temp_kelvin = 1.0 / inverso_T
     return temp_kelvin - 273.15
 
-def matchear_archivos_ruido(nombre_buscar):
-    """
-    Busca el archivo en el repositorio y levanta la matriz numérica
-    soportando codificación Windows (CP1252) y cualquier mezcla de espacios o tabs.
-    """
-    directorio_base = "."
-    for root, dirs, files in os.walk(directorio_base):
-        if nombre_buscar in files:
-            ruta_completa = os.path.join(root, nombre_buscar)
-            
-            try:
-                # Agregamos encoding="cp1252" para que digiera la "ó" de Medición sin romper
-                datos = np.genfromtxt(ruta_completa, skip_header=4, encoding="cp1252")
-                return datos
-            except Exception as error_numpy:
-                st.error(f"⚠️ Error de NumPy en {nombre_buscar}: {error_numpy}")
-                return None
-                
-    return None
+Error de NumPy en MOSISV72M_DIE4_PFGIW1_VD=-4.5_RUIDO_100u_M1.txt: Some errors were detected ! Line #6 (got 5 columns instead of 3) Line #7 (got 5 columns instead of 3) Line #8 (got 5 columns instead of 3)
 
 def calcular_desvio_archivo(nombre_archivo):
     """Procesa un archivo de ruido, remueve la deriva térmica y devuelve el desvío en nA."""
