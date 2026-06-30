@@ -17,8 +17,8 @@ def convertir_r_a_temp_steinhart(resistencia):
 
 def matchear_archivos_ruido(nombre_buscar):
     """
-    Busca el archivo en el repositorio y levanta la matriz numérica
-    soportando codificación Windows (CP1252) y cualquier mezcla de espacios o tabs.
+    Busca el archivo en el repositorio, saltea el encabezado de texto
+    y levanta las 5 columnas completas sin trabarse por el encoding o separadores.
     """
     directorio_base = "."
     for root, dirs, files in os.walk(directorio_base):
@@ -26,11 +26,20 @@ def matchear_archivos_ruido(nombre_buscar):
             ruta_completa = os.path.join(root, nombre_buscar)
             
             try:
-                # Quitamos usecols para que lea todas las columnas que vengan (5 en este caso)
-                datos = np.genfromtxt(ruta_completa, skip_header=4, encoding="cp1252")
+                # Abrimos como archivo de texto puro para evitar conflictos de codec con NumPy
+                with open(ruta_completa, "r", encoding="cp1252") as f:
+                    lineas = f.readlines()
+                
+                # Tu archivo tiene exactamente 3 líneas de texto antes de los números:
+                # 1. Fecha, 2. Línea vacía, 3. Títulos (Tiempo Corriente Tensión)
+                lineas_datos = lineas[3:]
+                
+                # np.loadtxt procesa la lista de strings e interpreta las 5 columnas de forma nativa
+                datos = np.loadtxt(lineas_datos)
                 return datos
-            except Exception as error_numpy:
-                st.error(f"⚠️ Error de NumPy en {nombre_buscar}: {error_numpy}")
+                
+            except Exception as error_lectura:
+                st.error(f"⚠️ Error leyendo {nombre_buscar}: {error_lectura}")
                 return None
                 
     return None
