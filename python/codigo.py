@@ -4,7 +4,7 @@ from graficos import (
     graficar_dispositivos, 
     graficar_sensibilidad_fg, 
     graficar_sensibilidad_fg_absoluta,
-    graficar_sensibilidad_fg2, 
+    graficar_sensibilidad_fg2,
     graficar_sensibilidad_fg_absoluta2,
     graficar_evolucion_vg
 )
