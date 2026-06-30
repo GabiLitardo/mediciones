@@ -17,20 +17,20 @@ def convertir_r_a_temp_steinhart(resistencia):
     return temp_kelvin - 273.15
 
 def calcular_desvio_archivo(nombre_archivo):
-    """Procesa un archivo de 3 columnas por tabs y devuelve el desvío en nA."""
+    """Procesa un archivo de ruido tolerando cambios de tabs a espacios."""
     datos_lista = matchear_archivos(nombre_archivo)
     if not datos_lista:
         return None
         
     datos = datos_lista[0]
     
-    # Resguardo por si el archivo que se está midiendo está vacío o incompleto
+    # Si la matriz colapsó a una dimensión o no tiene las 3 columnas, la salteamos de forma segura
     if len(datos.shape) < 2 or datos.shape[1] < 3:
         return None
 
     tiempo = datos[:, 0]
     corriente_uA = np.abs(datos[:, 1]) * 1e6  # Pasamos ID a módulo en uA
-    resistencia = datos[:, 2]                 # Columna del termistor limpio
+    resistencia = datos[:, 2]                 # Columna del termistor
     
     # 1. Convertimos resistencia a temperatura (°C)
     temperatura_C = convertir_r_a_temp_steinhart(resistencia)
