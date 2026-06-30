@@ -17,8 +17,8 @@ def convertir_r_a_temp_steinhart(resistencia):
 
 def matchear_archivos_ruido(nombre_buscar):
     """
-    Busca el archivo en el repositorio, saltea el encabezado de texto
-    y levanta las 5 columnas completas sin trabarse por el encoding o separadores.
+    Busca el archivo en el repositorio, limpia los fines de línea y 
+    levanta las 5 columnas completas de forma nativa sin trabarse.
     """
     directorio_base = "."
     for root, dirs, files in os.walk(directorio_base):
@@ -26,15 +26,21 @@ def matchear_archivos_ruido(nombre_buscar):
             ruta_completa = os.path.join(root, nombre_buscar)
             
             try:
-                # Abrimos como archivo de texto puro para evitar conflictos de codec con NumPy
+                # Abrimos como texto puro con la codificación de Windows que se banca la "ó"
                 with open(ruta_completa, "r", encoding="cp1252") as f:
                     lineas = f.readlines()
                 
-                # Tu archivo tiene exactamente 3 líneas de texto antes de los números:
-                # 1. Fecha, 2. Línea vacía, 3. Títulos (Tiempo Corriente Tensión)
-                lineas_datos = lineas[3:]
+                # Tu archivo tiene una línea en blanco al principio y texto 
+                # Filtramos las líneas de texto para quedarnos SOLO con las numéricas
+                lineas_datos = []
+                for linea in lineas:
+                    # Quitamos espacios en los extremos
+                    l_limpia = linea.strip()
+                    # Si la línea empieza con un número, es un dato numérico válido
+                    if l_limpia and (l_limpia[0].isdigit() or l_limpia[0] == '-'):
+                        lineas_datos.append(l_limpia)
                 
-                # np.loadtxt procesa la lista de strings e interpreta las 5 columnas de forma nativa
+                # np.loadtxt procesa la lista de strings e interpreta las 5 columnas limpias
                 datos = np.loadtxt(lineas_datos)
                 return datos
                 
@@ -55,9 +61,9 @@ def calcular_desvio_archivo(nombre_archivo):
         st.warning(f"Formato de matriz inválido en {nombre_archivo}: dimensión {datos.shape}")
         return None
 
-    tiempo = datos[:, 0] [cite: 1, 2]
+    tiempo = datos[:, 0] [cite: 2]
     corriente_uA = np.abs(datos[:, 1]) * 1e6  # Columna 1 
-    resistencia = datos[:, 2]                 # Columna 2                
+    resistencia = datos[:, 2]                 # Columna 2             
     
     # 1. Convertimos resistencia a temperatura (°C)
     temperatura_C = convertir_r_a_temp_steinhart(resistencia)
