@@ -4,6 +4,8 @@ from graficos import (
     graficar_dispositivos, 
     graficar_sensibilidad_fg, 
     graficar_sensibilidad_fg_absoluta,
+    graficar_sensibilidad_fg2, 
+    graficar_sensibilidad_fg_absoluta2,
     graficar_evolucion_vg
 )
 from ruido import mostrar_resumen_ruido
@@ -73,7 +75,17 @@ if mostrar_sensibilidad:
         lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3"],
         tipo_tanda="FG_tanda1"
     )
+    graficar_sensibilidad_fg2(
+        titulo="Sensibilidad FG Tanda 1 (Tasa vs $I_D$ Promedio Normalizado)",
+        lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3"],
+        tipo_tanda="FG_tanda1"
+    )
     graficar_sensibilidad_fg(
+        titulo="Sensibilidad FG Tanda 2 (Tasa vs $I_D$ Promedio Normalizado)",
+        lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
+        tipo_tanda="FG_tanda2"
+    )
+    graficar_sensibilidad_fg2(
         titulo="Sensibilidad FG Tanda 2 (Tasa vs $I_D$ Promedio Normalizado)",
         lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
         tipo_tanda="FG_tanda2"
@@ -85,7 +97,17 @@ if mostrar_sensibilidad:
         lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3"],
         tipo_tanda="FG_tanda1"
     )
+    graficar_sensibilidad_fg_absoluta2(
+        titulo="Sensibilidad Absoluta FG Tanda 1 (Tasa Absoluta vs $I_D$ Promedio Absoluto)",
+        lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3"],
+        tipo_tanda="FG_tanda1"
+    )
     graficar_sensibilidad_fg_absoluta(
+        titulo="Sensibilidad Absoluta FG Tanda 2 (Tasa Absoluta vs $I_D$ Promedio Absoluto)",
+        lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
+        tipo_tanda="FG_tanda2"
+    )
+    graficar_sensibilidad_fg_absoluta2(
         titulo="Sensibilidad Absoluta FG Tanda 2 (Tasa Absoluta vs $I_D$ Promedio Absoluto)",
         lista_dispositivos=["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"],
         tipo_tanda="FG_tanda2"
