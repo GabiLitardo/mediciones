@@ -18,15 +18,15 @@ def convertir_r_a_temp_steinhart(resistencia):
 def matchear_archivos_ruido(nombre_buscar):
     """
     Busca el archivo en el repositorio y levanta las primeras 3 columnas 
-    (Tiempo, Corriente, Resistencia) tolerando cualquier mezcla de espacios o tabs.
+    (Tiempo, Corriente, Resistencia) salteando correctamente las 4 líneas de cabecera.
     """
     directorio_base = "."
     for root, dirs, files in os.walk(directorio_base):
         if nombre_buscar in files:
             ruta_completa = os.path.join(root, nombre_buscar)
             try:
-                # Al no definir delimiter, se banca espacios o tabs indistintamente
-                datos = np.genfromtxt(ruta_completa, skip_header=2, usecols=(0, 1, 2))
+                # Cambiamos a skip_header=4 para limpiar por completo el texto inicial
+                datos = np.genfromtxt(ruta_completa, skip_header=4, usecols=(0, 1, 2))
                 return datos
             except:
                 return None
