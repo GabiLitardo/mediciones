@@ -14,7 +14,7 @@ C_SH = 8.77550e-8
 @st.cache_data
 def calcular_fit_polinomico_cached(disp_name, tipo_tanda, tiempos_list, corrientes_list):
     try:
-        coeficientes = np.polyfit(tiempos_list, corrientes_list, deg=5)
+        coeficientes = np.polyfit(tiempos_list, corrientes_list, deg=4)
         return coeficientes.tolist()
     except:
         return None
@@ -143,10 +143,10 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, anal
             coefs = calcular_fit_polinomico_cached(disp, llave_cache, tiempos.tolist(), corrientes_proc.tolist())
             
         if coefs is not None and analitico:
-            a, b, c, d, e, f = coefs
+            a, b, c, d, e = coefs
             t_cont = np.linspace(tiempos.min(), tiempos.max(), 200)
-            eje_y = np.abs(5*a*(t_cont**4) + 4*b*(t_cont**3) + 3*c*(t_cont**2) + 2*d*t_cont + e)
-            eje_x = a*(t_cont**5) + b*(t_cont**4) + c*(t_cont**3) + d*(t_cont**2) + e*t_cont + f
+            eje_y = np.abs(4*a*(t_cont**3) + 3*b*(t_cont**2) + 2*c*t_cont + d)
+            eje_x = a*(t_cont**4) + b*(t_cont**3) + c*(t_cont**2) + d*t_cont + e
             resultado[disp] = {"x": eje_x, "y": eje_y, "es_lineal": True}
         else:
             # Algoritmo discreto diferencial (Versión 2 / Fallback)
