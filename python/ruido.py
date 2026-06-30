@@ -20,23 +20,19 @@ def matchear_archivos_ruido(nombre_buscar):
     Busca el archivo y lo lee mostrando el error real en Streamlit 
     si algo falla al parsear.
     """
-    directorio_base = "."
-    for root, dirs, files in os.walk(directory_base):
+    directorio_base = "."  # Definida en español
+    for root, dirs, files in os.walk(directorio_base):  # Usada en español
         if nombre_buscar in files:
             ruta_completa = os.path.join(root, nombre_buscar)
             
-            # Quitamos el try-except genérico para ver qué explota
             try:
-                # Tu archivo tiene exactamente 4 líneas de texto antes de los números:
-                # 1. Fecha, 2. Vacía, 3. Explicación, 4. Títulos (Tiempo Corriente Tensión)
+                # Tu archivo tiene exactamente 4 líneas antes de los datos
                 datos = np.genfromtxt(ruta_completa, skip_header=4)
                 return datos
             except Exception as error_numpy:
                 st.error(f"⚠️ Error de NumPy en {nombre_buscar}: {error_numpy}")
                 return None
                 
-    # Si ni siquiera encuentra el archivo por nombre
-    # st.warning(f"No se encontró el archivo físico: {nombre_buscar}")
     return None
 
 def calcular_desvio_archivo(nombre_archivo):
