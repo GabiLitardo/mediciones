@@ -112,7 +112,7 @@ if mostrar_resumen:
         sens_abs_t2 = proc_sens.procesar_sensibilidad(["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"], "FG_tanda2", normalizado=False)
         
     if resultados_ruido is None:
-        resultados_ruido = proc_ruido.procesar_ruido(dispositivos_cruce, corrientes_ruido, normalizado=True)
+        resultados_ruido = proc_ruido.procesar_ruido(dispositivos_cruce, corrientes_ruido)
     
     sens_resumen = {disp: sens_abs_t2[0][disp] for disp in dispositivos_cruce}
     ruido_resumen = {disp: resultados_ruido[disp] for disp in dispositivos_cruce}
