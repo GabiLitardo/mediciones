@@ -1,4 +1,4 @@
-# codigo.py - Cabecera modificada
+# codigo.py
 import streamlit as st
 import graficos
 import proc_evo
@@ -8,7 +8,7 @@ import proc_ruido
 st.title("Resumen mediciones Chaves-Litardo")
 
 # =====================================================================
-# CONFIGURACIÓN DE CHECKBOXES (Se mantiene igual)
+# CONFIGURACIÓN DE CHECKBOXES
 # =====================================================================
 mostrar_evolucion = st.checkbox("1. Análisis temporal", value=True)
 mostrar_sensibilidad = st.checkbox("2. Análisis de Sensibilidad a radiación", value=False)
