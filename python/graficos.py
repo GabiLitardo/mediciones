@@ -88,7 +88,7 @@ def graficar_ruido(titulo, datos_ruido):
     st.plotly_chart(fig_ply, width='stretch')
     plt.close()
 
-def graficar_correlacion_sens_ruido(titulo, datos_sensibilidad, datos_ruido):
+def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido):
     fig_ply = go.Figure()
     colores = {"PFGIW1": "#1f77b4", "PFGIW2": "#ff7f0e", "PFGIP2": "#2ca02c"}
     
