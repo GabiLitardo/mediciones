@@ -16,9 +16,9 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
         fig_ply.add_trace(go.Scatter(x=tiempos_ordenados, y=valores_ordenados, mode='markers', name=f"{disp} (Medido)"))
         if es_fg:
             if tanda == 1:
-                coefs = calcular_fit_polinomico(disp, "FG_tanda1", tiempos_ordenados.tolist(), valores_ordenados.tolist())
+                coefs = calcular_fit_polinomico(tiempos_ordenados.tolist(), valores_ordenados.tolist())
             if tanda == 2:
-                coefs = calcular_fit_polinomico(disp, "FG_tanda2", tiempos_ordenados.tolist(), valores_ordenados.tolist())
+                coefs = calcular_fit_polinomico(tiempos_ordenados.tolist(), valores_ordenados.tolist())
             a, b, c, d, e = coefs
             t_continuo = np.linspace(tiempos_ordenados.min(), tiempos_ordenados.max(), 200)
             i_fitteada = a * (t_continuo ** 4) + b * (t_continuo ** 3) + c * (t_continuo ** 2) + d * t_continuo + e
