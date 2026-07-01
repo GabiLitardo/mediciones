@@ -123,7 +123,13 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido):
         ))
     '''
     fig_ply.update_layout(
-        title=titulo,
+        title=dict(
+            text=titulo,
+            y=0.98,
+            yanchor="top",
+            x=0.5,
+            xanchor="center"
+        ),
         xaxis=dict(
             title=r"Corriente Normalizada $I_{D_norm}$ [$\mu$A]",
             domain=[0, 0.82]
