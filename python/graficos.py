@@ -31,7 +31,7 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
             i_fitteada = a * (t_continuo ** 4) + b * (t_continuo ** 3) + c * (t_continuo ** 2) + d * t_continuo + e
             plt.plot(t_continuo, i_fitteada, "-", label=f"{disp} (Fit Poly g4)")
             fig_ply.add_trace(go.Scatter(x=t_continuo, y=i_fitteada, mode='lines', name=f"{disp} (Fit Poly)"))                     
-    graficar(titulo, "Tiempo Acumulado [min]", ylabel.replace("$", ""))
+    graficar(titulo = titulo, xlabel = "Tiempo Acumulado [min]", ylabel = ylabel.replace("$", ""))
     st.pyplot(fig_mpl)
     fig_ply.update_layout(title=titulo, xaxis_title=xlabel, yaxis_title=ylabel, template="plotly_white")
     st.plotly_chart(fig_ply, width='stretch')
