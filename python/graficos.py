@@ -30,7 +30,7 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     plt.grid(True, linestyle=":", alpha=0.6)
     plt.legend()
     st.pyplot(fig_mpl)
-    fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title=ylabel.replace("$", ""), template="plotly_white")
+    fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title=ylabel, template="plotly_white")
     st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
     
@@ -45,11 +45,11 @@ def graficar_evolucion_vg(titulo, datos_procesados):
         fig_ply.add_trace(go.Scatter(x=tiempos_ordenados, y=valores_ordenados, mode='lines+markers', name=disp))       
     plt.title(titulo)
     plt.xlabel("Tiempo Acumulado [min]")
-    plt.ylabel("Tensión $V_{FG}$ [V]")
+    plt.ylabel(r"Tensión $V_{FG}$ [V]")
     plt.grid(True, linestyle=":", alpha=0.6)
     plt.legend()
     st.pyplot(fig_mpl)
-    fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title="Tensión V_FG [V]", template="plotly_white")
+    fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title=r"Tensión $V_{FG}$ [V]", template="plotly_white")
     st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
 
@@ -63,13 +63,13 @@ def graficar_sensibilidad_fg(titulo, datos_sensibilidad):
         fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines', name=f"{disp} (Poly)"))
         
     plt.title(titulo)
-    plt.xlabel(r"Corriente Promedio Normalizada $I_{D\_norm}$ [u.a.]")
-    plt.ylabel(r"Tasa de Cambio [($\mu$A/unid_norm)/min]")
+    plt.xlabel(r"Corriente Promedio Normalizada $I_{D\_norm}$ [$\mu$A]")
+    plt.ylabel(r"Tasa de Cambio normalizada [($\mu$A)/min]")
     plt.grid(True, linestyle=":", alpha=0.6)
     plt.legend()
     st.pyplot(fig_mpl)
     
-    fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Normalizada I_D_norm [u.a.]", yaxis_title="Tasa de Cambio [(uA/unid_norm)/min]", template="plotly_white")
+    fig_ply.update_layout(title=titulo, xaxis_title=r"Corriente Promedio Normalizada I_D_norm [$\mu$A]", yaxis_title=r"Tasa de Cambio normalizada[($\mu$A)/min]", template="plotly_white")
     st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
 
@@ -90,7 +90,7 @@ def graficar_sensibilidad_fg_absoluta(titulo, datos_sensibilidad):
     plt.legend()
     st.pyplot(fig_mpl)
     
-    fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Absoluta I_D [uA]", yaxis_title="Tasa de Cambio Absoluta [uA/min]", template="plotly_white")
+    fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Absoluta I_D [uA]", yaxis_title=r"Tasa de Cambio Absoluta [$\mu$A/min]", template="plotly_white")
     st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
 
@@ -104,13 +104,13 @@ def graficar_sensibilidad_fg2(titulo, datos_sensibilidad):
         fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines+markers', name=disp))
 
     plt.title(titulo)
-    plt.xlabel("Corriente Promedio Normalizada $I_{D\_norm}$ [u.a.]")
-    plt.ylabel("Tasa de Cambio [($\mu$A/unid_norm)/min]")
+    plt.xlabel(r"Corriente Promedio Normalizada $I_{D\_norm}$ [$\mu$A]")
+    plt.ylabel(r"Tasa de Cambio normalizada[($\mu$A)/min]")
     plt.grid(True, linestyle=":", alpha=0.6)
     plt.legend()
     st.pyplot(fig_mpl)
 
-    fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Normalizada I_D_norm [u.a.]", yaxis_title="Tasa de Cambio [(uA/unid_norm)/min]", template="plotly_white")
+    fig_ply.update_layout(title=titulo, xaxis_title=r"Corriente Promedio Normalizada $I_D$ [$\mu$A]", yaxis_title=r"Tasa de Cambio normalizada [($\mu$A)/min]", template="plotly_white")
     st.plotly_chart(fig_ply, use_container_width=True)
     plt.close(fig_mpl)
 
@@ -124,11 +124,11 @@ def graficar_sensibilidad_fg_absoluta2(titulo, datos_sensibilidad):
         fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines+markers', name=disp))
 
     plt.title(titulo)
-    plt.xlabel("Corriente Promedio Absoluta $I_D$ [$\mu$A]")
-    plt.ylabel("Tasa de Cambio Absoluta [$\mu$A/min]")
+    plt.xlabel(r"Corriente Promedio Absoluta $I_D$ [$\mu$A]")
+    plt.ylabel(r"Tasa de Cambio Absoluta [$\mu$A/min]")
     plt.grid(True, linestyle=":", alpha=0.6)
     plt.legend()
     st.pyplot(fig_mpl)
-    fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Absoluta I_D [uA]", yaxis_title="Tasa de Cambio Absoluta [uA/min]", template="plotly_white")
+    fig_ply.update_layout(title=titulo, xaxis_title=r"Corriente Promedio Absoluta $I_D$ [$\mu$A]", yaxis_title=r"Tasa de Cambio Absoluta [$\mu$A/min]", template="plotly_white")
     st.plotly_chart(fig_ply, use_container_width=True)
     plt.close(fig_mpl)
