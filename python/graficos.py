@@ -114,13 +114,13 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido):
             mode='markers+lines', name=f"{disp} (Ruido)", 
             line=dict(dash='dash', color=color), yaxis='y2'
         ))
-        
+        '''
         fig_ply.add_trace(go.Scatter(
             x=datos_tc[disp]["x"], y=datos_tc[disp]["y"],
             mode='markers+lines', name=f"{disp} (TC)", 
             line=dict(dash='dot', color=color), marker=dict(symbol='square'), yaxis='y3'
         ))
-    
+    '''
     fig_ply.update_layout(
         title=dict(
             text=titulo,
