@@ -11,7 +11,6 @@ def calcular_fit_polinomico(tiempos_list, corrientes_list):
 
 def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True):
     datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda)
-    
     resultado_fit = {}
     resultado_discreto = {}
     
@@ -28,7 +27,7 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True):
         eje_y = np.abs(4*a*(t_cont**3) + 3*b*(t_cont**2) + 2*c*t_cont + d)
         eje_x = a*(t_cont**4) + b*(t_cont**3) + c*(t_cont**2) + d*t_cont + e
         
-        resultado_fit[disp] = [eje_x, eje_y]
+        resultado_fit[disp] = {"x": eje_x, "y": eje_y}
         
     for disp, datos in datos_crudos.items():   
         tiempos = datos["tiempos"]
@@ -44,6 +43,6 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True):
             eje_y.append(tasa)
             eje_x.append(promedio)
             
-        resultado_discreto[disp] = [np.array(eje_x), np.array(eje_y)]
+        resultado_discreto[disp] = {"x": np.array(eje_x), "y": np.array(eje_y)}
         
     return [resultado_fit, resultado_discreto]
