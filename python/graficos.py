@@ -134,6 +134,13 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido):
             overlaying='y', 
             side='right'
         ),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="center",
+            x=0.5
+        ),
         template="plotly_white"
     )
     st.plotly_chart(fig_ply, width='stretch')
