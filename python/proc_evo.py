@@ -1,7 +1,7 @@
 # proc_evo.py
 import numpy as np
 from pathlib import Path
-from lector_archivos import matchear_archivos_iv
+from lector_archivos import matchear_archivos
 
 def calcular_tiempo_acumulado(nro, tipo_tanda):
     """Calcula el tiempo acumulado según el historial de intervalos de irradiación."""
