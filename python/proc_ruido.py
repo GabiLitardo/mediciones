@@ -24,7 +24,7 @@ def calcular_desvio_archivo(nombre_archivo):
         
     return np.std(corriente_ruido_uA, ddof=1) * 1000.0
 
-def procesar_ruido_tanda(lista_dispositivos, corrientes_nominales):
+def procesar_ruido(lista_dispositivos, corrientes_nominales):
     resultado = {}
     for disp in lista_dispositivos:
         eje_x = []
