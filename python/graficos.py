@@ -69,8 +69,8 @@ def graficar_ruido(titulo, datos_ruido):
         x_data = datos["x"]
         y_data = datos["y"]
         
-        plt.plot(x_data, y_data, "o-", label=disp)
-        fig_ply.add_trace(go.Scatter(x=x_data, y=y_data, mode='lines+markers', name=disp))
+        plt.plot(x_data, y_data, "x", label=disp)
+        fig_ply.add_trace(go.Scatter(x=x_data, y=y_data, mode='markers', name=disp))
             
     plt.title(titulo)
     plt.xlabel(r"Corriente Nominal $I_D$ [$\mu$A]")
