@@ -26,7 +26,7 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True):
         t_cont = np.linspace(tiempos.min(), tiempos.max(), 200)
         eje_y = np.abs(4*a*(t_cont**3) + 3*b*(t_cont**2) + 2*c*t_cont + d)
         eje_x = a*(t_cont**4) + b*(t_cont**3) + c*(t_cont**2) + d*t_cont + e
-        resultado[disp] = {"x": eje_x, "y": eje_y, "es_lineal": True}
+        resultado[disp] = {"x": eje_x, "y": eje_y}
     resultados.append(resultado)
     resultado = {}
     for disp, datos in datos_crudos.items():   
@@ -37,6 +37,6 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True):
             promedio = (corrientes_proc[k+1] + corrientes_proc[k]) / 2.0
             eje_y.append(tasa)
             eje_x.append(promedio)
-        resultado[disp] = {"x": np.array(eje_x), "y": np.array(eje_y), "es_lineal": False}
+        resultado[disp] = {"x": np.array(eje_x), "y": np.array(eje_y)}
     resultados.append(resultado)
     return resultados
