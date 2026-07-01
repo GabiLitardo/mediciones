@@ -1,6 +1,5 @@
 # codigo.py
 import streamlit as st
-import graficos
 import proc_evo
 import proc_sens
 import proc_ruido
