@@ -88,15 +88,13 @@ def graficar_ruido(titulo, datos_ruido):
     st.plotly_chart(fig_ply, width='stretch')
     plt.close()
 
-def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido):
+def graficar_correlacion_sens_ruido(titulo, datos_sensibilidad, datos_ruido):
     fig_ply = go.Figure()
     colores = {"PFGIW1": "#1f77b4", "PFGIW2": "#ff7f0e", "PFGIP2": "#2ca02c"}
     
-    # 1. Buscamos máximos para Sensibilidad (y1) y Ruido (y2)
     s_max = max(np.max(d["y"]) for d in datos_sensibilidad.values())
     r_max = max(np.max(d["y"]) for d in datos_ruido.values())
     
-    # 2. Inventamos el arreglo de Coeficiente Térmico (y3) usando las mismas X del ruido
     tc_max = 0.15 
     datos_tc = {
         "PFGIW1": {"x": datos_ruido["PFGIW1"]["x"], "y": np.array([0.12, 0.09, 0.07, 0.05, 0.03])},
@@ -104,51 +102,46 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido):
         "PFGIP2": {"x": datos_ruido["PFGIP2"]["x"], "y": np.array([0.08, 0.06, 0.05, 0.04, 0.02])}
     }
 
-    # —— Renderizado de las 9 curvas ——
     for disp in datos_sensibilidad.keys():
         color = colores.get(disp, None)
         
-        # Eje Y1: Sensibilidad (Línea continua)
         fig_ply.add_trace(go.Scatter(
             x=datos_sensibilidad[disp]["x"], y=datos_sensibilidad[disp]["y"],
             mode='lines', name=f"{disp} (Sens)", line=dict(color=color)
         ))
         
-        # Eje Y2: Ruido (Línea punteada)
         fig_ply.add_trace(go.Scatter(
             x=datos_ruido[disp]["x"], y=datos_ruido[disp]["y"],
             mode='markers+lines', name=f"{disp} (Ruido)", 
             line=dict(dash='dash', color=color), yaxis='y2'
         ))
         
-        # Eje Y3: Coeficiente Térmico (Línea de puntos + Cuadrados)
         fig_ply.add_trace(go.Scatter(
             x=datos_tc[disp]["x"], y=datos_tc[disp]["y"],
             mode='markers+lines', name=f"{disp} (TC)", 
             line=dict(dash='dot', color=color), marker=dict(symbol='square'), yaxis='y3'
         ))
     
-    # —— Configuración del Layout Multieje ——
     fig_ply.update_layout(
         title=titulo,
         xaxis=dict(
             title="Corriente Promedio Normalizada I_D_norm [u.a.]",
-            domain=[0, 0.82] # Achicamos el gráfico horizontalmente para hacerle lugar al eje 3
+            domain=[0, 0.82]
         ),
         yaxis=dict(
-            title="Tasa de Cambio Absoluta [uA/min]",
-            titlefont=dict(color="#1f77b4"), range=[0, s_max * 1.1]
+            title=dict(text="Tasa de Cambio Absoluta [uA/min]", font=dict(color="#1f77b4")),
+            range=[0, s_max * 1.1]
         ),
         yaxis2=dict(
-            title="Desvío de Ruido [nA]",
-            titlefont=dict(color="#ff7f0e"), range=[0, r_max * 1.1],
+            title=dict(text="Desvío de Ruido [nA]", font=dict(color="#ff7f0e")),
+            range=[0, r_max * 1.1],
             overlaying='y', side='right'
         ),
         yaxis3=dict(
-            title="Coeficiente Térmico [%/°C]",
-            titlefont=dict(color="#2ca02c"), range=[0, tc_max * 1.1],
+            title=dict(text="Coeficiente Térmico [%/°C]", font=dict(color="#2ca02c")),
+            range=[0, tc_max * 1.1],
             overlaying='y', side='right',
-            anchor='free', position=0.94 # Lo mandamos flotando más a la derecha
+            anchor='free', position=0.94
         ),
         legend=dict(
             orientation="h", yanchor="bottom", y=1.05, xanchor="center", x=0.4
