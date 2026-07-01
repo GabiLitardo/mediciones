@@ -44,7 +44,7 @@ def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
         plt.plot(datos["x"], datos["y"], "o--", label=disp)
         fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines+markers', name=disp))
     '''
-    datos_sensibilidad_discreto = datos_sensibilidad["discreto"]
+    datos_sensibilidad_discreto = datos_sensibilidad[1]
     for disp, datos in datos_sensibilidad_discreto.items():
         plt.plot(datos["x"], datos["y"], "o--", label=disp)
         fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines+markers', name=disp))
