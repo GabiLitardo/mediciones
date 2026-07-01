@@ -12,8 +12,8 @@ def calcular_fit_polinomico(tiempos_list, corrientes_list):
 def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True):
     """Calcula los arreglos X e Y para los gráficos de sensibilidad de manera unificada."""
     datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda)
-    resultados = []
     resultado = {}
+    resultados = {}
     
     for disp, datos in datos_crudos.items():
         tiempos = datos["tiempos"]
@@ -27,8 +27,9 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True):
         eje_y = np.abs(4*a*(t_cont**3) + 3*b*(t_cont**2) + 2*c*t_cont + d)
         eje_x = a*(t_cont**4) + b*(t_cont**3) + c*(t_cont**2) + d*t_cont + e
         resultado[disp] = {"x": eje_x, "y": eje_y, "es_lineal": True}
-        resultados.append(resultado)
-        
+        resultados["analitico"] = resultado
+    resultado = {}
+    for disp, datos in datos_crudos.items():   
         eje_x, eje_y = [], []
         for k in range(len(corrientes_proc) - 1):
             dt = tiempos[k+1] - tiempos[k]
@@ -37,5 +38,5 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True):
             eje_y.append(tasa)
             eje_x.append(promedio)
         resultado[disp] = {"x": np.array(eje_x), "y": np.array(eje_y), "es_lineal": False}
-        resultados.append(resultado)
+        resultados["discreto"] = resultado
     return resultados
