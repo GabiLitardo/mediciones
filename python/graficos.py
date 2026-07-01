@@ -3,11 +3,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import streamlit as st
 import plotly.graph_objects as go
-from procesamiento import calcular_fit_polinomico_cached
+from procesamiento import calcular_fit_polinomico
 
-def graficar_dispositivos(titulo, ylabel, datos_procesados):
+def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     """Dibuja la evolución temporal absoluta de corrientes o voltajes interpolados."""
-    fig_mpl, ax = plt.subplots(figsize=(10, 5))
+    fig_mpl = plt.figure(figsize=(10, 5))
     fig_ply = go.Figure()
     hay_datos = False    
     
@@ -16,35 +16,29 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados):
         valores_ordenados = datos["valores"]
         
         # 1. Graficamos los puntos crudos medidos
-        ax.plot(tiempos_ordenados, valores_ordenados, "x", label=f"{disp} (Medido)")
+        plt.plot(tiempos_ordenados, valores_ordenados, "x", label=f"{disp} (Medido)")
         fig_ply.add_trace(go.Scatter(x=tiempos_ordenados, y=valores_ordenados, mode='markers', name=f"{disp} (Medido)"))
         
-        # 2. Si no es FOXFET (detectado por la unidad en ylabel), superponemos la curva continua del polinomio
-        if "Tensión [V]" not in ylabel:
-            try:
-                # Reutilizamos el fit desde la caché de procesamiento para dibujar la línea continua suave
-                coefs = calcular_fit_polinomico_cached(disp, "FG_tanda1", tiempos_ordenados.tolist(), valores_ordenados.tolist())
-                if coefs is None: # Intenta con la tanda 2 si no
-                    coefs = calcular_fit_polinomico_cached(disp, "FG_tanda2", tiempos_ordenados.tolist(), valores_ordenados.tolist())
-                
-                if coefs is not None:
-                    a, b, c, d, e = coefs
-                    t_continuo = np.linspace(tiempos_ordenados.min(), tiempos_ordenados.max(), 200)
-                    i_fitteada = a * (t_continuo ** 4) + b * (t_continuo ** 3) + c * (t_continuo ** 2) + d * t_continuo + e
-                    
-                    ax.plot(t_continuo, i_fitteada, "-", label=f"{disp} (Fit Poly g4)")
-                    fig_ply.add_trace(go.Scatter(x=t_continuo, y=i_fitteada, mode='lines', name=f"{disp} (Fit Poly)"))
-            except:
-                pass
+        if es_fg:
+            if tanda = 1:
+                coefs = calcular_fit_polinomico(disp, "FG_tanda1", tiempos_ordenados.tolist(), valores_ordenados.tolist())
+            if tanda = 2:
+                coefs = calcular_fit_polinomico(disp, "FG_tanda2", tiempos_ordenados.tolist(), valores_ordenados.tolist())
+            a, b, c, d, e = coefs
+            t_continuo = np.linspace(tiempos_ordenados.min(), tiempos_ordenados.max(), 200)
+            i_fitteada = a * (t_continuo ** 4) + b * (t_continuo ** 3) + c * (t_continuo ** 2) + d * t_continuo + e
+            
+            plt.plot(t_continuo, i_fitteada, "-", label=f"{disp} (Fit Poly g4)")
+            fig_ply.add_trace(go.Scatter(x=t_continuo, y=i_fitteada, mode='lines', name=f"{disp} (Fit Poly)"))
                 
         hay_datos = True
             
     if hay_datos:
-        ax.set_title(titulo)
-        ax.set_xlabel("Tiempo Acumulado [min]")
-        ax.set_ylabel(ylabel)
-        ax.grid(True, linestyle=":", alpha=0.6)
-        ax.legend()
+        plt.title(titulo)
+        plt.xlabel("Tiempo Acumulado [min]")
+        plt.ylabel(ylabel)
+        plt.grid(True, linestyle=":", alpha=0.6)
+        plt.legend()
         st.pyplot(fig_mpl)
         
         fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title=ylabel.replace("$", ""), template="plotly_white")
