@@ -31,6 +31,7 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     plt.legend()
     st.pyplot(fig_mpl)
     fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title=ylabel, template="plotly_white")
+    fig_ply.config['mathjax'] = 'cdn'
     st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
     
@@ -50,6 +51,7 @@ def graficar_evolucion_vg(titulo, datos_procesados):
     plt.legend()
     st.pyplot(fig_mpl)
     fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title=r"Tensión $V_{FG}$ [V]", template="plotly_white")
+    fig_ply.config['mathjax'] = 'cdn'
     st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
 
@@ -70,6 +72,7 @@ def graficar_sensibilidad_fg(titulo, datos_sensibilidad):
     st.pyplot(fig_mpl)
     
     fig_ply.update_layout(title=titulo, xaxis_title=r"Corriente Promedio Normalizada I_D_norm [$\mu$A]", yaxis_title=r"Tasa de Cambio normalizada[($\mu$A)/min]", template="plotly_white")
+    fig_ply.config['mathjax'] = 'cdn'
     st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
 
@@ -91,6 +94,7 @@ def graficar_sensibilidad_fg_absoluta(titulo, datos_sensibilidad):
     st.pyplot(fig_mpl)
     
     fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Absoluta I_D [uA]", yaxis_title=r"Tasa de Cambio Absoluta [$\mu$A/min]", template="plotly_white")
+    fig_ply.config['mathjax'] = 'cdn'
     st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
 
@@ -111,6 +115,7 @@ def graficar_sensibilidad_fg2(titulo, datos_sensibilidad):
     st.pyplot(fig_mpl)
 
     fig_ply.update_layout(title=titulo, xaxis_title=r"Corriente Promedio Normalizada $I_D$ [$\mu$A]", yaxis_title=r"Tasa de Cambio normalizada [($\mu$A)/min]", template="plotly_white")
+    fig_ply.config['mathjax'] = 'cdn'
     st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
 
@@ -130,5 +135,6 @@ def graficar_sensibilidad_fg_absoluta2(titulo, datos_sensibilidad):
     plt.legend()
     st.pyplot(fig_mpl)
     fig_ply.update_layout(title=titulo, xaxis_title=r"Corriente Promedio Absoluta $I_D$ [$\mu$A]", yaxis_title=r"Tasa de Cambio Absoluta [$\mu$A/min]", template="plotly_white")
+    fig_ply.config['mathjax'] = 'cdn'
     st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
