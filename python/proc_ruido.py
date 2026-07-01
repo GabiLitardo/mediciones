@@ -12,7 +12,7 @@ def convertir_r_a_temp_steinhart(resistencia):
 
 def calcular_desvio_archivo(nombre_archivo):
     """Remueve la deriva térmica lineal del archivo de ruido y extrae el desvío AC neto."""
-    lista_mediciones = matchear_archivos_ruido(nombre_archivo)
+    lista_mediciones = matchear_archivos(nombre_archivo, tipo_medicion="ruido")
     
     if not lista_mediciones:
         return None
