@@ -15,7 +15,7 @@ def matchear_archivos_iv(nombre_archivo_generico):
     return mediciones
 
 def matchear_archivos_ruido(nombre_buscar):
-    """Busca un archivo de ruido .txt y extrae sus columnas saltando la cabecera."""
+    """Busca un archivo de ruido .txt y extrae sus columnas usando tabulaciones."""
     # Buscamos el archivo recursivamente en el repo
     ruta = next(Path(".").glob(f"**/{nombre_buscar}"), None)
     
@@ -23,8 +23,12 @@ def matchear_archivos_ruido(nombre_buscar):
         return None
         
     try:
-        # skip_header=1 vuela la línea de "Tiempo (s) Id (A)..." de un solo viaje
-        # usecols=(0, 1, 2) se queda solo con Tiempo, Id y Termistor (así no cargamos Vd y Vg de gusto)
+        datos = np.genfromtxt(ruta, delimiter='\t', skip_header=1, usecols=(0, 1, 2), encoding="cp1252")
+        return datos if datos.size > 0 else None
+    except:
+        return None
+        
+    try:
         datos = np.genfromtxt(ruta, skip_header=1, usecols=(0, 1, 2), encoding="cp1252")
         return datos if datos.size > 0 else None
     except:
