@@ -103,7 +103,7 @@ def graficar_sensibilidad_fg2(titulo, datos_sensibilidad):
         plt.plot(datos["x"], datos["y"], "o--", label=disp)
         fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines+markers', name=disp))
 
-    plt.set_title(titulo)
+    plt.title(titulo)
     plt.xlabel("Corriente Promedio Normalizada $I_{D\_norm}$ [u.a.]")
     plt.ylabel("Tasa de Cambio [($\mu$A/unid_norm)/min]")
     plt.grid(True, linestyle=":", alpha=0.6)
