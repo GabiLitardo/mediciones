@@ -23,13 +23,7 @@ def matchear_archivos_ruido(nombre_buscar):
         return None
         
     try:
-        datos = np.genfromtxt(ruta, delimiter='\t', skip_header=1, usecols=(0, 1, 2), encoding="cp1252")
-        return datos if datos.size > 0 else None
-    except:
-        return None
-        
-    try:
-        datos = np.genfromtxt(ruta, skip_header=1, usecols=(0, 1, 2), encoding="cp1252")
+        datos = np.genfromtxt(ruta, delimiter='\t', skip_header=5, usecols=(0, 1, 2), encoding="cp1252")
         return datos if datos.size > 0 else None
     except:
         return None
