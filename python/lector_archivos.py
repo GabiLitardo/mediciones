@@ -16,7 +16,7 @@ def matchear_archivos_iv(nombre_archivo_generico):
 
 def matchear_archivos_ruido(nombre_archivo_generico):
     """Busca archivos de ruido .txt recursivamente y devuelve una lista con sus matrices de datos."""
-   directorio_base = Path(".")
+    directorio_base = Path(".")
     lista_de_rutas = directorio_base.glob("**/" + nombre_archivo_generico)
     mediciones = []
     for ruta_archivo in lista_de_rutas:
