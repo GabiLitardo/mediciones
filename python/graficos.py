@@ -61,4 +61,29 @@ def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
     st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
 
-
+def graficar_ruido(titulo, datos_ruido):
+    plt.figure(figsize=(10, 5))
+    fig_ply = go.Figure()
+    
+    for disp, datos in datos_ruido.items():
+        x_data = datos["x"]
+        y_data = datos["y"]
+        
+        plt.plot(x_data, y_data, "o-", label=disp)
+        fig_ply.add_trace(go.Scatter(x=x_data, y=y_data, mode='lines+markers', name=disp))
+            
+    plt.title(titulo)
+    plt.xlabel(r"Corriente Nominal $I_D$ [$\mu$A]")
+    plt.ylabel("Desvío de Ruido [nA]")
+    plt.grid(True, linestyle=":", alpha=0.6)
+    plt.legend()
+    st.pyplot(plt.gcf())
+    
+    fig_ply.update_layout(
+        title=titulo, 
+        xaxis_title="Corriente Nominal I_D [uA]", 
+        yaxis_title="Desvío de Ruido [nA]", 
+        template="plotly_white"
+    )
+    st.plotly_chart(fig_ply, width='stretch')
+    plt.close()
