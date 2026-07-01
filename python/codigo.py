@@ -117,8 +117,4 @@ if mostrar_resumen:
     sens_resumen = {disp: sens_abs_t2[0][disp] for disp in dispositivos_cruce}
     ruido_resumen = {disp: resultados_ruido[disp] for disp in dispositivos_cruce}
     
-    graficos.graficar_correlacion_sens_ruido(
-        titulo="Tanda 2: Sensibilidad Absoluta y Ruido vs I_D Normalizada",
-        datos_sensibilidad=sens_resumen,
-        datos_ruido=ruido_resumen
-    )
+    graficos.graficar_superposicion_sens_ruido(titulo="Tanda 2: Sensibilidad Absoluta y Ruido vs I_D Normalizada",datos_sensibilidad=sens_resumen,datos_ruido=ruido_resumen)
