@@ -11,7 +11,7 @@ def graficar(titulo, xlabel, ylabel):
     plt.ylabel(ylabel)
     plt.grid(True, linestyle=":", alpha=0.6)
     plt.legend()
-    fig_ply.update_layout(title=titulo, xaxis_title=xlabel, yaxis_title=ylabel, template="plotly_white")
+    fig_ply.update_layout(title=titulo, xaxis_title=xlabel, yaxis_title=ylabel.replace("$", ""), template="plotly_white")
 
 def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     """Dibuja la evolución temporal absoluta de corrientes o voltajes interpolados."""
