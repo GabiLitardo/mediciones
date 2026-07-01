@@ -66,18 +66,18 @@ if mostrar_sensibilidad:
     st.subheader("Normalizada")
     
     sens_norm_t1 = proc_sens.procesar_sensibilidad(["PFGIW1", "PFGIW2", "PFGIW3"], "FG_tanda1", normalizado=True)
-    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad FG Tanda 1 (Tasa vs $I_D$ Promedio Normalizado)", datos_sensibilidad=sens_norm_t1, xlabel = r"Corriente Promedio Normalizada $I_{D\_norm}$ [$\mu$A]", ylabel = r"Tasa de Cambio normalizada [($\mu$A)/min]")
+    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad FG Tanda 1 (Tasa vs $I_D$ Normalizado)", datos_sensibilidad=sens_norm_t1, xlabel = r"Corriente Normalizada $I_{D\_norm}$ [$\mu$A]", ylabel = r"Tasa de Cambio normalizada [($\mu$A)/min]")
         
     sens_norm_t2 = proc_sens.procesar_sensibilidad(["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"], "FG_tanda2", normalizado=True)
-    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad FG Tanda 2 (Tasa vs $I_D$ Promedio Normalizado)", datos_sensibilidad=sens_norm_t2, xlabel = r"Corriente Promedio Normalizada $I_{D\_norm}$ [$\mu$A]", ylabel = r"Tasa de Cambio normalizada [($\mu$A)/min]")
+    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad FG Tanda 2 (Tasa vs $I_D$ Normalizado)", datos_sensibilidad=sens_norm_t2, xlabel = r"Corriente Normalizada $I_{D\_norm}$ [$\mu$A]", ylabel = r"Tasa de Cambio normalizada [($\mu$A)/min]")
         
     st.subheader("Sin normalizar")
     
     sens_abs_t1 = proc_sens.procesar_sensibilidad(["PFGIW1", "PFGIW2", "PFGIW3"], "FG_tanda1", normalizado=False)
-    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad Absoluta FG Tanda 1 (Tasa Absoluta vs $I_D$ Promedio Normalizado)", datos_sensibilidad=sens_abs_t1, xlabel = r"Corriente Promedio Normalizada $I_{D\_norm}$ [$\mu$A]", ylabel = r"Tasa de Cambio Absoluta [$\mu$A/min]")
+    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad Absoluta FG Tanda 1 (Tasa Absoluta vs $I_D$ Normalizado)", datos_sensibilidad=sens_abs_t1, xlabel = r"Corriente Normalizada $I_{D\_norm}$ [$\mu$A]", ylabel = r"Tasa de Cambio Absoluta [$\mu$A/min]")
         
     sens_abs_t2 = proc_sens.procesar_sensibilidad(["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"], "FG_tanda2", normalizado=False)
-    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad Absoluta FG Tanda 2 (Tasa Absoluta vs $I_D$ Promedio Normalizado)", datos_sensibilidad=sens_abs_t2, xlabel = r"Corriente Promedio Normalizada $I_{D\_norm}$ [$\mu$A]", ylabel = r"Tasa de Cambio Absoluta [$\mu$A/min]")
+    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad Absoluta FG Tanda 2 (Tasa Absoluta vs $I_D$ Normalizado)", datos_sensibilidad=sens_abs_t2, xlabel = r"Corriente Normalizada $I_{D\_norm}$ [$\mu$A]", ylabel = r"Tasa de Cambio Absoluta [$\mu$A/min]")
     
 # =====================================================================
 # SECCIÓN 3: RUIDO
