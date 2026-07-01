@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import streamlit as st
 import plotly.graph_objects as go
-from procesamiento import calcular_fit_polinomico
+from proc_sens import calcular_fit_polinomico
 
 def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     """Dibuja la evolución temporal absoluta de corrientes o voltajes interpolados."""
