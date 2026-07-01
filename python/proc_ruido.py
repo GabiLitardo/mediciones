@@ -24,3 +24,14 @@ def calcular_desvio_archivo(nombre_archivo):
     corriente_ruido_uA = corriente_uA - corriente_tendencia
         
     return np.std(corriente_ruido_uA, ddof=1) * 1000.0 # multiplico por 1000 para que quede en nA
+
+def calcular_desvio(lista_dispositivos, corrientes):
+    resultados = {}
+    for disp in lista_dispositivos:
+        resultados[disp] = {}
+        for corr in corrientes_nominales:
+            nombre_archivo = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1.txt"
+            sigma = calcular_desvio_archivo(nombre_archivo)
+            resultados[disp][f"{curr} uA"] = f"{sigma:.2f} nA"
+
+    return resultados
