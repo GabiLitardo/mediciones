@@ -111,7 +111,7 @@ def graficar_sensibilidad_fg2(titulo, datos_sensibilidad):
     st.pyplot(fig_mpl)
 
     fig_ply.update_layout(title=titulo, xaxis_title=r"Corriente Promedio Normalizada $I_D$ [$\mu$A]", yaxis_title=r"Tasa de Cambio normalizada [($\mu$A)/min]", template="plotly_white")
-    st.plotly_chart(fig_ply, use_container_width=True)
+    st.plotly_chart(fig_ply, width=True)
     plt.close(fig_mpl)
 
 def graficar_sensibilidad_fg_absoluta2(titulo, datos_sensibilidad):
@@ -130,5 +130,5 @@ def graficar_sensibilidad_fg_absoluta2(titulo, datos_sensibilidad):
     plt.legend()
     st.pyplot(fig_mpl)
     fig_ply.update_layout(title=titulo, xaxis_title=r"Corriente Promedio Absoluta $I_D$ [$\mu$A]", yaxis_title=r"Tasa de Cambio Absoluta [$\mu$A/min]", template="plotly_white")
-    st.plotly_chart(fig_ply, use_container_width=True)
+    st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
