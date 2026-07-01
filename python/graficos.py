@@ -31,8 +31,8 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     plt.legend()
     st.pyplot(fig_mpl)
     fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title=ylabel, template="plotly_white")
-
-    st.plotly_chart(fig_ply, width='stretch')
+    configuracion_plotly = {'mathjax': 'cdn'}
+    st.plotly_chart(fig_ply, width='stretch', config=configuracion_plotly)
     plt.close(fig_mpl)
     
 def graficar_evolucion_vg(titulo, datos_procesados):
