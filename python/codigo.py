@@ -100,17 +100,5 @@ if mostrar_ruido:
     
     lista_dispositivos = ["PFGIW1", "PFGIW2", "PFGIP2"]
     corrientes_nominales = [100, 150, 200, 250, 350]
-    resultados = {}
-    
-    for disp in lista_dispositivos:
-        resultados[disp] = {}
-        for curr in corrientes_nominales:
-            nombre_archivo = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{curr}u_M1.txt"
-            sigma = proc_ruido.calcular_desvio_archivo(nombre_archivo)
-            
-            if sigma is not None:
-                resultados[disp][f"{curr} uA"] = f"{sigma:.2f} nA"
-            else:
-                resultados[disp][f"{curr} uA"] = "Falta medición / Incompleto"
-                
+    resultados = proc_ruido.calcular_desvio(lista_dispositivos, corrientes_nominales)
     st.write(resultados)
