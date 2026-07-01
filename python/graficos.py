@@ -94,14 +94,14 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido):
     
     s_max = max(np.max(d["y"]) for d in datos_sensibilidad.values())
     r_max = max(np.max(d["y"]) for d in datos_ruido.values())
-    
+    '''
     tc_max = 0.15 
     datos_tc = {
         "PFGIW1": {"x": datos_ruido["PFGIW1"]["x"], "y": np.array([0.12, 0.09, 0.07, 0.05, 0.03])},
         "PFGIW2": {"x": datos_ruido["PFGIW2"]["x"], "y": np.array([0.14, 0.11, 0.08, 0.06, 0.04])},
         "PFGIP2": {"x": datos_ruido["PFGIP2"]["x"], "y": np.array([0.08, 0.06, 0.05, 0.04, 0.02])}
     }
-
+    '''
     for disp in datos_sensibilidad.keys():
         color = colores.get(disp, None)
         
@@ -137,12 +137,12 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido):
             range=[0, r_max * 1.1],
             overlaying='y', side='right'
         ),
-        yaxis3=dict(
-            title=dict(text="Coeficiente Térmico [%/°C]", font=dict(color="#2ca02c")),
-            range=[0, tc_max * 1.1],
-            overlaying='y', side='right',
-            anchor='free', position=0.94
-        ),
+        #yaxis3=dict(
+            #title=dict(text="Coeficiente Térmico [%/°C]", font=dict(color="#2ca02c")),
+           # range=[0, tc_max * 1.1],
+          #  overlaying='y', side='right',
+         #   anchor='free', position=0.94
+        #),
         legend=dict(
             orientation="h", yanchor="bottom", y=1.05, xanchor="center", x=0.4
         ),
