@@ -14,12 +14,12 @@ def matchear_archivos_iv(nombre_archivo_generico):
         mediciones.append(medicion)
     return mediciones
 
-def matchear_archivos_ruido(nombre_buscar):
-    """Busca un archivo de ruido .txt y extrae sus columnas usando tabulaciones."""
-    # Buscamos el archivo recursivamente en el repo
-    ruta = next(Path(".").glob(f"**/{nombre_buscar}"), None)
-    try:
-        datos = np.genfromtxt(ruta, delimiter='\t', skip_header=5, usecols=(0, 1, 2), encoding="cp1252")
-        return datos
-    except:
-        return None
+def matchear_archivos_ruido(nombre_archivo_generico):
+    """Busca archivos de ruido .txt recursivamente y devuelve una lista con sus matrices de datos."""
+    directorio_base = Path(".")
+    lista_de_rutas = directorio_base.glob("**/" + nombre_archivo_generico)
+    mediciones = []
+    for ruta_archivo in lista_de_rutas:
+        medicion = np.genfromtxt(ruta_archivo, delimiter='\t', skip_header=5, usecols=(0, 1, 2), encoding="cp1252")
+        mediciones.append(medicion)
+    return mediciones
