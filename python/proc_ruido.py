@@ -1,6 +1,6 @@
 # proc_ruido.py
 import numpy as np
-from lector_archivos import matchear_archivos_ruido
+from lector_archivos import matchear_archivos
 
 A_SH = 1.12924e-3
 B_SH = 2.34108e-4
