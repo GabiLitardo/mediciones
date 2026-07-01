@@ -92,6 +92,9 @@ def graficar_correlacion_sens_ruido(titulo, datos_sensibilidad, datos_ruido):
     plt.figure(figsize=(10, 5))
     fig_ply = go.Figure()
     
+    # Definimos una paleta fija por dispositivo para que coincidan los colores
+    colores = {"PFGIW1": "#1f77b4", "PFGIW2": "#ff7f0e", "PFGIP2": "#2ca02c"}
+    
     s_max = 1e-5
     for disp, datos in datos_sensibilidad.items():
         s_max = max(s_max, np.max(datos["y"]))
@@ -103,19 +106,23 @@ def graficar_correlacion_sens_ruido(titulo, datos_sensibilidad, datos_ruido):
     for disp, datos in datos_sensibilidad.items():
         x_data = datos["x"]
         y_data = datos["y"]
-        plt.plot(x_data, y_data, "-", label=f"{disp} (Sensibilidad)")
-        fig_ply.add_trace(go.Scatter(x=x_data, y=y_data, mode='lines', name=f"{disp} (Sensibilidad)"))
+        color = colores.get(disp, None)
+        
+        plt.plot(x_data, y_data, "-", label=f"{disp} (Sens)", color=color)
+        fig_ply.add_trace(go.Scatter(
+            x=x_data, y=y_data, mode='lines', 
+            name=f"{disp} (Sens)", line=dict(color=color)
+        ))
         
     for disp, datos in datos_ruido.items():
         x_data = datos["x"]
         y_data = datos["y"]
-        plt.plot(x_data, y_data, "o--", label=f"{disp} (Ruido)")
+        color = colores.get(disp, None)
+        
+        plt.plot(x_data, y_data, "o--", label=f"{disp} (Ruido)", color=color)
         fig_ply.add_trace(go.Scatter(
-            x=x_data, 
-            y=y_data, 
-            mode='markers+lines', 
-            name=f"{disp} (Ruido)",
-            line=dict(dash='dash'),
+            x=x_data, y=y_data, mode='markers+lines', 
+            name=f"{disp} (Ruido)", line=dict(dash='dash', color=color),
             yaxis='y2'
         ))
             
@@ -129,16 +136,8 @@ def graficar_correlacion_sens_ruido(titulo, datos_sensibilidad, datos_ruido):
     fig_ply.update_layout(
         title=titulo, 
         xaxis_title="Corriente Promedio Normalizada I_D_norm [u.a.]", 
-        yaxis=dict(
-            title="Tasa de Cambio Absoluta [uA/min]",
-            range=[0, s_max * 1.1]
-        ),
-        yaxis2=dict(
-            title="Desvío de Ruido [nA]",
-            range=[0, r_max * 1.1],
-            overlaying='y',
-            side='right'
-        ),
+        yaxis=dict(title="Tasa de Cambio Absoluta [uA/min]", range=[0, s_max * 1.1]),
+        yaxis2=dict(title="Desvío de Ruido [nA]", range=[0, r_max * 1.1], overlaying='y', side='right'),
         template="plotly_white"
     )
     st.plotly_chart(fig_ply, width='stretch')
