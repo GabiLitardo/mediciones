@@ -38,10 +38,10 @@ def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
     """Dibuja la sensibilidad normalizada"""
     fig_mpl = plt.figure(figsize=(10, 5))
     fig_ply = go.Figure()
-    
-    for disp, datos in datos_sensibilidad.items():
-        plt.plot(datos["x"], datos["y"], "-", label=f"{disp} (Poly Fit g4)")
-        fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines', name=f"{disp} (Poly)"))
+    for dato_sensibilidad in datos_sensibilidad:
+        for disp, datos in dato_sensibilidad.items():
+            plt.plot(datos["x"], datos["y"], "-", label=f"{disp} (Poly Fit g4)")
+            fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines', name=f"{disp} (Poly)"))
         
     plt.title(titulo)
     plt.xlabel(xlabel)
