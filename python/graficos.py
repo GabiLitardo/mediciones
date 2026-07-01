@@ -107,7 +107,7 @@ def graficar_sensibilidad_fg_absoluta(titulo, datos_sensibilidad):
     hay_datos = False    
     
     for disp, datos in datos_sensibilidad.items():
-        ax.plot(datos["x"], datos["y"], "-", label=f"{disp} (Poly Fit g5)")
+        ax.plot(datos["x"], datos["y"], "-", label=f"{disp} (Poly Fit g4)")
         fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines', name=f"{disp} (Poly)"))
         hay_datos = True
             
