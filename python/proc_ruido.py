@@ -32,6 +32,6 @@ def calcular_desvio(lista_dispositivos, corrientes):
         for corr in corrientes:
             nombre_archivo = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1.txt"
             sigma = calcular_desvio_archivo(nombre_archivo)
-            resultados[disp][f"{curr} uA"] = f"{sigma:.2f} nA"
+            resultados[disp][f"{corr} uA"] = f"{sigma:.2f} nA"
 
     return resultados
