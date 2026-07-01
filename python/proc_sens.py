@@ -25,7 +25,7 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True):
         
         t_cont = np.linspace(tiempos.min(), tiempos.max(), 200)
         eje_y = np.abs(4*a*(t_cont**3) + 3*b*(t_cont**2) + 2*c*t_cont + d)
-        eje_x = a*(t_cont**4) + b*(t_cont**3) + c*(t_cont**2) + d*t_cont + e
+        eje_x = (a*(t_cont**4) + b*(t_cont**3) + c*(t_cont**2) + d*t_cont + e) * factor
         
         resultado_fit[disp] = {"x": eje_x, "y": eje_y}
         
@@ -39,7 +39,7 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True):
         for k in range(len(corrientes_proc) - 1):
             dt = tiempos[k+1] - tiempos[k]
             tasa = np.abs(corrientes_proc[k+1] - corrientes_proc[k]) / dt
-            promedio = (corrientes_proc[k+1] + corrientes_proc[k]) / 2.0
+            promedio = (corrientes[k+1] + corrientes[k]) / 2.0
             eje_y.append(tasa)
             eje_x.append(promedio)
             
