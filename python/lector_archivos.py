@@ -15,27 +15,17 @@ def matchear_archivos_iv(nombre_archivo_generico):
     return mediciones
 
 def matchear_archivos_ruido(nombre_buscar):
-    """Busca un archivo de ruido .txt y extrae sus 5 columnas limpias."""
-    directorio_base = "."
-    for root, dirs, files in os.walk(directorio_base):
-        if nombre_buscar in files:
-            ruta_completa = os.path.join(root, nombre_buscar)
-            try:
-                with open(ruta_completa, "r", encoding="cp1252") as f:
-                    lineas = f.readlines()
-                
-                lineas_datos = []
-                for linea in lineas:
-                    l_limpia = linea.strip()
-                    # Verificamos que no esté vacía y que empiece con número o signo menos
-                    if l_limpia and (l_limpia[0].isdigit() or l_limpia[0] == '-'):
-                        lineas_datos.append(l_limpia)
-                
-                if not lineas_datos:
-                    return None
-                    
-                datos = np.loadtxt(lineas_datos)
-                return datos
-            except Exception as error_lectura:
-                return None
-    return None
+    """Busca un archivo de ruido .txt y extrae sus columnas saltando la cabecera."""
+    # Buscamos el archivo recursivamente en el repo
+    ruta = next(Path(".").glob(f"**/{nombre_buscar}"), None)
+    
+    if ruta is None:
+        return None
+        
+    try:
+        # skip_header=1 vuela la línea de "Tiempo (s) Id (A)..." de un solo viaje
+        # usecols=(0, 1, 2) se queda solo con Tiempo, Id y Termistor (así no cargamos Vd y Vg de gusto)
+        datos = np.genfromtxt(ruta, skip_header=1, usecols=(0, 1, 2), encoding="cp1252")
+        return datos if datos.size > 0 else None
+    except:
+        return None
