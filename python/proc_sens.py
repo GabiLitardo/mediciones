@@ -12,14 +12,14 @@ def calcular_fit_polinomico(tiempos_list, corrientes_list):
 def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True):
     """Calcula los arreglos X e Y para los gráficos de sensibilidad de manera unificada."""
     datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda)
+    resultados = []
     resultado = {}
     
     for disp, datos in datos_crudos.items():
         tiempos = datos["tiempos"]
         corrientes = datos["valores"]
         factor = factores_normalizacion.get(disp, 1.0) if normalizado else 1.0
-        corrientes_proc = corrientes / factor
-        resultados = []        
+        corrientes_proc = corrientes / factor       
         coefs = calcular_fit_polinomico(tiempos.tolist(), corrientes_proc.tolist())
 
         a, b, c, d, e = coefs
