@@ -22,7 +22,7 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, anal
         
         coefs = None
         if analitico:
-            coefs = calcular_fit_polinomico_cached(tiempos.tolist(), corrientes_proc.tolist())
+            coefs = calcular_fit_polinomico(tiempos.tolist(), corrientes_proc.tolist())
             
         if analitico:
             a, b, c, d, e = coefs
