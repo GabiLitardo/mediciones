@@ -2,21 +2,24 @@
 import numpy as np
 from lector_archivos import matchear_archivos_ruido
 
-# Constantes de Steinhart-Hart para el termistor
 A_SH = 1.12924e-3
 B_SH = 2.34108e-4
 C_SH = 8.77550e-8
 
 def convertir_r_a_temp_steinhart(resistencia):
-    """Convierte la lectura del termistor a temperatura en °C."""
     ln_R = np.log(resistencia)
     return (1.0 / (A_SH + B_SH * ln_R + C_SH * (ln_R ** 3))) - 273.15
 
 def calcular_desvio_archivo(nombre_archivo):
     """Remueve la deriva térmica lineal del archivo de ruido y extrae el desvío AC neto."""
-    datos = matchear_archivos_ruido(nombre_archivo)
+    lista_mediciones = matchear_archivos_ruido(nombre_archivo)
     
-    if datos is None or datos.size == 0 or len(datos.shape) < 2 or datos.shape[1] < 3:
+    if not lista_mediciones:
+        return None
+        
+    datos = lista_mediciones[0]
+    
+    if datos.size == 0 or len(datos.shape) < 2 or datos.shape[1] < 3:
         return None
 
     try:
