@@ -25,21 +25,27 @@ if mostrar_evolucion:
     graficos.graficar_dispositivos(
         titulo="Evolución Floating Gates Tanda 1 (I @ V = -4.5 V)",
         ylabel=r"$I_D$ [$\mu$A]",
-        datos_procesados=datos_fg_t1
+        datos_procesados=datos_fg_t1,
+        tanda = 1,
+        es_fg = True
     )
 
     datos_fg_t2 = proc_evo.obtener_datos_crudos_tanda(["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"], "FG_tanda2")
     graficos.graficar_dispositivos(
         titulo="Evolución Floating Gates Tanda 2 (I @ V = -4.5 V)",
         ylabel=r"$I_D$ [$\mu$A]",
-        datos_procesados=datos_fg_t2
+        datos_procesados=datos_fg_t2,
+        tanda = 2,
+        es_fg = True
     )
 
     datos_foxfet = proc_evo.obtener_datos_crudos_tanda(["FFC1", "FFC2", "FFC3", "FFL", "FFS"], "FOXFET")
     graficos.graficar_dispositivos(
         titulo="Evolución FOXFETs (Tensión interpolada @ I = 10 uA)",
         ylabel="Tensión [V]",
-        datos_procesados=datos_foxfet
+        datos_procesados=datos_foxfet,
+        tanda = 0, 
+        es_fg = False
     )
 
     st.subheader("Evolución del Voltaje de Compuerta Equivalente ($V_{FG}$)")
