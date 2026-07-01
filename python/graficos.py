@@ -8,17 +8,12 @@ from procesamiento import calcular_fit_polinomico
 def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     """Dibuja la evolución temporal absoluta de corrientes o voltajes interpolados."""
     fig_mpl = plt.figure(figsize=(10, 5))
-    fig_ply = go.Figure()
-    hay_datos = False    
-    
+    fig_ply = go.Figure()    
     for disp, datos in datos_procesados.items():
         tiempos_ordenados = datos["tiempos"]
         valores_ordenados = datos["valores"]
-        
-        # 1. Graficamos los puntos crudos medidos
         plt.plot(tiempos_ordenados, valores_ordenados, "x", label=f"{disp} (Medido)")
         fig_ply.add_trace(go.Scatter(x=tiempos_ordenados, y=valores_ordenados, mode='markers', name=f"{disp} (Medido)"))
-        
         if es_fg:
             if tanda = 1:
                 coefs = calcular_fit_polinomico(disp, "FG_tanda1", tiempos_ordenados.tolist(), valores_ordenados.tolist())
@@ -27,71 +22,55 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
             a, b, c, d, e = coefs
             t_continuo = np.linspace(tiempos_ordenados.min(), tiempos_ordenados.max(), 200)
             i_fitteada = a * (t_continuo ** 4) + b * (t_continuo ** 3) + c * (t_continuo ** 2) + d * t_continuo + e
-            
             plt.plot(t_continuo, i_fitteada, "-", label=f"{disp} (Fit Poly g4)")
-            fig_ply.add_trace(go.Scatter(x=t_continuo, y=i_fitteada, mode='lines', name=f"{disp} (Fit Poly)"))
-                
-        hay_datos = True
-            
-    if hay_datos:
-        plt.title(titulo)
-        plt.xlabel("Tiempo Acumulado [min]")
-        plt.ylabel(ylabel)
-        plt.grid(True, linestyle=":", alpha=0.6)
-        plt.legend()
-        st.pyplot(fig_mpl)
-        
-        fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title=ylabel.replace("$", ""), template="plotly_white")
-        st.plotly_chart(fig_ply, width='stretch')
+            fig_ply.add_trace(go.Scatter(x=t_continuo, y=i_fitteada, mode='lines', name=f"{disp} (Fit Poly)"))                     
+    plt.title(titulo)
+    plt.xlabel("Tiempo Acumulado [min]")
+    plt.ylabel(ylabel)
+    plt.grid(True, linestyle=":", alpha=0.6)
+    plt.legend()
+    st.pyplot(fig_mpl)
+    fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title=ylabel.replace("$", ""), template="plotly_white")
+    st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
     
 def graficar_evolucion_vg(titulo, datos_procesados):
-    """Dibuja la descarga temporal equivalente en voltaje V_FG."""
-    fig_mpl, ax = plt.subplots(figsize=(10, 5))
+    """Dibuja la descarga temporal equivalente en tensión V_FG."""
+    fig_mpl = plt.figure(figsize=(10, 5))
     fig_ply = go.Figure()
-    hay_datos = False    
-    
     for disp, datos in datos_procesados.items():
         tiempos_ordenados = datos["tiempos"]
         valores_ordenados = datos["valores"]
-        
-        ax.plot(tiempos_ordenados, valores_ordenados, "o--", label=disp)
-        fig_ply.add_trace(go.Scatter(x=tiempos_ordenados, y=valores_ordenados, mode='lines+markers', name=disp))
-        hay_datos = True
-            
-    if hay_datos:
-        ax.set_title(titulo)
-        ax.set_xlabel("Tiempo Acumulado [min]")
-        ax.set_ylabel("Tensión $V_{FG}$ [V]")
-        ax.grid(True, linestyle=":", alpha=0.6)
-        ax.legend()
-        st.pyplot(fig_mpl)
-        
-        fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title="Tensión V_FG [V]", template="plotly_white")
-        st.plotly_chart(fig_ply, width='stretch')
+        plt.plot(tiempos_ordenados, valores_ordenados, "o--", label=disp)
+        fig_ply.add_trace(go.Scatter(x=tiempos_ordenados, y=valores_ordenados, mode='lines+markers', name=disp))       
+    plt.title(titulo)
+    plt.xlabel("Tiempo Acumulado [min]")
+    plt.ylabel("Tensión $V_{FG}$ [V]")
+    plt.grid(True, linestyle=":", alpha=0.6)
+    plt.legend()
+    st.pyplot(fig_mpl)
+    fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title="Tensión V_FG [V]", template="plotly_white")
+    st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
 
 def graficar_sensibilidad_fg(titulo, datos_sensibilidad):
-    """Dibuja la sensibilidad normalizada (Versión 1: Polinómica Analítica)."""
-    fig_mpl, ax = plt.subplots(figsize=(10, 5))
+    """Dibuja la sensibilidad normalizada"""
+    fig_mpl = plt.figure(figsize=(10, 5))
     fig_ply = go.Figure()
-    hay_datos = False    
     
     for disp, datos in datos_sensibilidad.items():
-        ax.plot(datos["x"], datos["y"], "-", label=f"{disp} (Poly Fit g4)")
+        plt.plot(datos["x"], datos["y"], "-", label=f"{disp} (Poly Fit g4)")
         fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines', name=f"{disp} (Poly)"))
-        hay_datos = True
-            
-    if hay_datos:
-        ax.set_title(titulo)
-        ax.set_xlabel(r"Corriente Promedio Normalizada $I_{D\_norm}$ [u.a.]")
-        ax.set_ylabel(r"Tasa de Cambio [($\mu$A/unid_norm)/min]")
-        ax.grid(True, linestyle=":", alpha=0.6)
-        ax.legend()
-        st.pyplot(fig_mpl)
         
-        fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Normalizada I_D_norm [u.a.]", yaxis_title="Tasa de Cambio [(uA/unid_norm)/min]", template="plotly_white")
-        st.plotly_chart(fig_ply, width='stretch')
+    plt.title(titulo)
+    plt.xlabel(r"Corriente Promedio Normalizada $I_{D\_norm}$ [u.a.]")
+    plt.ylabel(r"Tasa de Cambio [($\mu$A/unid_norm)/min]")
+    plt.grid(True, linestyle=":", alpha=0.6)
+    plt.legend()
+    st.pyplot(fig_mpl)
+    
+    fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Normalizada I_D_norm [u.a.]", yaxis_title="Tasa de Cambio [(uA/unid_norm)/min]", template="plotly_white")
+    st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
 
 def graficar_sensibilidad_fg_absoluta(titulo, datos_sensibilidad):
