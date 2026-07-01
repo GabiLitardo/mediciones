@@ -13,28 +13,14 @@ def convertir_r_a_temp_steinhart(resistencia):
 def calcular_desvio_archivo(nombre_archivo):
     """Remueve la deriva térmica lineal del archivo de ruido y extrae el desvío AC neto."""
     lista_mediciones = matchear_archivos(nombre_archivo, tipo_medicion="ruido")
-    
-    if not lista_mediciones:
-        return None
-        
     datos = lista_mediciones[0]
+    corriente_uA = np.abs(datos[:, 1]) * 1e6
+    resistencia = datos[:, 2]
     
-    if datos.size == 0 or len(datos.shape) < 2 or datos.shape[1] < 3:
-        return None
-
-    try:
-        corriente_uA = np.abs(datos[:, 1]) * 1e6
-        resistencia = datos[:, 2]
+    temperatura_C = convertir_r_a_temp_steinhart(resistencia)
+    coefs = np.polyfit(temperatura_C, corriente_uA, deg=1)
+    corriente_tendencia = np.polyval(coefs, temperatura_C)
+    
+    corriente_ruido_uA = corriente_uA - corriente_tendencia
         
-        temperatura_C = convertir_r_a_temp_steinhart(resistencia)
-        coefs = np.polyfit(temperatura_C, corriente_uA, deg=1)
-        corriente_tendencia = np.polyval(coefs, temperatura_C)
-        
-        corriente_ruido_uA = corriente_uA - corriente_tendencia
-        
-        if len(corriente_ruido_uA) < 2:
-            return None
-            
-        return np.std(corriente_ruido_uA, ddof=1) * 1000.0
-    except:
-        return None
+    return np.std(corriente_ruido_uA, ddof=1) * 1000.0 # multiplico por 1000 para que quede en nA
