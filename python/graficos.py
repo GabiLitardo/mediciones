@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 from proc_sens import calcular_fit_polinomico
 
 def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
-    """Dibuja la evolución temporal absoluta de corrientes o voltajes interpolados."""
+    """Dibuja la evolución temporal absoluta de corrientes o tensiones interpoladas."""
     fig_mpl = plt.figure(figsize=(10, 5))
     fig_ply = go.Figure()    
     for disp, datos in datos_procesados.items():
