@@ -10,9 +10,15 @@ st.title("Resumen mediciones Chaves-Litardo")
 # =====================================================================
 # CONFIGURACIÓN DE CHECKBOXES
 # =====================================================================
-mostrar_evolucion = st.checkbox("1. Análisis temporal", value=True)
+mostrar_resumen = st.checkbox("0. Resumen (Sensibilidad Absoluta vs Ruido)", value=True)
+mostrar_evolucion = st.checkbox("1. Análisis temporal", value=False)
 mostrar_sensibilidad = st.checkbox("2. Análisis de Sensibilidad a radiación", value=False)
 mostrar_ruido = st.checkbox("3. Análisis de Ruido", value=False)
+
+# variables auxiliares
+
+sens_abs_t2 = None
+resultados_ruido = None
 
 # =====================================================================
 # SECCIÓN 1: EVOLUCIÓN TEMPORAL
@@ -91,3 +97,28 @@ if mostrar_ruido:
     
     resultados_ruido = proc_ruido.procesar_ruido(lista_dispositivos, corrientes_nominales)
     graficos.graficar_ruido(titulo="Desvío Estándar del Ruido Neto vs Corriente Nominal", datos_ruido=resultados_ruido)
+# =====================================================================
+# SECCIÓN 4: RESUMEN
+# =====================================================================
+if mostrar_resumen:
+    st.markdown("---")
+    st.header("Correlación: Sensibilidad Absoluta vs Ruido Neto")
+    
+    dispositivos_cruce = ["PFGIW1", "PFGIW2", "PFGIP2"]
+    corrientes_ruido = [100, 150, 200, 250, 350]
+    
+    # Si las secciones de arriba no se ejecutaron, las calculamos acá de forma segura
+    if sens_abs_t2 is None:
+        sens_abs_t2 = proc_sens.procesar_sensibilidad(["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"], "FG_tanda2", normalizado=False)
+        
+    if resultados_ruido is None:
+        resultados_ruido = proc_ruido.procesar_ruido(dispositivos_cruce, corrientes_ruido, normalizado=True)
+    
+    sens_resumen = {disp: sens_abs_t2[0][disp] for disp in dispositivos_cruce}
+    ruido_resumen = {disp: resultados_ruido[disp] for disp in dispositivos_cruce}
+    
+    graficos.graficar_correlacion_sens_ruido(
+        titulo="Tanda 2: Sensibilidad Absoluta y Ruido vs I_D Normalizada",
+        datos_sensibilidad=sens_resumen,
+        datos_ruido=ruido_resumen
+    )
