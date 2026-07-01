@@ -120,7 +120,7 @@ def graficar_sensibilidad_fg_absoluta2(titulo, datos_sensibilidad):
     fig_ply = go.Figure()
 
     for disp, datos in datos_sensibilidad.items():
-        ax.plot(datos["x"], datos["y"], "o--", label=disp)
+        plt.plot(datos["x"], datos["y"], "o--", label=disp)
         fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines+markers', name=disp))
 
     plt.title(titulo)
