@@ -33,6 +33,7 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title=ylabel, template="plotly_white")
     st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
+    
 def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
     """Dibuja la sensibilidad."""
     fig_mpl = plt.figure(figsize=(10, 5))
@@ -42,12 +43,12 @@ def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
     for disp, datos in datos_sensibilidad_analitico.items():
         plt.plot(datos["x"], datos["y"], "o--", label=disp)
         fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines+markers', name=disp))
-    '''
+    
     datos_sensibilidad_discreto = datos_sensibilidad[1]
     for disp, datos in datos_sensibilidad_discreto.items():
         plt.plot(datos["x"], datos["y"], "o--", label=disp)
         fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines+markers', name=disp))
-    '''
+    
     plt.title(titulo)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
