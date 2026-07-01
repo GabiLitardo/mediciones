@@ -33,28 +33,8 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title=ylabel, template="plotly_white")
     st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
-    
-def graficar_evolucion_vg(titulo, datos_procesados):
-    """Dibuja la descarga temporal equivalente en tensión V_FG."""
-    fig_mpl = plt.figure(figsize=(10, 5))
-    fig_ply = go.Figure()
-    for disp, datos in datos_procesados.items():
-        tiempos_ordenados = datos["tiempos"]
-        valores_ordenados = datos["valores"]
-        plt.plot(tiempos_ordenados, valores_ordenados, "o--", label=disp)
-        fig_ply.add_trace(go.Scatter(x=tiempos_ordenados, y=valores_ordenados, mode='lines+markers', name=disp))       
-    plt.title(titulo)
-    plt.xlabel("Tiempo Acumulado [min]")
-    plt.ylabel(r"Tensión $V_{FG}$ [V]")
-    plt.grid(True, linestyle=":", alpha=0.6)
-    plt.legend()
-    st.pyplot(fig_mpl)
-    fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title=r"Tensión $V_{FG}$ [V]", template="plotly_white")
 
-    st.plotly_chart(fig_ply, width='stretch')
-    plt.close(fig_mpl)
-
-def graficar_sensibilidad_fg(titulo, datos_sensibilidad):
+def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
     """Dibuja la sensibilidad normalizada"""
     fig_mpl = plt.figure(figsize=(10, 5))
     fig_ply = go.Figure()
@@ -64,35 +44,13 @@ def graficar_sensibilidad_fg(titulo, datos_sensibilidad):
         fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines', name=f"{disp} (Poly)"))
         
     plt.title(titulo)
-    plt.xlabel(r"Corriente Promedio Normalizada $I_{D\_norm}$ [$\mu$A]")
-    plt.ylabel(r"Tasa de Cambio normalizada [($\mu$A)/min]")
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
     plt.grid(True, linestyle=":", alpha=0.6)
     plt.legend()
     st.pyplot(fig_mpl)
     
     fig_ply.update_layout(title=titulo, xaxis_title=r"Corriente Promedio Normalizada I_D_norm [$\mu$A]", yaxis_title=r"Tasa de Cambio normalizada[($\mu$A)/min]", template="plotly_white")
-
-    st.plotly_chart(fig_ply, width='stretch')
-    plt.close(fig_mpl)
-
-def graficar_sensibilidad_fg_absoluta(titulo, datos_sensibilidad):
-    """Dibuja la sensibilidad absoluta sin normalizar (Versión 1: Polinómica Analítica)."""
-    fig_mpl = plt.figure(figsize=(10, 5))
-    fig_ply = go.Figure()
-    hay_datos = False    
-    
-    for disp, datos in datos_sensibilidad.items():
-        plt.plot(datos["x"], datos["y"], "-", label=f"{disp} (Poly Fit g4)")
-        fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines', name=f"{disp} (Poly)"))
-            
-    plt.title(titulo)
-    plt.xlabel(r"Corriente Promedio Absoluta $I_D$ [$\mu$A]")
-    plt.ylabel(r"Tasa de Cambio Absoluta [$\mu$A/min]")
-    plt.grid(True, linestyle=":", alpha=0.6)
-    plt.legend()
-    st.pyplot(fig_mpl)
-    
-    fig_ply.update_layout(title=titulo, xaxis_title="Corriente Promedio Absoluta I_D [uA]", yaxis_title=r"Tasa de Cambio Absoluta [$\mu$A/min]", template="plotly_white")
 
     st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
