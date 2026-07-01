@@ -34,24 +34,48 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
 
-def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
-    """Dibuja la sensibilidad normalizada"""
+def graficar_sensibilidad_fg2(titulo, datos_sensibilidad):
+    """Dibuja la sensibilidad normalizada (Versión 2: Diferencial Discreta)."""
     fig_mpl = plt.figure(figsize=(10, 5))
     fig_ply = go.Figure()
-    for dato_sensibilidad in datos_sensibilidad:
-        for disp, datos in dato_sensibilidad.items():
-            plt.plot(datos["x"], datos["y"], "-", label=f"{disp} (Poly Fit g4)")
-            fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines', name=f"{disp} (Poly)"))
-        
+    
+    datos_sensibilidad_analitico = datos_sensibilidad[0]
+    for disp, datos in datos_sensibilidad_analitico.items():
+        plt.plot(datos["x"], datos["y"], "o--", label=disp)
+        fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines+markers', name=disp))
+
+    datos_sensibilidad_discreto = datos_sensibilidad[1]
+    for disp, datos in datos_sensibilidad_discreto.items():
+        plt.plot(datos["x"], datos["y"], "o--", label=disp)
+        fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines+markers', name=disp))
     plt.title(titulo)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
+    plt.xlabel(r"Corriente Promedio Normalizada $I_{D\_norm}$ [$\mu$A]")
+    plt.ylabel(r"Tasa de Cambio normalizada[($\mu$A)/min]")
     plt.grid(True, linestyle=":", alpha=0.6)
     plt.legend()
     st.pyplot(fig_mpl)
-    
-    fig_ply.update_layout(title=titulo, xaxis_title=r"Corriente Promedio Normalizada I_D_norm [$\mu$A]", yaxis_title=r"Tasa de Cambio normalizada[($\mu$A)/min]", template="plotly_white")
+
+    fig_ply.update_layout(title=titulo, xaxis_title=r"Corriente Promedio Normalizada $I_D$ [$\mu$A]", yaxis_title=r"Tasa de Cambio normalizada [($\mu$A)/min]", template="plotly_white")
 
     st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
 
+def graficar_sensibilidad_fg_absoluta2(titulo, datos_sensibilidad):
+    """Dibuja la sensibilidad absoluta sin normalizar (Versión 2: Diferencial Discreta)."""
+    fig_mpl = plt.figure(figsize=(10, 5))
+    fig_ply = go.Figure()
+
+    for disp, datos in datos_sensibilidad.items():
+        plt.plot(datos["x"], datos["y"], "o--", label=disp)
+        fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines+markers', name=disp))
+
+    plt.title(titulo)
+    plt.xlabel(r"Corriente Promedio Absoluta $I_D$ [$\mu$A]")
+    plt.ylabel(r"Tasa de Cambio Absoluta [$\mu$A/min]")
+    plt.grid(True, linestyle=":", alpha=0.6)
+    plt.legend()
+    st.pyplot(fig_mpl)
+    fig_ply.update_layout(title=titulo, xaxis_title=r"Corriente Promedio Absoluta $I_D$ [$\mu$A]", yaxis_title=r"Tasa de Cambio Absoluta [$\mu$A/min]", template="plotly_white")
+
+    st.plotly_chart(fig_ply, width='stretch')
+    plt.close(fig_mpl)
