@@ -17,29 +17,42 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True):
     for disp, datos in datos_crudos.items():
         tiempos = datos["tiempos"]
         corrientes = datos["valores"]
-        factor = factores_normalizacion.get(disp, 1.0) if normalizado else 1.0
-        corrientes_proc = corrientes / factor       
+        factor = factores_normalizacion.get(disp, 1.0)
         
-        coefs = calcular_fit_polinomico(tiempos.tolist(), corrientes_proc.tolist())
-        a, b, c, d, e = coefs
+        corrientes_norm = corrientes / factor
+        if normalizado:
+            corrientes_proc = corrientes_norm
+        else:
+            corrientes_proc = corrientes       
+        
+        coefs_y = calcular_fit_polinomico(tiempos.tolist(), corrientes_proc.tolist())
+        a_y, b_y, c_y, d_y, e_y = coefs_y
+        
+        coefs_x = calcular_fit_polinomico(tiempos.tolist(), corrientes_norm.tolist())
+        a_x, b_x, c_x, d_x, e_x = coefs_x
         
         t_cont = np.linspace(tiempos.min(), tiempos.max(), 200)
-        eje_y = np.abs(4*a*(t_cont**3) + 3*b*(t_cont**2) + 2*c*t_cont + d)
-        eje_x = a*(t_cont**4) + b*(t_cont**3) + c*(t_cont**2) + d*t_cont + e
+        eje_y = np.abs(4*a_y*(t_cont**3) + 3*b_y*(t_cont**2) + 2*c_y*t_cont + d_y)
+        eje_x = a_x*(t_cont**4) + b_x*(t_cont**3) + c_x*(t_cont**2) + d_x*t_cont + e_x
         
         resultado_fit[disp] = {"x": eje_x, "y": eje_y}
         
     for disp, datos in datos_crudos.items():   
         tiempos = datos["tiempos"]
         corrientes = datos["valores"]
-        factor = factores_normalizacion.get(disp, 1.0) if normalizado else 1.0
-        corrientes_proc = corrientes / factor
+        factor = factores_normalizacion.get(disp, 1.0)
+        
+        corrientes_norm = corrientes / factor
+        if normalizado:
+            corrientes_proc = corrientes_norm
+        else:
+            corrientes_proc = corrientes
         
         eje_x, eje_y = [], []
         for k in range(len(corrientes_proc) - 1):
             dt = tiempos[k+1] - tiempos[k]
             tasa = np.abs(corrientes_proc[k+1] - corrientes_proc[k]) / dt
-            promedio = (corrientes_proc[k+1] + corrientes_proc[k]) / 2.0
+            promedio = (corrientes_norm[k+1] + corrientes_norm[k]) / 2.0
             eje_y.append(tasa)
             eje_x.append(promedio)
             
