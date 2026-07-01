@@ -11,7 +11,7 @@ def graficar(titulo, xlabel, ylabel):
     plt.ylabel(ylabel)
     plt.grid(True, linestyle=":", alpha=0.6)
     plt.legend()
-    fig_ply.update_layout(title=titulo, xaxis_title=xlabel, yaxis_title=ylabel.replace("$", ""), template="plotly_white")
+    fig_ply.update_layout(title=titulo, xaxis_title=xlabel, yaxis_title=ylabel, template="plotly_white")
 
 def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     """Dibuja la evolución temporal absoluta de corrientes o voltajes interpolados."""
@@ -32,7 +32,7 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
             i_fitteada = a * (t_continuo ** 4) + b * (t_continuo ** 3) + c * (t_continuo ** 2) + d * t_continuo + e
             plt.plot(t_continuo, i_fitteada, "-", label=f"{disp} (Fit Poly g4)")
             fig_ply.add_trace(go.Scatter(x=t_continuo, y=i_fitteada, mode='lines', name=f"{disp} (Fit Poly)"))                     
-    graficar(titulo, "Tiempo Acumulado [min]", ylabel)
+    graficar(titulo, "Tiempo Acumulado [min]", ylabel.replace("$", ""))
     st.pyplot(fig_mpl)
     st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
