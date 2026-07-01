@@ -18,12 +18,8 @@ def matchear_archivos_ruido(nombre_buscar):
     """Busca un archivo de ruido .txt y extrae sus columnas usando tabulaciones."""
     # Buscamos el archivo recursivamente en el repo
     ruta = next(Path(".").glob(f"**/{nombre_buscar}"), None)
-    
-    if ruta is None:
-        return None
-        
     try:
         datos = np.genfromtxt(ruta, delimiter='\t', skip_header=5, usecols=(0, 1, 2), encoding="cp1252")
-        return datos if datos.size > 0 else None
+        return datos
     except:
         return None
