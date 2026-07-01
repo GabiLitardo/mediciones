@@ -85,9 +85,9 @@ if mostrar_sensibilidad:
 if mostrar_ruido:
     st.markdown("---")
     st.header("Análisis de Ruido")
-    st.subheader("Resumen de Desvío Estándar del Ruido (nA)")
     
     lista_dispositivos = ["PFGIW1", "PFGIW2", "PFGIP2"]
     corrientes_nominales = [100, 150, 200, 250, 350]
-    resultados = proc_ruido.calcular_desvio(lista_dispositivos, corrientes_nominales)
-    st.write(resultados)
+    
+    resultados_ruido = proc_ruido.procesar_ruido(lista_dispositivos, corrientes_nominales)
+    graficos.graficar_ruido(titulo="Desvío Estándar del Ruido Neto vs Corriente Nominal", datos_ruido=resultados_ruido)
