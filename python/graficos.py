@@ -23,7 +23,7 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
             t_continuo = np.linspace(tiempos_ordenados.min(), tiempos_ordenados.max(), 200)
             i_fitteada = a * (t_continuo ** 4) + b * (t_continuo ** 3) + c * (t_continuo ** 2) + d * t_continuo + e
             plt.plot(t_continuo, i_fitteada, "-", label=f"{disp} (Fit Poly g4)")
-            fig_ply.add_trace(go.Scatter(x=t_continuo, y=i_fitteada, mode='lines', name=f"{disp} (Fit Poly)"))        
+            fig_ply.add_trace(go.Scatter(x=t_continuo, y=i_fitteada, mode='lines', name=f"{disp} (Fit Poly g4)"))        
     plt.title(titulo)
     plt.xlabel("Tiempo Acumulado [min]")
     plt.ylabel(ylabel)
