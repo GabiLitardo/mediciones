@@ -5,13 +5,6 @@ import streamlit as st
 import plotly.graph_objects as go
 from proc_sens import calcular_fit_polinomico
 
-def graficar(titulo, xlabel, ylabel):
-    plt.title(titulo)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.grid(True, linestyle=":", alpha=0.6)
-    plt.legend()
-
 def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     """Dibuja la evolución temporal absoluta de corrientes o voltajes interpolados."""
     fig_mpl = plt.figure(figsize=(10, 5))
@@ -30,10 +23,14 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
             t_continuo = np.linspace(tiempos_ordenados.min(), tiempos_ordenados.max(), 200)
             i_fitteada = a * (t_continuo ** 4) + b * (t_continuo ** 3) + c * (t_continuo ** 2) + d * t_continuo + e
             plt.plot(t_continuo, i_fitteada, "-", label=f"{disp} (Fit Poly g4)")
-            fig_ply.add_trace(go.Scatter(x=t_continuo, y=i_fitteada, mode='lines', name=f"{disp} (Fit Poly)"))                     
-    graficar(titulo = titulo, xlabel = "Tiempo Acumulado [min]", ylabel = ylabel.replace("$", ""))
+            fig_ply.add_trace(go.Scatter(x=t_continuo, y=i_fitteada, mode='lines', name=f"{disp} (Fit Poly)"))        
+    plt.title(titulo)
+    plt.xlabel("Tiempo Acumulado [min]")
+    plt.ylabel(ylabel)
+    plt.grid(True, linestyle=":", alpha=0.6)
+    plt.legend()
     st.pyplot(fig_mpl)
-    fig_ply.update_layout(title=titulo, xaxis_title=xlabel, yaxis_title=ylabel, template="plotly_white")
+    fig_ply.update_layout(title=titulo, xaxis_title="Tiempo Acumulado [min]", yaxis_title=ylabel.replace("$", ""), template="plotly_white")
     st.plotly_chart(fig_ply, width='stretch')
     plt.close(fig_mpl)
     
