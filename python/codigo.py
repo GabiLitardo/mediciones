@@ -10,7 +10,7 @@ st.title("Resumen mediciones Chaves-Litardo")
 # =====================================================================
 # CONFIGURACIÓN DE CHECKBOXES
 # =====================================================================
-mostrar_resumen = st.checkbox("0. Resumen (Sensibilidad Absoluta vs Ruido)", value=False)
+mostrar_resumen = st.checkbox("0. Resumen (Sensibilidad Absoluta vs Ruido)", value=True)
 mostrar_evolucion = st.checkbox("1. Análisis temporal", value=False)
 mostrar_sensibilidad = st.checkbox("2. Análisis de Sensibilidad a radiación", value=False)
 mostrar_ruido = st.checkbox("3. Análisis de Ruido", value=False)
@@ -27,75 +27,43 @@ if mostrar_evolucion:
     st.markdown("---")
     st.header("Evolución Temporal")
     
-    # -----------------------------------------------------------------
-    # FILAS 1 y 2: Evolución de Corriente / Tensión (3 Columnas)
-    # -----------------------------------------------------------------
     datos_fg_t1 = proc_evo.obtener_datos_crudos_tanda(["PFGIW1", "PFGIW2", "PFGIW3"], "FG_tanda1")
-    datos_fg_t2 = proc_evo.obtener_datos_crudos_tanda(["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"], "FG_tanda2")
-    datos_foxfet = proc_evo.obtener_datos_crudos_tanda(["FFC1", "FFC2", "FFC3", "FFL", "FFS"], "FOXFET")
-    
-    col1, col2, col3 = st.columns([1, 1, 1])
-    
-    with col1:
-        # Columna 1: Tanda 1 (Lanza Matplotlib arriba y Plotly abajo)
-        graficos.graficar_dispositivos(
-            titulo="Evolución Floating Gates Tanda 1 (I @ V = -4.5 V)",
-            ylabel=r"$I_D$ [$\mu$A]",
-            datos_procesados=datos_fg_t1,
-            tanda = 1,
-            es_fg = True
-        )
-        
-    with col2:
-        # Columna 2: Tanda 2 (Lanza Matplotlib arriba y Plotly abajo)
-        graficos.graficar_dispositivos(
-            titulo="Evolución Floating Gates Tanda 2 (I @ V = -4.5 V)",
-            ylabel=r"$I_D$ [$\mu$A]",
-            datos_procesados=datos_fg_t2,
-            tanda = 2,
-            es_fg = True
-        )
-        
-    with col3:
-        # Columna 3: FOXFET (Lanza Matplotlib arriba y Plotly abajo)
-        graficos.graficar_dispositivos(
-            titulo="Evolución FOXFETs (Tensión interpolada @ I = 10 uA)",
-            ylabel="Tensión [V]",
-            datos_procesados=datos_foxfet,
-            tanda = 0, 
-            es_fg = False
-        )
+    graficos.graficar_dispositivos(
+        titulo="Evolución Floating Gates Tanda 1 (I @ V = -4.5 V)",
+        ylabel=r"$I_D$ [$\mu$A]",
+        datos_procesados=datos_fg_t1,
+        tanda = 1,
+        es_fg = True
+    )
 
-    # -----------------------------------------------------------------
-    # FILAS 3 y 4: Evolución Tensión Equivalente V_FG (3 Columnas, la 3ra vacía)
-    # -----------------------------------------------------------------
-    st.markdown("---")
+    datos_fg_t2 = proc_evo.obtener_datos_crudos_tanda(["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"], "FG_tanda2")
+    graficos.graficar_dispositivos(
+        titulo="Evolución Floating Gates Tanda 2 (I @ V = -4.5 V)",
+        ylabel=r"$I_D$ [$\mu$A]",
+        datos_procesados=datos_fg_t2,
+        tanda = 2,
+        es_fg = True
+    )
+
+    datos_foxfet = proc_evo.obtener_datos_crudos_tanda(["FFC1", "FFC2", "FFC3", "FFL", "FFS"], "FOXFET")
+    graficos.graficar_dispositivos(
+        titulo="Evolución FOXFETs (Tensión interpolada @ I = 10 uA)",
+        ylabel="Tensión [V]",
+        datos_procesados=datos_foxfet,
+        tanda = 0, 
+        es_fg = False
+    )
+
     st.subheader("Evolución de la Tensión de Compuerta Equivalente ($V_{FG}$)")
     
     datos_vg_t1 = proc_evo.obtener_datos_evolucion_vg(["PFGIW1", "PFGIW2"], "FG_tanda1")
+    #graficos.graficar_evolucion_vg(titulo="Descarga Temporal de Floating Gates Tanda 1 en Voltaje", datos_procesados=datos_vg_t1)
+    graficos.graficar_dispositivos(titulo="Descarga Temporal de Floating Gates Tanda 1 en Tensión", ylabel = r"Tensión $V_{FG}$ [V]", datos_procesados = datos_vg_t1, tanda = 1, es_fg = True)
+    
     datos_vg_t2 = proc_evo.obtener_datos_evolucion_vg(["PFGIW1", "PFGIW2", "PFGIP2"], "FG_tanda2")
-    
-    col4, col5, col6 = st.columns([1, 1, 1])
-    
-    with col4:
-        # Columna 1: Tensión Tanda 1 (Matplotlib arriba, Plotly abajo)
-        graficos.graficar_dispositivos(
-            titulo="Descarga Temporal de Floating Gates Tanda 1 en Tensión", 
-            ylabel = r"Tensión $V_{FG}$ [V]", 
-            datos_procesados = datos_vg_t1, 
-            tanda = 1, 
-            es_fg = True
-        )
-        
-    with col5:
-        # Columna 2: Tensión Tanda 2 (Matplotlib arriba, Plotly abajo)
-        graficos.graficar_dispositivos(
-            titulo="Descarga Temporal de Floating Gates Tanda 2 en Tensión", 
-            ylabel = r"Tensión $V_{FG}$ [V]", 
-            datos_procesados = datos_vg_t2, 
-            tanda = 2, 
-            es_fg = True
-        )# =====================================================================
+    #graficos.graficar_evolucion_vg(titulo="Descarga Temporal de Floating Gates Tanda 2 en Voltaje", datos_procesados=datos_vg_t2)
+    graficos.graficar_dispositivos(titulo="Descarga Temporal de Floating Gates Tanda 2 en Tensión", ylabel = r"Tensión $V_{FG}$ [V]", datos_procesados = datos_vg_t2, tanda = 2, es_fg = True)
+# =====================================================================
 # SECCIÓN 2: SENSIBILIDAD
 # =====================================================================
 if mostrar_sensibilidad:
