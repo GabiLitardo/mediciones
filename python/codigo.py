@@ -34,7 +34,7 @@ if mostrar_evolucion:
     datos_fg_t2 = proc_evo.obtener_datos_crudos_tanda(["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"], "FG_tanda2")
     datos_foxfet = proc_evo.obtener_datos_crudos_tanda(["FFC1", "FFC2", "FFC3", "FFL", "FFS"], "FOXFET")
     
-    col1, col2, col3 = st.columns(3, gap="small")
+    col1, col2, col3 = st.columns([1, 1, 1])
     
     with col1:
         # Columna 1: Tanda 1 (Lanza Matplotlib arriba y Plotly abajo)
@@ -75,7 +75,7 @@ if mostrar_evolucion:
     datos_vg_t1 = proc_evo.obtener_datos_evolucion_vg(["PFGIW1", "PFGIW2"], "FG_tanda1")
     datos_vg_t2 = proc_evo.obtener_datos_evolucion_vg(["PFGIW1", "PFGIW2", "PFGIP2"], "FG_tanda2")
     
-    col4, col5, col6 = st.columns(3, gap="small")
+    col4, col5, col6 = st.columns([1, 1, 1])
     
     with col4:
         # Columna 1: Tensión Tanda 1 (Matplotlib arriba, Plotly abajo)
