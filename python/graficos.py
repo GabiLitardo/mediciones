@@ -7,7 +7,7 @@ from proc_sens import calcular_fit_polinomico
 
 def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     """Dibuja la evolución temporal absoluta de corrientes o tensiones interpoladas."""
-    fig_mpl = plt.figure(figsize=(4, 3))
+    fig_mpl = plt.figure(figsize=(10, 5))
     fig_ply = go.Figure()    
     for disp, datos in datos_procesados.items():
         tiempos_ordenados = datos["tiempos"]
@@ -36,7 +36,7 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     
 def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
     """Dibuja la sensibilidad normalizada"""
-    fig_mpl = plt.figure(figsize=(4, 3))
+    fig_mpl = plt.figure(figsize=(10, 5))
     fig_ply = go.Figure()
     
     datos_sensibilidad_continuo = datos_sensibilidad[0]
@@ -62,7 +62,7 @@ def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
     plt.close(fig_mpl)
 
 def graficar_ruido(titulo, datos_ruido):
-    fig_plt = plt.figure(figsize=(4, 3))
+    plt.figure(figsize=(10, 5))
     fig_ply = go.Figure()
     
     for disp, datos in datos_ruido.items():
@@ -77,7 +77,7 @@ def graficar_ruido(titulo, datos_ruido):
     plt.ylabel("Desvío de Ruido [nA]")
     plt.grid(True, linestyle=":", alpha=0.6)
     plt.legend()
-    st.pyplot(fig_plt)
+    st.pyplot(plt.gcf())
     
     fig_ply.update_layout(
         title=titulo, 
