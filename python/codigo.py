@@ -10,7 +10,7 @@ st.title("Resumen mediciones Chaves-Litardo")
 # =====================================================================
 # CONFIGURACIÓN DE CHECKBOXES
 # =====================================================================
-mostrar_resumen = st.checkbox("0. Resumen (Sensibilidad Absoluta vs Ruido)", value=True)
+mostrar_resumen = st.checkbox("0. Resumen (Sensibilidad Absoluta vs Ruido)", value=False)
 mostrar_evolucion = st.checkbox("1. Análisis temporal", value=False)
 mostrar_sensibilidad = st.checkbox("2. Análisis de Sensibilidad a radiación", value=False)
 mostrar_ruido = st.checkbox("3. Análisis de Ruido", value=False)
