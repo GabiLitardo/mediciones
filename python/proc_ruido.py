@@ -40,7 +40,7 @@ def procesar_ruido(lista_dispositivos, corrientes_nominales):
     todas_las_evos = obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales)
     for disp in lista_dispositivos:    
         resultado[disp] = {
-            "x": np.array([float(corr)]),
+            "x": np.array([float(corr) for corr in corrientes_nominales]),
             "y": np.array([np.std(todas_las_evos[disp][corr]["y"], ddof=1) for corr in corrientes_nominales])
         }
     return resultado
