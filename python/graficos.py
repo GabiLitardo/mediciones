@@ -154,3 +154,51 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido):
         template="plotly_white"
     )
     st.plotly_chart(fig_ply, width='stretch')
+
+def graficar_evolucion_ruido(titulo, todas_las_evos, corrientes_a_graficar):
+    plt.figure(figsize=(10, 5))
+    
+    for disp, evos_disp in todas_las_evos.items():
+        for corr in corrientes_a_graficar:
+            if corr in evos_disp:
+                x_data = evos_disp[corr]["x"]
+                y_data = evos_disp[corr]["y"]
+                
+                plt.plot(x_data, y_data, alpha=0.7, label=f"{disp} @ {corr} uA")
+                
+    plt.xscale('log')
+    plt.title(titulo)
+    plt.xlabel("Tiempo [s] (Escala Log)")
+    plt.ylabel("Corriente de Ruido Neto [nA]")
+    plt.grid(True, which="both", linestyle=":", alpha=0.6)
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    st.pyplot(plt.gcf(), clear_figure=True)
+    plt.close()
+    
+    fig_ply = go.Figure()
+    
+    for disp, evos_disp in todas_las_evos.items():
+        for corr in corrientes_a_graficar:
+            if corr in evos_disp:
+                x_data = evos_disp[corr]["x"]
+                y_data = evos_disp[corr]["y"]
+                
+                fig_ply.add_trace(go.Scatter(
+                    x=x_data, 
+                    y=y_data, 
+                    mode='lines', 
+                    name=f"{disp} @ {corr} uA",
+                    opacity=0.8
+                ))
+                
+    fig_ply.update_layout(
+        title=titulo,
+        xaxis=dict(
+            title="Tiempo [s]",
+            type="log"
+        ),
+        yaxis=dict(title="Corriente de Ruido Neto [nA]"),
+        template="plotly_white",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5)
+    )
+    st.plotly_chart(fig_ply, width='stretch')
