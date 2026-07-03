@@ -23,21 +23,24 @@ def obtener_ruido_neto_archivo(nombre_archivo):
     
     return tiempo_s, corriente_ruido_nA
 
-def obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales):
+def obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales, es_larga):
     resultado = {}
     for disp in lista_dispositivos:
         resultado[disp] = {}
         for corr in corrientes_nominales:
-            nombre_archivo = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1.txt"            
+            if es_larga:
+                nombre_archivo = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1_LARGA.txt"
+            else:
+                nombre_archivo = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1.txt"            
             tiempo_s, corriente_ruido_nA = obtener_ruido_neto_archivo(nombre_archivo)
             resultado[disp][corr] = {"x": tiempo_s, "y": corriente_ruido_nA}
             
     return resultado
 
-def procesar_ruido(lista_dispositivos, corrientes_nominales):
+def procesar_ruido(lista_dispositivos, corrientes_nominales, es_larga = False):
     factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2": 1.0}
     resultado = {}
-    todas_las_evos = obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales)
+    todas_las_evos = obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales, es_larga)
     for disp in lista_dispositivos:    
         resultado[disp] = {
             "x": np.array([float(corr) for corr in corrientes_nominales]),
