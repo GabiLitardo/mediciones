@@ -10,32 +10,38 @@ def convertir_r_a_temp_steinhart(resistencia):
     ln_R = np.log(resistencia)
     return (1.0 / (A_SH + B_SH * ln_R + C_SH * (ln_R ** 3))) - 273.15
 
-def calcular_desvio_archivo(nombre_archivo):
+def obtener_ruido_neto_archivo(nombre_archivo):
     lista_mediciones = matchear_archivos(nombre_archivo, tipo_medicion="ruido")
     datos = lista_mediciones[0]
+    tiempo_s = datos[:, 0]
     corriente_uA = np.abs(datos[:, 1]) * 1e6
     resistencia = datos[:, 2]
-    
     temperatura_C = convertir_r_a_temp_steinhart(resistencia)
     coefs = np.polyfit(temperatura_C, corriente_uA, deg=1)
     corriente_tendencia = np.polyval(coefs, temperatura_C)
+    corriente_ruido_nA = (corriente_uA - corriente_tendencia) * 1000.0
     
-    corriente_ruido_uA = corriente_uA - corriente_tendencia
-        
-    return np.std(corriente_ruido_uA, ddof=1) * 1000.0
+    return tiempo_s, corriente_ruido_nA
 
-def procesar_ruido(lista_dispositivos, corrientes_nominales):
+def obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales):
     resultado = {}
     for disp in lista_dispositivos:
-        eje_x = []
-        eje_y = []
+        resultado[disp] = {}
         for corr in corrientes_nominales:
-            nombre_archivo = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1.txt"
-            sigma = calcular_desvio_archivo(nombre_archivo)
+            nombre_archivo = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1.txt"            
+            tiempo_s, corriente_ruido_nA = obtener_ruido_neto_archivo(nombre_archivo)
+            resultado[disp][corr] = {"x": tiempo_s, "y": corriente_ruido_nA}
             
-            eje_x.append(float(corr))
-            eje_y.append(sigma)
-            
-        resultado[disp] = {"x": np.array(eje_x), "y": np.array(eje_y)}
+    return resultado
 
+def procesar_ruido(lista_dispositivos, corrientes_nominales):
+    factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2": 1.0}
+    resultado = {}
+    todas_las_evos = obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales)
+    for disp in lista_dispositivos:
+        factor = factores_normalizacion.get(disp, 1.0)     
+        resultado[disp] = {
+            "x": np.array([float(corr) / factor for corr in corrientes_nominales]),
+            "y": np.array([np.std(todas_las_evos[disp][corr]["y"], ddof=1) for corr in corrientes_nominales])
+        }
     return resultado
