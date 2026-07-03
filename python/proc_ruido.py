@@ -38,10 +38,9 @@ def procesar_ruido(lista_dispositivos, corrientes_nominales):
     factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2": 1.0}
     resultado = {}
     todas_las_evos = obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales)
-    for disp in lista_dispositivos:
-        factor = factores_normalizacion.get(disp, 1.0)     
+    for disp in lista_dispositivos:    
         resultado[disp] = {
-            "x": np.array([float(corr) / factor for corr in corrientes_nominales]),
+            "x": np.array([float(corr)]),
             "y": np.array([np.std(todas_las_evos[disp][corr]["y"], ddof=1) for corr in corrientes_nominales])
         }
     return resultado
