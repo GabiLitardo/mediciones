@@ -19,9 +19,9 @@ def obtener_ruido_neto_archivo(nombre_archivo):
     temperatura_C = convertir_r_a_temp_steinhart(resistencia)
     coefs = np.polyfit(temperatura_C, corriente_uA, deg=1)
     corriente_tendencia = np.polyval(coefs, temperatura_C)
-    corriente_ruido_nA = (corriente_uA - corriente_tendencia) * 1000.0
+    corriente_ruido = (corriente_uA - corriente_tendencia)
     
-    return tiempo_s, corriente_ruido_nA
+    return tiempo_s, corriente_ruido
 
 def obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales, es_larga):
     resultado = {}
@@ -32,8 +32,8 @@ def obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales, es_larga):
                 nombre_archivo = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1_LARGA.txt"
             else:
                 nombre_archivo = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1.txt"            
-            tiempo_s, corriente_ruido_nA = obtener_ruido_neto_archivo(nombre_archivo)
-            resultado[disp][corr] = {"x": tiempo_s, "y": corriente_ruido_nA}
+            tiempo_s, corriente_ruido = obtener_ruido_neto_archivo(nombre_archivo)
+            resultado[disp][corr] = {"x": tiempo_s, "y": corriente_ruido}
             
     return resultado
 
@@ -44,6 +44,6 @@ def procesar_ruido(lista_dispositivos, corrientes_nominales, es_larga = False):
     for disp in lista_dispositivos:    
         resultado[disp] = {
             "x": np.array([float(corr) for corr in corrientes_nominales]),
-            "y": np.array([np.std(todas_las_evos[disp][corr]["y"], ddof=1) for corr in corrientes_nominales])
+            "y": np.array([np.std(todas_las_evos[disp][corr]["y"] * 1000, ddof=1) for corr in corrientes_nominales])
         }
     return resultado
