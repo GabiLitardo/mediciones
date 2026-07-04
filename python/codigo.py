@@ -103,7 +103,7 @@ if mostrar_ruido:
     graficos.graficar_evolucion_ruido(
         titulo="Corriente vs tiempo (log)",
         todas_las_evos=evos,
-        corrientes_a_graficar=[250] 
+        corrientes_a_graficar=[350] 
     )
 # =====================================================================
 # SECCIÓN 4: RESUMEN
