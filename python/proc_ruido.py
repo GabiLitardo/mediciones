@@ -21,7 +21,8 @@ def obtener_ruido_neto_archivo(nombre_archivo):
     corriente_tendencia = np.polyval(coefs, temperatura_C)
     corriente_ruido = (corriente_uA - corriente_tendencia)
     
-    return tiempo_s, corriente_ruido
+    #return tiempo_s, corriente_ruido
+    return tiempo_s, corriente_uA
 
 def obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales, es_larga):
     resultado = {}
