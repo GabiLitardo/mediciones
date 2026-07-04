@@ -12,6 +12,7 @@ def convertir_r_a_temp_steinhart(resistencia):
 
 def obtener_ruido_neto_archivo(nombre_archivo):
     lista_mediciones = matchear_archivos(nombre_archivo, tipo_medicion="ruido")
+    print(lista_mediciones)
     datos = lista_mediciones[0]
     tiempo_s = datos[:, 0]
     corriente_uA = np.abs(datos[:, 1]) * 1e6
