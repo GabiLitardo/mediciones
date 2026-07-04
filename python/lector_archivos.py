@@ -17,5 +17,7 @@ def matchear_archivos(nombre_archivo_generico, tipo_medicion="iv"):
             medicion = np.genfromtxt(ruta_archivo, delimiter='\t', skip_header=5, usecols=(0, 1, 2), encoding="cp1252")
         else:
             medicion = np.genfromtxt(ruta_archivo, skip_header=2, usecols=(0, 1), encoding="cp1252")
-        mediciones.append(medicion)       
+        mediciones.append(medicion)  
+    if len(mediciones) == 0:
+        print(nombre_archivo_generico)
     return mediciones
