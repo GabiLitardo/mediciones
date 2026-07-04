@@ -166,7 +166,7 @@ def graficar_evolucion_ruido(titulo, todas_las_evos, corrientes_a_graficar):
                 
                 plt.plot(x_data, y_data, alpha=0.7, label=f"{disp} @ {corr} uA")
                 
-    #plt.xscale('log')
+    plt.xscale('log')
     plt.title(titulo)
     plt.xlabel("Tiempo [s] (Escala Log)")
     plt.ylabel("Corriente de Ruido Neto [$\mu$A]")
@@ -195,7 +195,7 @@ def graficar_evolucion_ruido(titulo, todas_las_evos, corrientes_a_graficar):
         title=titulo,
         xaxis=dict(
             title="Tiempo [s]",
-            #type="log"
+            type="log"
         ),
         yaxis=dict(title="Corriente de Ruido Neto [$\mu$A]"),
         template="plotly_white",
