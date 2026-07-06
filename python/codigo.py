@@ -96,7 +96,7 @@ if mostrar_ruido:
     corrientes_nominales = [100, 150, 200, 250, 350]
     
     resultados_ruido = proc_ruido.procesar_ruido(lista_dispositivos, corrientes_nominales)
-    graficos.graficar_ruido(titulo="Desvío estándar del ruido neto vs corriente nominal", datos_ruido=resultados_ruido)
+    graficos.graficar_ruido(titulo="Desvío estándar del ruido neto vs Corriente nominal", datos_ruido=resultados_ruido)
 
     evos = proc_ruido.obtener_evolucion_ruido(["PFGIW1"], [100, 150, 200, 250, 350], True)
     
