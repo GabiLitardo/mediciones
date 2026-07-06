@@ -29,7 +29,7 @@ if mostrar_evolucion:
     
     datos_fg_t1 = proc_evo.obtener_datos_crudos_tanda(["PFGIW1", "PFGIW2", "PFGIW3"], "FG_tanda1")
     graficos.graficar_dispositivos(
-        titulo="Evolución Floating Gates Tanda 1 (I @ V = -4.5 V)",
+        titulo="Evolución Floating Gates tanda 1 (I @ V = -4.5 V)",
         ylabel=r"$I_D$ [$\mu$A]",
         datos_procesados=datos_fg_t1,
         tanda = 1,
@@ -38,7 +38,7 @@ if mostrar_evolucion:
 
     datos_fg_t2 = proc_evo.obtener_datos_crudos_tanda(["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"], "FG_tanda2")
     graficos.graficar_dispositivos(
-        titulo="Evolución Floating Gates Tanda 2 (I @ V = -4.5 V)",
+        titulo="Evolución Floating Gates tanda 2 (I @ V = -4.5 V)",
         ylabel=r"$I_D$ [$\mu$A]",
         datos_procesados=datos_fg_t2,
         tanda = 2,
