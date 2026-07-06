@@ -1,7 +1,7 @@
 
-Medición hecha el 2026-06-16  04:11 p.m.
+MediciÃ³n hecha el 2026-06-16  04:11 p.m.
 
-Medición de corriente y resistencia en el tiempo
+MediciÃ³n de corriente y resistencia en el tiempo
 Tiempo	Corriente	Resistencia
 3.838000E+0	-1.003850E-4	1.277520E+4	0.000000E+0	0.000000E+0
 7.773000E+0	-1.003670E-4	1.277580E+4	0.000000E+0	0.000000E+0
