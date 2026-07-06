@@ -10,9 +10,9 @@ st.title("Resumen mediciones Chaves-Litardo")
 # =====================================================================
 # CONFIGURACIÓN DE CHECKBOXES
 # =====================================================================
-mostrar_resumen = st.checkbox("0. Resumen (Sensibilidad Absoluta vs Ruido)", value=False)
+mostrar_resumen = st.checkbox("0. Resumen (Sensibilidad absoluta vs Ruido)", value=False)
 mostrar_evolucion = st.checkbox("1. Análisis temporal", value=False)
-mostrar_sensibilidad = st.checkbox("2. Análisis de Sensibilidad a radiación", value=False)
+mostrar_sensibilidad = st.checkbox("2. Análisis de sensibilidad a radiación", value=False)
 mostrar_ruido = st.checkbox("3. Análisis de Ruido", value=False)
 
 # variables auxiliares
@@ -54,36 +54,36 @@ if mostrar_evolucion:
         es_fg = False
     )
 
-    st.subheader("Evolución de la Tensión de Compuerta Equivalente ($V_{FG}$)")
+    st.subheader("Evolución de la tensión de compuerta equivalente ($V_{FG}$)")
     
     datos_vg_t1 = proc_evo.obtener_datos_evolucion_vg(["PFGIW1", "PFGIW2"], "FG_tanda1")
     #graficos.graficar_evolucion_vg(titulo="Descarga Temporal de Floating Gates Tanda 1 en Voltaje", datos_procesados=datos_vg_t1)
-    graficos.graficar_dispositivos(titulo="Descarga Temporal de Floating Gates Tanda 1 en Tensión", ylabel = r"Tensión $V_{FG}$ [V]", datos_procesados = datos_vg_t1, tanda = 1, es_fg = True)
+    graficos.graficar_dispositivos(titulo="Descarga temporal de Floating Gates tanda 1 en tensión", ylabel = r"Tensión $V_{FG}$ [V]", datos_procesados = datos_vg_t1, tanda = 1, es_fg = True)
     
     datos_vg_t2 = proc_evo.obtener_datos_evolucion_vg(["PFGIW1", "PFGIW2", "PFGIP2"], "FG_tanda2")
     #graficos.graficar_evolucion_vg(titulo="Descarga Temporal de Floating Gates Tanda 2 en Voltaje", datos_procesados=datos_vg_t2)
-    graficos.graficar_dispositivos(titulo="Descarga Temporal de Floating Gates Tanda 2 en Tensión", ylabel = r"Tensión $V_{FG}$ [V]", datos_procesados = datos_vg_t2, tanda = 2, es_fg = True)
+    graficos.graficar_dispositivos(titulo="Descarga temporal de Floating Gates tanda 2 en tensión", ylabel = r"Tensión $V_{FG}$ [V]", datos_procesados = datos_vg_t2, tanda = 2, es_fg = True)
 # =====================================================================
 # SECCIÓN 2: SENSIBILIDAD
 # =====================================================================
 if mostrar_sensibilidad:
     st.markdown("---")
-    st.header("Análisis de Sensibilidad")
+    st.header("Análisis de sensibilidad")
     st.subheader("Normalizada")
     
     sens_norm_t1 = proc_sens.procesar_sensibilidad(["PFGIW1", "PFGIW2", "PFGIW3"], "FG_tanda1", normalizado=True)
     graficos.graficar_sensibilidad_fg(titulo="Sensibilidad FG tanda 1 (Tasa vs $I_D$ Normalizado)", datos_sensibilidad=sens_norm_t1, xlabel = r"Corriente normalizada $I_{D_{norm}}$ [$\mu$A]", ylabel = r"Tasa de cambio normalizada [($\mu$A)/min]")
         
     sens_norm_t2 = proc_sens.procesar_sensibilidad(["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"], "FG_tanda2", normalizado=True)
-    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad FG tanda 2 (Tasa vs $I_D$ Normalizado)", datos_sensibilidad=sens_norm_t2, xlabel = r"Corriente normalizada $I_{D_{norm}}$ [$\mu$A]", ylabel = r"Tasa de cambio normalizada [($\mu$A)/min]")
+    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad FG tanda 2 (Tasa vs $I_D$ normalizado)", datos_sensibilidad=sens_norm_t2, xlabel = r"Corriente normalizada $I_{D_{norm}}$ [$\mu$A]", ylabel = r"Tasa de cambio normalizada [($\mu$A)/min]")
         
     st.subheader("Sin normalizar")
     
     sens_abs_t1 = proc_sens.procesar_sensibilidad(["PFGIW1", "PFGIW2", "PFGIW3"], "FG_tanda1", normalizado=False)
-    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad absoluta FG Tanda 1 (Tasa absoluta vs $I_D$ Normalizado)", datos_sensibilidad=sens_abs_t1, xlabel = r"Corriente normalizada $I_{D_{norm}}$ [$\mu$A]", ylabel = r"Tasa de cambio absoluta [$\mu$A/min]")
+    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad absoluta FG Tanda 1 (Tasa absoluta vs $I_D$ normalizado)", datos_sensibilidad=sens_abs_t1, xlabel = r"Corriente normalizada $I_{D_{norm}}$ [$\mu$A]", ylabel = r"Tasa de cambio absoluta [$\mu$A/min]")
         
     sens_abs_t2 = proc_sens.procesar_sensibilidad(["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"], "FG_tanda2", normalizado=False)
-    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad absoluta FG Tanda 2 (Tasa absoluta vs $I_D$ Normalizado)", datos_sensibilidad=sens_abs_t2, xlabel = r"Corriente normalizada $I_{D_{norm}}$ [$\mu$A]", ylabel = r"Tasa de cambio absoluta [$\mu$A/min]")
+    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad absoluta FG Tanda 2 (Tasa absoluta vs $I_D$ normalizado)", datos_sensibilidad=sens_abs_t2, xlabel = r"Corriente normalizada $I_{D_{norm}}$ [$\mu$A]", ylabel = r"Tasa de cambio absoluta [$\mu$A/min]")
     
 # =====================================================================
 # SECCIÓN 3: RUIDO
