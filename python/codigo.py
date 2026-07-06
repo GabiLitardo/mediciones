@@ -72,18 +72,18 @@ if mostrar_sensibilidad:
     st.subheader("Normalizada")
     
     sens_norm_t1 = proc_sens.procesar_sensibilidad(["PFGIW1", "PFGIW2", "PFGIW3"], "FG_tanda1", normalizado=True)
-    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad FG Tanda 1 (Tasa vs $I_D$ Normalizado)", datos_sensibilidad=sens_norm_t1, xlabel = r"Corriente Normalizada $I_{D\_norm}$ [$\mu$A]", ylabel = r"Tasa de Cambio normalizada [($\mu$A)/min]")
+    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad FG tanda 1 (Tasa vs $I_D$ Normalizado)", datos_sensibilidad=sens_norm_t1, xlabel = r"Corriente normalizada $I_{D_{norm}}$ [$\mu$A]", ylabel = r"Tasa de cambio normalizada [($\mu$A)/min]")
         
     sens_norm_t2 = proc_sens.procesar_sensibilidad(["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"], "FG_tanda2", normalizado=True)
-    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad FG Tanda 2 (Tasa vs $I_D$ Normalizado)", datos_sensibilidad=sens_norm_t2, xlabel = r"Corriente Normalizada $I_{D\_norm}$ [$\mu$A]", ylabel = r"Tasa de Cambio normalizada [($\mu$A)/min]")
+    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad FG tanda 2 (Tasa vs $I_D$ Normalizado)", datos_sensibilidad=sens_norm_t2, xlabel = r"Corriente normalizada $I_{D_{norm}}$ [$\mu$A]", ylabel = r"Tasa de cambio normalizada [($\mu$A)/min]")
         
     st.subheader("Sin normalizar")
     
     sens_abs_t1 = proc_sens.procesar_sensibilidad(["PFGIW1", "PFGIW2", "PFGIW3"], "FG_tanda1", normalizado=False)
-    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad Absoluta FG Tanda 1 (Tasa Absoluta vs $I_D$ Normalizado)", datos_sensibilidad=sens_abs_t1, xlabel = r"Corriente Normalizada $I_{D\_norm}$ [$\mu$A]", ylabel = r"Tasa de Cambio Absoluta [$\mu$A/min]")
+    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad absoluta FG Tanda 1 (Tasa absoluta vs $I_D$ Normalizado)", datos_sensibilidad=sens_abs_t1, xlabel = r"Corriente normalizada $I_{D_{norm}}$ [$\mu$A]", ylabel = r"Tasa de cambio absoluta [$\mu$A/min]")
         
     sens_abs_t2 = proc_sens.procesar_sensibilidad(["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"], "FG_tanda2", normalizado=False)
-    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad Absoluta FG Tanda 2 (Tasa Absoluta vs $I_D$ Normalizado)", datos_sensibilidad=sens_abs_t2, xlabel = r"Corriente Normalizada $I_{D\_norm}$ [$\mu$A]", ylabel = r"Tasa de Cambio Absoluta [$\mu$A/min]")
+    graficos.graficar_sensibilidad_fg(titulo="Sensibilidad absoluta FG Tanda 2 (Tasa absoluta vs $I_D$ Normalizado)", datos_sensibilidad=sens_abs_t2, xlabel = r"Corriente normalizada $I_{D_{norm}}$ [$\mu$A]", ylabel = r"Tasa de cambio absoluta [$\mu$A/min]")
     
 # =====================================================================
 # SECCIÓN 3: RUIDO
@@ -96,7 +96,7 @@ if mostrar_ruido:
     corrientes_nominales = [100, 150, 200, 250, 350]
     
     resultados_ruido = proc_ruido.procesar_ruido(lista_dispositivos, corrientes_nominales)
-    graficos.graficar_ruido(titulo="Desvío Estándar del Ruido Neto vs Corriente Nominal", datos_ruido=resultados_ruido)
+    graficos.graficar_ruido(titulo="Desvío estándar del ruido neto vs corriente nominal", datos_ruido=resultados_ruido)
 
     evos = proc_ruido.obtener_evolucion_ruido(["PFGIW1"], [100, 150, 200, 250, 350], True)
     
@@ -110,7 +110,7 @@ if mostrar_ruido:
 # =====================================================================
 if mostrar_resumen:
     st.markdown("---")
-    st.header("Correlación: Sensibilidad Absoluta vs Ruido Neto")
+    st.header("Correlación: sensibilidad absoluta vs ruido neto")
     
     dispositivos_cruce = ["PFGIW1", "PFGIW2", "PFGIP2"]
     corrientes_ruido = [100, 150, 200, 250, 350]
@@ -125,4 +125,4 @@ if mostrar_resumen:
     sens_resumen = {disp: sens_abs_t2[0][disp] for disp in dispositivos_cruce}
     ruido_resumen = {disp: resultados_ruido[disp] for disp in dispositivos_cruce}
     
-    graficos.graficar_superposicion_sens_ruido(titulo="Tanda 2: Sensibilidad Absoluta y Ruido vs I_D Normalizada",datos_sensibilidad=sens_resumen,datos_ruido=ruido_resumen)
+    graficos.graficar_superposicion_sens_ruido(titulo="Tanda 2: Sensibilidad absoluta y ruido vs I_D normalizada",datos_sensibilidad=sens_resumen,datos_ruido=ruido_resumen)
