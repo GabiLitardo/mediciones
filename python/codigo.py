@@ -4,7 +4,7 @@ import graficos
 import proc_evo
 import proc_sens
 import proc_ruido
-
+ 
 st.title("Resumen mediciones Chaves-Litardo")
 
 # =====================================================================
