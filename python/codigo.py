@@ -4,6 +4,7 @@ import graficos
 import proc_evo
 import proc_sens
 import proc_ruido
+import proc_temp
  
 st.title("Resumen mediciones Chaves-Litardo")
 
@@ -14,6 +15,7 @@ mostrar_resumen = st.checkbox("0. Resumen (Sensibilidad absoluta vs Ruido)", val
 mostrar_evolucion = st.checkbox("1. Análisis temporal", value=False)
 mostrar_sensibilidad = st.checkbox("2. Análisis de sensibilidad a radiación", value=False)
 mostrar_ruido = st.checkbox("3. Análisis de Ruido", value=False)
+mostrar_temperatura = st.checkbox("Mostrar Efectos de Temperatura", value=False)
 
 # variables auxiliares
 
@@ -105,6 +107,24 @@ if mostrar_ruido:
         todas_las_evos=evos,
         corrientes_a_graficar=[100, 150, 200, 250, 350]
     )
+
+if mostrar_temperatura:
+    st.markdown("---")
+    st.header("Análisis de Coeficiente Térmico")
+    
+    lista_disp_temp = ["PFGIW1"]
+    corrientes_temp = [200]
+    
+    datos_temp = proc_temp.obtener_datos_corriente_vs_temp(lista_disp_temp, corrientes_temp)
+    
+    if datos_temp and any(datos_temp[d] for d in datos_temp):
+        graficos.graficar_corriente_vs_temperatura(
+            titulo="Evolución de Corriente de Drenaje vs Temperatura (@ VD = -5V)",
+            datos_temperatura=datos_temp
+        )
+    else:
+        st.warning("No se encontraron archivos de medición de temperatura para los parámetros seleccionados.")
+
 # =====================================================================
 # SECCIÓN 4: RESUMEN
 # =====================================================================
