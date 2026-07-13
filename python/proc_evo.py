@@ -95,8 +95,7 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda):
                 "tiempos": np.array(tiempos)[indices],
                 "valores": np.array(valores)[indices]
             }
-        if 1:
-            print("A")
+        print("A")
     return resultado
 
 def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda):
