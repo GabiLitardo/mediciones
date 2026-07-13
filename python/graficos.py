@@ -203,12 +203,14 @@ def graficar_evolucion_ruido(titulo, todas_las_evos, corrientes_a_graficar):
     )
     st.plotly_chart(fig_ply, width='stretch')
 
-import matplotlib.pyplot as plt
-import plotly.graph_objects as go
-import streamlit as st
-
-def graficar_corriente_vs_temperatura(titulo, datos_temperatura):
+def graficar_I_vs_T(titulo, datos_temperatura):
+    """
+    Grafica la Corriente ID @ VD = -5V en función de la Temperatura 
+    para cada combinación de dispositivo y corriente nominal.
+    """
+    # —— 1. RENDERING EN MATPLOTLIB ——
     plt.figure(figsize=(10, 5))
+    
     for disp, corrientes_dict in datos_temperatura.items():
         for corr, curvas in corrientes_dict.items():
             plt.plot(curvas["x"], curvas["y"], 'o-', label=f"{disp} ({corr} uA)")
@@ -221,12 +223,16 @@ def graficar_corriente_vs_temperatura(titulo, datos_temperatura):
     st.pyplot(plt.gcf(), clear_figure=True)
     plt.close()
 
+    # —— 2. RENDERING EN PLOTLY ——
     fig_ply = go.Figure()
+    
     for disp, corrientes_dict in datos_temperatura.items():
         for corr, curvas in corrientes_dict.items():
             fig_ply.add_trace(go.Scatter(
-                x=curvas["x"], y=curvas["y"],
-                mode='markers+lines', name=f"{disp} ({corr} uA)"
+                x=curvas["x"], 
+                y=curvas["y"],
+                mode='markers+lines', 
+                name=f"{disp} ({corr} uA)"
             ))
             
     fig_ply.update_layout(
@@ -237,4 +243,3 @@ def graficar_corriente_vs_temperatura(titulo, datos_temperatura):
         legend=dict(orientation="h", yanchor="bottom", y=1.05, xanchor="center", x=0.5)
     )
     st.plotly_chart(fig_ply, width='stretch')
-    
