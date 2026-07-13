@@ -18,6 +18,7 @@ def obtener_datos_I_vs_T(lista_dispositivos, corrientes_nominales, lista_tempera
                     nombre_buscar = f"*_UTN_DIE4_{disp}_{corr}uA_{temp}_{m_ver}.csv"
                     lista_datos = matchear_archivos(nombre_buscar, tipo_medicion="temperatura")
                     if !lista_datos:
+                        print(nombre_buscar)
                         nombre_buscar = f"*_UTN_DIE4_{disp}_{corr}u_{temp}_{m_ver}.csv"
                         lista_datos = matchear_archivos(nombre_buscar, tipo_medicion="temperatura")
                     
