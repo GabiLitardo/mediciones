@@ -74,8 +74,21 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda):
                 
                 if tipo_tanda == "FOXFET":
                     corrientes_abs = np.abs(corrientes)
-                    indices_orden = np.argsort(corrientes_abs)
-                    v_interp = np.interp(1e-5, corrientes_abs[indices_orden], tensiones[indices_orden])
+                    
+                    idx_cercano = np.argmin(np.abs(corrientes_abs - 1e-5))
+                    
+                    if idx_cercano == 0:
+                        v_interp = tensiones[0]
+                    elif idx_cercano == len(tensiones) - 1:
+                        v_interp = tensiones[-1]
+                    else:
+                        entorno = [idx_cercano - 1, idx_cercano, idx_cercano + 1]
+                        x_local = corrientes_abs[entorno]
+                        y_local = tensiones[entorno]
+                        
+                        idx_local_orden = np.argsort(x_local)
+                        v_interp = np.interp(1e-5, x_local[idx_local_orden], y_local[idx_local_orden])
+                    
                     valores.append(v_interp)
                     tiempos.append(t)
                 else:
