@@ -115,7 +115,7 @@ if mostrar_temperatura:
     st.header("Análisis de Coeficiente Térmico")
     
     # Parámetros fijos que querés barrer
-    lista_disp_temp = ["PFGIW1"]
+    lista_disp_temp = ["PFGIW1", "PFGIW2", "PFGIP2"]
     corrientes_temp = [150, 200]
     lista_temps = [30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130]  # Meté acá la lista de temperaturas reales de tus carpetas
     
