@@ -72,7 +72,7 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda):
                 tensiones = archivo_encontrado[:, 0]
                 corrientes = archivo_encontrado[:, 1]
                 
-               if tipo_tanda == "FOXFET":
+                if tipo_tanda == "FOXFET":
                     corrientes_abs = np.abs(corrientes)
                     indices_orden = np.argsort(corrientes_abs)
                     
