@@ -107,18 +107,24 @@ if mostrar_ruido:
         todas_las_evos=evos,
         corrientes_a_graficar=[100, 150, 200, 250, 350]
     )
-
+# =====================================================================
+# SECCIÓN 4: TEMPERATURA
+# =====================================================================
 if mostrar_temperatura:
     st.markdown("---")
     st.header("Análisis de Coeficiente Térmico")
     
+    # Parámetros fijos que querés barrer
     lista_disp_temp = ["PFGIW1"]
     corrientes_temp = [200]
+    lista_temps = [25, 50, 75, 100]  # Meté acá la lista de temperaturas reales de tus carpetas
     
-    datos_temp = proc_temp.obtener_datos_corriente_vs_temp(lista_disp_temp, corrientes_temp)
+    # Invocamos al backend que adaptamos antes
+    datos_temp = proc_temp.obtener_datos_I_vs_T(lista_disp_temp, corrientes_temp, lista_temps)
     
+    # Mandamos a graficar si trajo datos
     if datos_temp and any(datos_temp[d] for d in datos_temp):
-        graficos.graficar_corriente_vs_temperatura(
+        graficos.graficar_I_vs_T(
             titulo="Evolución de Corriente de Drenaje vs Temperatura (@ VD = -5V)",
             datos_temperatura=datos_temp
         )
