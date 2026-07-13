@@ -100,6 +100,8 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda):
             st.write(valores[-1])
         if disp == "FFC3":
             st.write(valores[-1])
+            dif = 19.762991949353207 - 16.264310684920805
+            st.write(dif)
     return resultado
 
 def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda):
