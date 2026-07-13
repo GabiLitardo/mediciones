@@ -10,7 +10,6 @@ def obtener_datos_corriente_vs_temp(lista_dispositivos, corrientes_nominales):
         for corr in corrientes_nominales:
             nombre_generico = f"*_UTN_DIE4_{disp}_{corr}uA_*_M1.csv"
             
-            # Buscamos las rutas de forma local para tener los nombres reales
             directorio_base = Path(".")
             lista_de_rutas = directorio_base.glob("**/" + nombre_generico)
             
@@ -23,7 +22,6 @@ def obtener_datos_corriente_vs_temp(lista_dispositivos, corrientes_nominales):
                 if match:
                     temp_valor = float(match.group(1))
                     
-                    # Le pedimos al lector que abra ESTE archivo puntual
                     lista_datos = matchear_archivos(nombre_archivo, tipo_medicion="temperatura")
                     
                     if lista_datos:
@@ -31,8 +29,11 @@ def obtener_datos_corriente_vs_temp(lista_dispositivos, corrientes_nominales):
                         v_drain = datos[:, 0]
                         i_drain = datos[:, 1]
                         
-                        idx_vd = np.argmin(np.abs(v_drain - (-5.0)))
-                        i_en_v5 = np.abs(i_drain[idx_vd]) * 1e6
+                        # Buscamos 5.0V positivo ya que el SMU barrió de 0 a 6V
+                        idx_vd = np.argmin(np.abs(v_drain - 5.0))
+                        
+                        # Guardamos la corriente directamente (ya viene en uA)
+                        i_en_v5 = np.abs(i_drain[idx_vd])
                         
                         temps_aux.append(temp_valor)
                         corrientes_aux.append(i_en_v5)
