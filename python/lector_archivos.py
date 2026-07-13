@@ -17,6 +17,6 @@ def matchear_archivos(nombre_archivo_generico, tipo_medicion="iv"):
         elif tipo_medicion == "temperatura":
             medicion = np.genfromtxt(ruta_archivo, delimiter=',', skip_header=2, usecols=(0, 1), encoding="cp1252")
         else:
-            medicion = np.genfromtxt(ruta_archivo, skip_header=2, usecols=(0, 1), encoding="cp1252")
+            medicion = np.genfromtxt(ruta_archivo, skip_header=1, usecols=(3, 4))
         mediciones.append(medicion)  
     return mediciones
