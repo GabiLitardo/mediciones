@@ -15,7 +15,7 @@ mostrar_resumen = st.checkbox("0. Resumen (Sensibilidad absoluta vs Ruido)", val
 mostrar_evolucion = st.checkbox("1. Análisis temporal", value=False)
 mostrar_sensibilidad = st.checkbox("2. Análisis de sensibilidad a radiación", value=False)
 mostrar_ruido = st.checkbox("3. Análisis de Ruido", value=False)
-mostrar_temperatura = st.checkbox("Mostrar Efectos de Temperatura", value=False)
+mostrar_temperatura = st.checkbox("4. Mostrar Efectos de Temperatura", value=False)
 
 # variables auxiliares
 
