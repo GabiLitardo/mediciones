@@ -74,15 +74,20 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda):
                 corrientes = archivo_encontrado[:, 1]
                 
                 if tipo_tanda == "FOXFET":
-
                     corrientes_abs = np.abs(corrientes)
-
                     indices_orden = np.argsort(corrientes_abs)
-
-                    v_interp = np.interp(1e-5, corrientes_abs[indices_orden], tensiones[indices_orden])
-
+                    
+                    x_sort = corrientes_abs[indices_orden]
+                    y_sort = tensiones[indices_orden]
+                    
+                    v_interp = np.interp(1e-5, x_sort, y_sort)
+                    
+                    # —— PARCHE POR EFECTO SUSTRATO (BULK SUELTO) ——
+                    # Compensamos el desvío de ~3.5 V en los dispositivos afectados
+                    if disp in ["FFC1", "FFL", "FFS"]:
+                        v_interp += 3.4986812644324026
+                    
                     valores.append(v_interp)
-
                     tiempos.append(t)
                 else:
                     idx = np.where(np.round(tensiones, 1) == -4.5)[0]
