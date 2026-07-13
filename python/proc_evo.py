@@ -2,6 +2,7 @@
 import numpy as np
 from pathlib import Path
 from lector_archivos import matchear_archivos
+import streamlit as st
 
 def calcular_tiempo_acumulado(nro, tipo_tanda):
     """Calcula el tiempo acumulado según el historial de intervalos de irradiación."""
@@ -95,7 +96,7 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda):
                 "tiempos": np.array(tiempos)[indices],
                 "valores": np.array(valores)[indices]
             }
-        print("A")
+        st.write("A")
     return resultado
 
 def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda):
