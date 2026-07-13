@@ -202,3 +202,39 @@ def graficar_evolucion_ruido(titulo, todas_las_evos, corrientes_a_graficar):
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5)
     )
     st.plotly_chart(fig_ply, width='stretch')
+
+import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+import streamlit as st
+
+def graficar_corriente_vs_temperatura(titulo, datos_temperatura):
+    plt.figure(figsize=(10, 5))
+    for disp, corrientes_dict in datos_temperatura.items():
+        for corr, curvas in corrientes_dict.items():
+            plt.plot(curvas["x"], curvas["y"], 'o-', label=f"{disp} ({corr} uA)")
+            
+    plt.title(titulo)
+    plt.xlabel("Temperatura [°C]")
+    plt.ylabel(r"Corriente $I_D$ @ $V_D = -5$V [$\mu$A]")
+    plt.grid(True, linestyle=":", alpha=0.6)
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    st.pyplot(plt.gcf(), clear_figure=True)
+    plt.close()
+
+    fig_ply = go.Figure()
+    for disp, corrientes_dict in datos_temperatura.items():
+        for corr, curvas in corrientes_dict.items():
+            fig_ply.add_trace(go.Scatter(
+                x=curvas["x"], y=curvas["y"],
+                mode='markers+lines', name=f"{disp} ({corr} uA)"
+            ))
+            
+    fig_ply.update_layout(
+        title=titulo,
+        xaxis=dict(title="Temperatura [°C]"),
+        yaxis=dict(title="Corriente I_D @ V_D = -5V [uA]"),
+        template="plotly_white",
+        legend=dict(orientation="h", yanchor="bottom", y=1.05, xanchor="center", x=0.5)
+    )
+    st.plotly_chart(fig_ply, width='stretch')
+    
