@@ -18,6 +18,4 @@ def matchear_archivos(nombre_archivo_generico, tipo_medicion="iv"):
         else:
             medicion = np.genfromtxt(ruta_archivo, skip_header=2, usecols=(0, 1), encoding="cp1252")
         mediciones.append(medicion)  
-    if len(mediciones) == 0:
-        print(nombre_archivo_generico)
     return mediciones
