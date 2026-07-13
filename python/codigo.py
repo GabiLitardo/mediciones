@@ -117,7 +117,7 @@ if mostrar_temperatura:
     # Parámetros fijos que querés barrer
     lista_disp_temp = ["PFGIW1"]
     corrientes_temp = [200]
-    lista_temps = [25, 50, 75, 100]  # Meté acá la lista de temperaturas reales de tus carpetas
+    lista_temps = [30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130]  # Meté acá la lista de temperaturas reales de tus carpetas
     
     # Invocamos al backend que adaptamos antes
     datos_temp = proc_temp.obtener_datos_I_vs_T(lista_disp_temp, corrientes_temp, lista_temps)
