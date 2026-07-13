@@ -95,7 +95,7 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda):
                 "tiempos": np.array(tiempos)[indices],
                 "valores": np.array(valores)[indices]
             }
-        if disp == "FFC1":
+        if 1:
             print("A")
     return resultado
 
