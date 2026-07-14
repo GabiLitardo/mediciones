@@ -4,6 +4,7 @@ import numpy as np
 import streamlit as st
 import plotly.graph_objects as go
 from proc_sens import calcular_fit_polinomico
+import pandas as pd
 
 def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     """Dibuja la evolución temporal absoluta de corrientes o tensiones interpoladas."""
@@ -206,11 +207,10 @@ def graficar_evolucion_ruido(titulo, todas_las_evos, corrientes_a_graficar):
 def graficar_I_vs_T(titulo, datos_temperatura):
     """
     Grafica la Corriente ID @ VD = -5V en función de la Temperatura 
-    para cada combinación de dispositivo y corriente nominal.
+    y muestra una tabla con los coeficientes térmicos (alpha) calculados.
     """
-    # —— 1. RENDERING EN MATPLOTLIB ——
+    # —— 1. RENDER DE GRÁFICO ESTÁTICO (MATPLOTLIB) ——
     plt.figure(figsize=(10, 5))
-    
     for disp, corrientes_dict in datos_temperatura.items():
         for corr, curvas in corrientes_dict.items():
             plt.plot(curvas["x"], curvas["y"], 'o-', label=f"{disp} ({corr} uA)")
@@ -223,9 +223,8 @@ def graficar_I_vs_T(titulo, datos_temperatura):
     st.pyplot(plt.gcf(), clear_figure=True)
     plt.close()
 
-    # —— 2. RENDERING EN PLOTLY ——
+    # —— 2. RENDER DE GRÁFICO INTERACTIVO (PLOTLY) ——
     fig_ply = go.Figure()
-    
     for disp, corrientes_dict in datos_temperatura.items():
         for corr, curvas in corrientes_dict.items():
             fig_ply.add_trace(go.Scatter(
@@ -243,3 +242,22 @@ def graficar_I_vs_T(titulo, datos_temperatura):
         legend=dict(orientation="h", yanchor="bottom", y=1.05, xanchor="center", x=0.5)
     )
     st.plotly_chart(fig_ply, width='stretch')
+
+    # —— 3. CÁLCULO Y PRESENTACIÓN DE LA TABLA DE COEFICIENTES ——
+    st.markdown("### Tabla de Coeficientes Térmicos")
+    
+    filas_tabla = []
+    for disp, corrientes_dict in datos_temperatura.items():
+        for corr, curvas in corrientes_dict.items():
+            if "alpha" in curvas:
+                filas_tabla.append({
+                    "Dispositivo": disp,
+                    "Corriente Nominal [uA]": corr,
+                    "Coef. Térmico (α) [uA/°C]": round(curvas["alpha"], 4)
+                })
+                
+    if filas_tabla:
+        df_coefs = pd.DataFrame(filas_tabla)
+        st.dataframe(df_coefs, use_container_width=True, hide_index=True)
+    else:
+        st.warning("No se encontraron coeficientes térmicos calculados para mostrar.")
