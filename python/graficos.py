@@ -89,43 +89,77 @@ def graficar_ruido(titulo, datos_ruido):
     st.plotly_chart(fig_ply, width='stretch')
     plt.close()
 
-def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido):
+def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, datos_temp):
     fig_ply = go.Figure()
     colores = {"PFGIW1": "#1f77b4", "PFGIW2": "#ff7f0e", "PFGIP2": "#2ca02c"}
     
     s_max = max(np.max(d["y"]) for d in datos_sensibilidad.values())
     r_max = max(np.max(d["y"]) for d in datos_ruido.values())
 
-    tc_max = 0.15 
-    datos_tc = {
-        "PFGIW1": {"x": datos_ruido["PFGIW1"]["x"], "y": np.array([0.12, 0.09, 0.07, 0.05, 0.03])},
-        "PFGIW2": {"x": datos_ruido["PFGIW2"]["x"], "y": np.array([0.14, 0.11, 0.08, 0.06, 0.04])},
-        "PFGIP2": {"x": datos_ruido["PFGIP2"]["x"], "y": np.array([0.08, 0.06, 0.05, 0.04, 0.02])}
-    }
+    # —— PROCESAMIENTO DE COEFICIENTES TÉRMICOS REALES ——
+    datos_tc_reales = {}
+    for disp in datos_sensibilidad.keys():
+        x_corrientes = []
+        y_coefs_relativos = []
+        
+        # Si tenemos mediciones térmicas para este dispositivo
+        if disp in datos_temp:
+            for corr_nominal, curvas in datos_temp[disp].items():
+                if "alpha" in curvas:
+                    # Convertimos la corriente de string a float por si viene como clave de texto
+                    i_nom = float(corr_nominal) 
+                    
+                    # Coeficiente porcentual relativo: (Pendiente uA/°C / Corriente Nominal uA) * 100
+                    coef_relativo = (curvas["alpha"] / i_nom) * 100.0
+                    
+                    x_corrientes.append(i_nom)
+                    y_coefs_relativos.append(coef_relativo)
+        
+        # Si encontramos puntos reales, los ordenamos por corriente creciente
+        if x_corrientes:
+            indices_orden = np.argsort(x_corrientes)
+            datos_tc_reales[disp] = {
+                "x": np.array(x_corrientes)[indices_orden],
+                "y": np.array(y_coefs_relativos)[indices_orden]
+            }
+        else:
+            # Fallback seguro en caso de que no haya mediciones de temp para algún dispositivo
+            datos_tc_reales[disp] = {"x": np.array([]), "y": np.array([])}
+
+    # Determinamos el límite superior del eje Y3 dinámicamente según el alpha real máximo hallado
+    valores_y3 = [np.max(d["y"]) for d in datos_tc_reales.values() if len(d["y"]) > 0]
+    tc_max = max(valores_y3) if valores_y3 else 0.15
+
+    # —— GENERACIÓN DE TRAZAS ——
     for disp in datos_sensibilidad.keys():
         color = colores.get(disp, None)
         
+        # 1. Traza de Sensibilidad (Eje Y principal)
         fig_ply.add_trace(go.Scatter(
             x=datos_sensibilidad[disp]["x"], y=datos_sensibilidad[disp]["y"],
             mode='lines', name=f"{disp} (Sens)", line=dict(color=color)
         ))
         
+        # 2. Traza de Ruido (Eje Y2 - Secundario derecho)
         fig_ply.add_trace(go.Scatter(
             x=datos_ruido[disp]["x"], y=datos_ruido[disp]["y"],
             mode='markers+lines', name=f"{disp} (Ruido)", 
             line=dict(dash='dash', color=color), yaxis='y2'
         ))
-        '''
-        fig_ply.add_trace(go.Scatter(
-            x=datos_tc[disp]["x"], y=datos_tc[disp]["y"],
-            mode='markers+lines', name=f"{disp} (TC)", 
-            line=dict(dash='dot', color=color), marker=dict(symbol='square'), yaxis='y3'
-        ))
-    '''
+        
+        # 3. Traza de Coeficiente Térmico REAL (Eje Y3 - Tercer eje desplazado)
+        if len(datos_tc_reales[disp]["x"]) > 0:
+            fig_ply.add_trace(go.Scatter(
+                x=datos_tc_reales[disp]["x"], y=datos_tc_reales[disp]["y"],
+                mode='markers+lines', name=f"{disp} (TC)", 
+                line=dict(dash='dot', color=color), marker=dict(symbol='square'), yaxis='y3'
+            ))
+
+    # —— AJUSTES DE MAQUETADO Y LEYENDA ——
     fig_ply.update_layout(
         title=dict(
             text=titulo,
-            y=0.98,
+            y=0.95,
             yanchor="top",
             x=0.5,
             xanchor="center"
@@ -149,9 +183,15 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido):
             overlaying='y', side='right',
             anchor='free', position=0.94
         ),
+        # Desplazamos la leyenda arriba a la derecha y en vertical para que no pise el título
         legend=dict(
-            orientation="h", yanchor="bottom", y=1.05, xanchor="center", x=0.4
+            orientation="v",
+            yanchor="middle",
+            y=0.5,
+            xanchor="left",
+            x=1.06
         ),
+        margin=dict(t=100, r=150), # Agregamos margen derecho para el tercer eje e izquierdo para la leyenda
         template="plotly_white"
     )
     st.plotly_chart(fig_ply, width='stretch')
