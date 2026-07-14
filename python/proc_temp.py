@@ -39,13 +39,14 @@ def obtener_datos_I_vs_T(lista_dispositivos, corrientes_nominales, lista_tempera
                     
                     temps_aux.append(float(temp))
                     corrientes_aux.append(i_en_v5)
-            
-            if temps_aux:
-                # Nos aseguramos de que queden ordenados de menor a mayor temperatura
-                indices_orden = np.argsort(temps_aux)
-                resultado[disp][corr] = {
-                    "x": np.array(temps_aux)[indices_orden],
-                    "y": np.array(corrientes_aux)[indices_orden]
-                }
+                    
+            coefs = np.polyfit(temps, corrientes, deg=1)
+            # Nos aseguramos de que queden ordenados de menor a mayor temperatura
+            indices_orden = np.argsort(temps_aux)
+            resultado[disp][corr] = {
+                "x": np.array(temps_aux)[indices_orden],
+                "y": np.array(corrientes_aux)[indices_orden],
+                "alpha": coefs[0]
+            }
                 
     return resultado
