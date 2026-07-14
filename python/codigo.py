@@ -145,7 +145,18 @@ if mostrar_resumen:
     if resultados_ruido is None:
         resultados_ruido = proc_ruido.procesar_ruido(dispositivos_cruce, corrientes_ruido)
     
+    # —— CÁLCULO SEGURO DE TEMPERATURAS PARA EL TRIPLE EJE ——
+    import proc_temp
+    lista_temps_resumen = [25, 50, 75, 100] # Lista de temperaturas reales que tengas en tu dataset
+    datos_temp_resumen = proc_temp.obtener_datos_I_vs_T(dispositivos_cruce, corrientes_ruido, lista_temps_resumen)
+    
     sens_resumen = {disp: sens_abs_t2[0][disp] for disp in dispositivos_cruce}
     ruido_resumen = {disp: resultados_ruido[disp] for disp in dispositivos_cruce}
     
-    graficos.graficar_superposicion_sens_ruido(titulo="Tanda 2: Sensibilidad absoluta y ruido vs I_D normalizada",datos_sensibilidad=sens_resumen,datos_ruido=ruido_resumen)
+    # Pasamos los 4 argumentos correspondientes
+    graficos.graficar_superposicion_sens_ruido(
+        titulo="Tanda 2: Sensibilidad absoluta, ruido y coef. térmico vs I_D normalizada",
+        datos_sensibilidad=sens_resumen,
+        datos_ruido=ruido_resumen,
+        datos_temp=datos_temp_resumen
+    )
