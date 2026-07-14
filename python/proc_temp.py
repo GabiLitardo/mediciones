@@ -18,7 +18,6 @@ def obtener_datos_I_vs_T(lista_dispositivos, corrientes_nominales, lista_tempera
                     nombre_buscar = f"*_UTN_DIE4_{disp}_{corr}uA_{temp}_{m_ver}.csv"
                     lista_datos = matchear_archivos(nombre_buscar, tipo_medicion="temperatura")
                     if not lista_datos:
-                        print(nombre_buscar)
                         nombre_buscar = f"*_UTN_DIE4_{disp}_{corr}u_{temp}_{m_ver}.csv"
                         lista_datos = matchear_archivos(nombre_buscar, tipo_medicion="temperatura")
                     
@@ -27,26 +26,31 @@ def obtener_datos_I_vs_T(lista_dispositivos, corrientes_nominales, lista_tempera
                         break
                 
                 if archivo_encontrado is not None:
-                    # Al usar tipo_medicion="temperatura", la columna 0 es vd (3) y la columna 1 es id (4)
                     v_drain = archivo_encontrado[:, 0]
                     i_drain = archivo_encontrado[:, 1]
                     
                     # Buscamos el índice más cercano a VD = -5.0V
                     idx_vd = np.argmin(np.abs(v_drain - (-5.0)))
                     
-                    # Guardamos el valor absoluto en uA (multiplicamos por 1e6 ya que viene en Amperes nativos)
+                    # Guardamos el valor absoluto en uA
                     i_en_v5 = np.abs(i_drain[idx_vd]) * 1e6
                     
                     temps_aux.append(float(temp))
                     corrientes_aux.append(i_en_v5)
-                    
-            coefs = np.polyfit(temps, corrientes, deg=1)
-            # Nos aseguramos de que queden ordenados de menor a mayor temperatura
-            indices_orden = np.argsort(temps_aux)
-            resultado[disp][corr] = {
-                "x": np.array(temps_aux)[indices_orden],
-                "y": np.array(corrientes_aux)[indices_orden],
-                "alpha": coefs[0]
-            }
+            
+            if temps_aux:
+                # 1. Nos aseguramos de ordenar los vectores de menor a mayor temperatura
+                indices_orden = np.argsort(temps_aux)
+                x_ordenado = np.array(temps_aux)[indices_orden]
+                y_ordenado = np.array(corrientes_aux)[indices_orden]
+                
+                # 2. Calculamos el coeficiente térmico (pendiente de la recta) con los datos ordenados
+                coefs = np.polyfit(x_ordenado, y_ordenado, deg=1)
+                
+                resultado[disp][corr] = {
+                    "x": x_ordenado,
+                    "y": y_ordenado,
+                    "alpha": coefs[0]  # Coeficiente térmico absoluto (uA/°C)
+                }
                 
     return resultado
