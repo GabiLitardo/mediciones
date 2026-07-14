@@ -235,11 +235,25 @@ def graficar_I_vs_T(titulo, datos_temperatura):
             ))
             
     fig_ply.update_layout(
-        title=titulo,
+        title={
+            'text': titulo,
+            'y': 0.95,
+            'x': 0.5,
+            'xanchor': 'center',
+            'yanchor': 'top'
+        },
         xaxis=dict(title="Temperatura [°C]"),
         yaxis=dict(title="Corriente I_D @ V_D = -5V [uA]"),
         template="plotly_white",
-        legend=dict(orientation="h", yanchor="bottom", y=1.05, xanchor="center", x=0.5)
+        # Ubicamos la leyenda a la derecha de forma limpia para que no compita con el título
+        legend=dict(
+            orientation="v",
+            yanchor="middle",
+            y=0.5,
+            xanchor="left",
+            x=1.02
+        ),
+        margin=dict(t=100) # Agregamos margen superior para darle aire al título
     )
     st.plotly_chart(fig_ply, width='stretch')
 
