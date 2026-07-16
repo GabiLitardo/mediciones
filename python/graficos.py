@@ -227,7 +227,7 @@ def graficar_evolucion_ruido(titulo, todas_las_evos, corrientes_a_graficar):
         title=titulo,
         xaxis=dict(
             title="Tiempo [s]",
-            type="log"
+            #type="log"
         ),
         yaxis=dict(title=r"Corriente de Ruido Neto [$\mu$A]"),
         template="plotly_white",
