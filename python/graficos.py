@@ -74,7 +74,7 @@ def graficar_ruido(titulo, datos_ruido):
         fig_ply.add_trace(go.Scatter(x=x_data, y=y_data, mode='markers', name=disp))
             
     plt.title(titulo)
-    plt.xlabel(r"Corriente Nominal $I_D$ [$\mu$A]")
+    plt.xlabel(r"Corriente Normalizada $I_D$ [$\mu$A]")
     plt.ylabel("Desvío de Ruido [nA]")
     plt.grid(True, linestyle=":", alpha=0.6)
     plt.legend()
