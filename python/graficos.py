@@ -109,7 +109,7 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
                 if "alpha" in curvas:
                     # Convertimos la clave nominal (ej: 150) a float para el eje X
                     x_coefs.append(float(corr_nominal))
-                    y_coefs.append(curvas["alpha"])
+                    y_coefs.append(np.abs(curvas["alpha"]))
         
         # Ordenamos los puntos por corriente para que Plotly no dibuje líneas cruzadas
         if x_coefs:
@@ -179,7 +179,7 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
             overlaying='y', side='right'
         ),
         yaxis3=dict(
-            title=dict(text="Coeficiente Térmico [uA/°C]", font=dict(color="#2ca02c")),
+            title=dict(text="Módulo de Coeficiente Térmico [uA/°C]", font=dict(color="#2ca02c")),
             range=[tc_min, tc_max], 
             overlaying='y', side='right',
             anchor='free', position=0.94
