@@ -1,22 +1,24 @@
 from pathlib import Path
 import numpy as np
-import os
-import streamlit as st
 
-def matchear_archivos(nombre_archivo_generico, tipo_medicion="iv"):
+def matchear_archivos(nombre_buscar, tipo_medicion="iv"):
     """
-    Busca archivos recursivamente y devuelve una lista con sus matrices de datos.
-    Acepta tipo_medicion="iv", tipo_medicion="ruido" o tipo_medicion="temperatura".
+    Busca archivos de forma recursiva en el directorio y subcarpetas,
+    devolviendo una lista con las matrices de datos cargadas.
     """
     directorio_base = Path(".")
-    lista_de_rutas = directorio_base.glob("**/" + nombre_archivo_generico)
+    rutas_encontradas = directorio_base.glob("**/" + nombre_buscar)
+    
     mediciones = []
-    for ruta_archivo in lista_de_rutas:
+    
+    for ruta in rutas_encontradas:
         if tipo_medicion == "ruido":
-            medicion = np.genfromtxt(ruta_archivo, delimiter='\t', skip_header=5, usecols=(0, 1, 2), encoding="cp1252")
+            datos = np.genfromtxt(ruta, delimiter='\t', skip_header=5, usecols=(0, 1, 2), encoding="cp1252")
         elif tipo_medicion == "temperatura":
-            medicion = np.genfromtxt(ruta_archivo, delimiter=',', skip_header=1, usecols=(3, 4))
+            datos = np.genfromtxt(ruta, delimiter=',', skip_header=1, usecols=(3, 4))
         else:
-            medicion = np.genfromtxt(ruta_archivo, skip_header=2, usecols=(0, 1), encoding="cp1252")
-        mediciones.append(medicion)  
+            datos = np.genfromtxt(ruta, skip_header=2, usecols=(0, 1), encoding="cp1252")
+            
+        mediciones.append(datos)
+        
     return mediciones
