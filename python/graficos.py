@@ -125,9 +125,18 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
             datos_tc[disp] = {"x": np.array([]), "y": np.array([])}
 
     # Calculamos los límites reales del eje Y3 de forma dinámica (soporta positivos y negativos)
-    todos_los_tc = np.concatenate([d["y"] for d in datos_tc.values() if len(d["y"]) > 0], default=np.array([0.0]))
-    tc_min = min(np.min(todos_los_tc) * 1.1, -0.1) if len(todos_los_tc) > 0 else -0.1
-    tc_max = max(np.max(todos_los_tc) * 1.1, 0.1) if len(todos_los_tc) > 0 else 0.1
+    lista_valores_tc = []
+    for d in datos_tc.values():
+        if len(d["y"]) > 0:
+            lista_valores_tc.extend(d["y"])
+
+    # Si la lista tiene datos, calculamos los mínimos y máximos; si no, asignamos un rango por defecto
+    if lista_valores_tc:
+        tc_min = min(min(lista_valores_tc) * 1.1, -0.1)
+        tc_max = max(max(lista_valores_tc) * 1.1, 0.1)
+    else:
+        tc_min = -0.1
+        tc_max = 0.1
 
     # —— GENERACIÓN DE TRAZAS ——
     for disp in datos_sensibilidad.keys():
