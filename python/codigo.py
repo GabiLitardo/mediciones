@@ -27,7 +27,7 @@ if mostrar_evolucion:
     graficos.graficar_dispositivos(
         titulo="Evolución Floating Gates tanda 1 (I @ V = -4.5 V)",
         ylabel=r"$I_D$ [$\mu$A]",
-        datos_processed=datos_fg_t1,
+        datos_procesados=datos_fg_t1,
         tanda=1,
         es_fg=True
     )
@@ -154,7 +154,6 @@ if mostrar_resumen:
     dispositivos_cruce = ["PFGIW1", "PFGIW2", "PFGIP2"]
     corrientes_ruido = [100, 150, 200, 250, 350]
 
-    # Cálculos seguros por si las secciones previas no se activaron en la interfaz
     if sens_abs_t2 is None:
         sens_abs_t2 = proc_sens.procesar_sensibilidad(["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"], "FG_tanda2", normalizado=False)
 
