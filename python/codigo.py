@@ -145,9 +145,7 @@ if mostrar_resumen:
     if resultados_ruido is None:
         resultados_ruido = proc_ruido.procesar_ruido(dispositivos_cruce, corrientes_ruido)
     
-    # —— CÁLCULO SEGURO DE TEMPERATURAS PARA EL TRIPLE EJE ——
-    import proc_temp
-    lista_temps_resumen = [25, 50, 75, 100] # Lista de temperaturas reales que tengas en tu dataset
+    lista_temps_resumen = [30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130]
     datos_temp_resumen = proc_temp.obtener_datos_I_vs_T(dispositivos_cruce, corrientes_ruido, lista_temps_resumen)
     
     sens_resumen = {disp: sens_abs_t2[0][disp] for disp in dispositivos_cruce}
