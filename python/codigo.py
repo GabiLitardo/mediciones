@@ -146,7 +146,7 @@ if mostrar_resumen:
         resultados_ruido = proc_ruido.procesar_ruido(dispositivos_cruce, corrientes_ruido)
     
     lista_temps_resumen = [30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130]
-    datos_temp_resumen = proc_temp.obtener_datos_I_vs_T(dispositivos_cruce, corrientes_ruido, lista_temps_resumen)
+    datos_temp_resumen = proc_temp.obtener_datos_I_vs_T(dispositivos_cruce, [150, 200], lista_temps_resumen)
     
     sens_resumen = {disp: sens_abs_t2[0][disp] for disp in dispositivos_cruce}
     ruido_resumen = {disp: resultados_ruido[disp] for disp in dispositivos_cruce}
