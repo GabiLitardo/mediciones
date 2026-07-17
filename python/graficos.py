@@ -98,30 +98,36 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
 
     datos_tc = {}
 
-    # —— ASIGNACIÓN DIRECTA USANDO TU INDEXACIÓN POR CORRIENTE ——
+    # —— RESOLUCIÓN CORECTA USANDO LAS CLAVES REALES DE TEMPERATURA ——
     for disp in datos_sensibilidad.keys():
-        x_ruido = datos_ruido[disp]["x"]  # [100, 150, 200, 250, 350]
+        x_coefs = []
         y_coefs = []
         
-        for i_nom in x_ruido:
-            # Consulta directa al diccionario usando la misma clave
-            if disp in datos_temp and i_nom in datos_temp[disp]:
-                curvas = datos_temp[disp][i_nom]
-                # Coeficiente relativo (%/°C) = (alpha / corriente_nominal) * 100
-                coef_relativo = (curvas["alpha"] / float(i_nom)) * 100.0
-                y_coefs.append(coef_relativo)
-            else:
-                y_coefs.append(0.0)  # Fallback si falta alguna medición
-            
-        datos_tc[disp] = {
-            "x": x_ruido,
-            "y": np.array(y_coefs)
-        }
+        # Iteramos únicamente sobre las corrientes que de verdad se midieron y existen en datos_temp
+        if datos_temp and disp in datos_temp:
+            for corr_nominal, curvas in datos_temp[disp].items():
+                if "alpha" in curvas:
+                    # Convertimos la clave nominal (ej: 150) a float para el eje X
+                    x_coefs.append(float(corr_nominal))
+                    
+                    # Coeficiente relativo (%/°C) = (alpha / corriente_nominal) * 100
+                    coef_relativo = (curvas["alpha"] / float(corr_nominal)) * 100.0
+                    y_coefs.append(coef_relativo)
+        
+        # Ordenamos los puntos por corriente para que Plotly no dibuje líneas cruzadas
+        if x_coefs:
+            indices_orden = np.argsort(x_coefs)
+            datos_tc[disp] = {
+                "x": np.array(x_coefs)[indices_orden],
+                "y": np.array(y_coefs)[indices_orden]
+            }
+        else:
+            datos_tc[disp] = {"x": np.array([]), "y": np.array([])}
 
-    # Calculamos los límites reales del eje Y3 (pueden ser negativos)
-    todos_los_tc = np.concatenate([d["y"] for d in datos_tc.values()])
-    tc_min = min(np.min(todos_los_tc) * 1.1, -0.1)
-    tc_max = max(np.max(todos_los_tc) * 1.1, 0.1)
+    # Calculamos los límites reales del eje Y3 de forma dinámica (soporta positivos y negativos)
+    todos_los_tc = np.concatenate([d["y"] for d in datos_tc.values() if len(d["y"]) > 0], default=np.array([0.0]))
+    tc_min = min(np.min(todos_los_tc) * 1.1, -0.1) if len(todos_los_tc) > 0 else -0.1
+    tc_max = max(np.max(todos_los_tc) * 1.1, 0.1) if len(todos_los_tc) > 0 else 0.1
 
     # —— GENERACIÓN DE TRAZAS ——
     for disp in datos_sensibilidad.keys():
@@ -133,19 +139,20 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
             mode='lines', name=f"{disp} (Sens)", line=dict(color=color)
         ))
         
-        # 2. Ruido (Eje Y2)
+        # 2. Ruido (Eje Y2 - Derecho externo)
         fig_ply.add_trace(go.Scatter(
             x=datos_ruido[disp]["x"], y=datos_ruido[disp]["y"],
             mode='markers+lines', name=f"{disp} (Ruido)", 
             line=dict(dash='dash', color=color), yaxis='y2'
         ))
         
-        # 3. Coeficiente Térmico (Eje Y3)
-        fig_ply.add_trace(go.Scatter(
-            x=datos_tc[disp]["x"], y=datos_tc[disp]["y"],
-            mode='markers+lines', name=f"{disp} (TC)", 
-            line=dict(dash='dot', color=color), marker=dict(symbol='square'), yaxis='y3'
-        ))
+        # 3. Coeficiente Térmico REAL (Eje Y3 - Derecho interno desplazado)
+        if len(datos_tc[disp]["x"]) > 0:
+            fig_ply.add_trace(go.Scatter(
+                x=datos_tc[disp]["x"], y=datos_tc[disp]["y"],
+                mode='markers+lines', name=f"{disp} (TC)", 
+                line=dict(dash='dot', color=color), marker=dict(symbol='square'), yaxis='y3'
+            ))
 
     fig_ply.update_layout(
         title=dict(
@@ -167,7 +174,7 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
         ),
         yaxis3=dict(
             title=dict(text="Coeficiente Térmico [%/°C]", font=dict(color="#2ca02c")),
-            range=[tc_min, tc_max],  # Rango dinámico que acepta valores bajo cero
+            range=[tc_min, tc_max], 
             overlaying='y', side='right',
             anchor='free', position=0.94
         ),
