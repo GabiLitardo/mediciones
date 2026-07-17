@@ -152,7 +152,7 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
         fig_ply.add_trace(go.Scatter(
             x=datos_ruido[disp]["x"], y=datos_ruido[disp]["y"],
             mode='markers+lines', name=f"{disp} (Ruido)", 
-            line=dict(dash='dash', color=color), yaxis='y2'
+            line=dict(dash='longdash', color=color), yaxis='y2'
         ))
         
         # 3. Coeficiente Térmico REAL (Eje Y3 - Derecho interno desplazado)
