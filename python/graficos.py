@@ -119,7 +119,7 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
             indices_orden = np.argsort(x_coefs)
             datos_tc[disp] = {
                 "x": np.array(x_coefs)[indices_orden],
-                "y": np.array(y_coefs)[indices_orden]
+                "y": np.abs(np.array(y_coefs))[indices_orden]
             }
         else:
             datos_tc[disp] = {"x": np.array([]), "y": np.array([])}
