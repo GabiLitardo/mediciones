@@ -145,7 +145,7 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
         # 1. Sensibilidad (Eje Y principal)
         fig_ply.add_trace(go.Scatter(
             x=datos_sensibilidad[disp]["x"], y=datos_sensibilidad[disp]["y"],
-            mode='lines', name=f"{disp} (Sens)", line=dict(color=color)
+            mode='lines', name=f"{disp} (Sens)", line=dict(dash = 'solid', color=color)
         ))
         
         # 2. Ruido (Eje Y2 - Derecho externo)
