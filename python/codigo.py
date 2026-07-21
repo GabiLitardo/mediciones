@@ -5,7 +5,7 @@ import proc_evo
 import proc_sens
 import proc_ruido
 import proc_temp
- 
+
 st.title("Resumen mediciones Chaves-Litardo")
 
 # =====================================================================
