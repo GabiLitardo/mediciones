@@ -48,3 +48,23 @@ def procesar_ruido(lista_dispositivos, corrientes_nominales, es_larga = False):
             "y": np.array([np.std(todas_las_evos[disp][corr]["y"] * 1000, ddof=1) for corr in corrientes_nominales])
         }
     return resultado
+
+def obtener_evolucion_temperatura_ruido(lista_dispositivos, corrientes_nominales, es_larga=False):
+    resultado = {}
+    for disp in lista_dispositivos:
+        resultado[disp] = {}
+        for corr in corrientes_nominales:
+            if es_larga:
+                nombre_archivo = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1_LARGA.txt"
+            else:
+                nombre_archivo = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1.txt"
+            
+            lista_mediciones = matchear_archivos(nombre_archivo, tipo_medicion="ruido")
+            if lista_mediciones:
+                datos = lista_mediciones[0]
+                tiempo_s = datos[:, 0]
+                resistencia = datos[:, 2]
+                temperatura_C = convertir_r_a_temp_steinhart(resistencia)
+                resultado[disp][corr] = {"x": tiempo_s, "y": temperatura_C}
+            
+    return resultado
