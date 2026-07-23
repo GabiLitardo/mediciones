@@ -295,7 +295,6 @@ def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t, corri
         xaxis=dict(title="Temperatura [°C]"),
         yaxis=dict(title=r"Corriente I_D [uA]"),
         template="plotly_white",
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5)
     )
     st.plotly_chart(fig_ply, width='stretch')
     
