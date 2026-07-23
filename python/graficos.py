@@ -310,3 +310,44 @@ def graficar_I_vs_T(titulo, datos_temperatura):
         st.dataframe(df_coefs, use_container_width=True, hide_index=True)
     else:
         st.warning("No se encontraron coeficientes térmicos calculados para mostrar.")
+def graficar_evolucion_temperatura(titulo, todas_las_evos_temp, corrientes_a_graficar):
+    # —— 1. MATPLOTLIB ——
+    plt.figure(figsize=(10, 5))
+    for disp, evos_disp in todas_las_evos_temp.items():
+        for corr in corrientes_a_graficar:
+            if corr in evos_disp:
+                x_data = evos_disp[corr]["x"]
+                y_data = evos_disp[corr]["y"]
+                plt.plot(x_data, y_data, alpha=0.7, label=f"{disp} @ {corr} uA")
+                
+    plt.title(titulo)
+    plt.xlabel("Tiempo [s]")
+    plt.ylabel("Temperatura [°C]")
+    plt.grid(True, which="both", linestyle=":", alpha=0.6)
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    st.pyplot(plt.gcf(), clear_figure=True)
+    plt.close()
+    
+    # —— 2. PLOTLY ——
+    fig_ply = go.Figure()
+    for disp, evos_disp in todas_las_evos_temp.items():
+        for corr in corrientes_a_graficar:
+            if corr in evos_disp:
+                x_data = evos_disp[corr]["x"]
+                y_data = evos_disp[corr]["y"]
+                fig_ply.add_trace(go.Scatter(
+                    x=x_data, 
+                    y=y_data, 
+                    mode='lines', 
+                    name=f"{disp} @ {corr} uA",
+                    opacity=0.8
+                ))
+                
+    fig_ply.update_layout(
+        title=titulo,
+        xaxis=dict(title="Tiempo [s]"),
+        yaxis=dict(title="Temperatura [°C]"),
+        template="plotly_white",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5)
+    )
+    st.plotly_chart(fig_ply, width='stretch')
