@@ -83,17 +83,18 @@ def obtener_corriente_vs_temperatura_ruido(lista_dispositivos, corrientes_nomina
             if lista_mediciones:
                 datos = lista_mediciones[0]
                 
-                # Datos extraídos directamente por columna en orden temporal original
-                corriente_cruda = datos[:, 1] *1e6  # Corriente tal cual viene en el archivo (uA)
-                resistencia = datos[:, 2]      # Resistencia tal cual viene en el archivo (Ohm)
-                
-                # Conversión de resistencia a temperatura por Steinhart-Hart
+                corriente_uA = np.abs(datos[:, 1]) * 1e6
+                resistencia = datos[:, 2]
                 temperatura_C = convertir_r_a_temp_steinhart(resistencia)
                 
-                # Guardamos en la secuencia temporal pura sin ordenar por X
+                # Ajuste lineal (grado 1)
+                coefs = np.polyfit(temperatura_C, corriente_uA, deg=1)
+                corriente_fit = np.polyval(coefs, temperatura_C)
+                
                 resultado[disp][corr] = {
-                    "x": temperatura_C,      # Eje X: Temperatura (°C) en tiempo real
-                    "y": corriente_cruda     # Eje Y: Corriente (A) cruda del archivo
+                    "x": temperatura_C,
+                    "y": corriente_uA,
+                    "y_fit": corriente_fit
                 }
             
     return resultado
