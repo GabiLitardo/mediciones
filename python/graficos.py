@@ -351,6 +351,7 @@ def graficar_evolucion_temperatura(titulo, todas_las_evos_temp, corrientes_a_gra
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5)
     )
     st.plotly_chart(fig_ply, width='stretch')
+    
 def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t, corrientes_a_graficar):
     # —— 1. MATPLOTLIB ——
     plt.figure(figsize=(10, 5))
@@ -363,7 +364,7 @@ def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t, corri
                 
     plt.title(titulo)
     plt.xlabel("Temperatura [°C]")
-    plt.ylabel(r"Corriente $I_D$ [$\mu$A]")
+    plt.ylabel("Corriente $I_D$ [A]")
     plt.grid(True, which="both", linestyle=":", alpha=0.6)
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     st.pyplot(plt.gcf(), clear_figure=True)
@@ -387,8 +388,9 @@ def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t, corri
     fig_ply.update_layout(
         title=titulo,
         xaxis=dict(title="Temperatura [°C]"),
-        yaxis=dict(title=r"Corriente I_D [uA]"),
+        yaxis=dict(title="Corriente I_D [A]"),
         template="plotly_white",
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5)
     )
     st.plotly_chart(fig_ply, width='stretch')
+    
