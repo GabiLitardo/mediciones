@@ -29,8 +29,8 @@ def obtener_datos_I_vs_T(lista_dispositivos, corrientes_nominales, lista_tempera
                     v_drain = archivo_encontrado[:, 0]
                     i_drain = archivo_encontrado[:, 1]
                     
-                    # Buscamos el índice más cercano a VD = -4.5.0V
-                    idx_vd = np.argmin(np.abs(v_drain - (-4.5.0)))
+                    # Buscamos el índice más cercano a VD = -4.5V
+                    idx_vd = np.argmin(np.abs(v_drain - (-4.5)))
                     
                     # Guardamos el valor absoluto en uA
                     i_en_v5 = np.abs(i_drain[idx_vd]) * 1e6
