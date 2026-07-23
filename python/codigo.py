@@ -136,7 +136,7 @@ if mostrar_temperatura:
     
     if datos_temp and any(datos_temp[d] for d in datos_temp):
         graficos.graficar_I_vs_T(
-            titulo="Evolución de Corriente de Drenaje vs Temperatura (@ VD = -5V)",
+            titulo="Evolución de Corriente de Drain vs Temperatura (@ VD = -5V)",
             datos_temperatura=datos_temp
         )
     else:
