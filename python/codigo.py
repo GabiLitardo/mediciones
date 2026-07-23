@@ -147,7 +147,7 @@ if mostrar_temperatura:
 # =====================================================================
 if mostrar_resumen:
     st.markdown("---")
-    st.header("Correlación: sensibilidad absoluta vs ruido neto")
+    st.header("Sensibilidad absoluta, ruido y coef. térmico vs I_D normalizada")
     
     dispositivos_cruce = ["PFGIW1", "PFGIW2", "PFGIP2"]
     corrientes_ruido = [100, 150, 200, 250, 350]
@@ -167,7 +167,7 @@ if mostrar_resumen:
     
     # Pasamos los 4 argumentos correspondientes
     graficos.graficar_superposicion_sens_ruido(
-        titulo="Tanda 2: Sensibilidad absoluta, ruido y coef. térmico vs I_D normalizada",
+        titulo="Sensibilidad absoluta, ruido y coef. térmico vs I_D normalizada",
         datos_sensibilidad=sens_resumen,
         datos_ruido=ruido_resumen,
         datos_temp=datos_temp_resumen
