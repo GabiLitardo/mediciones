@@ -252,7 +252,7 @@ def graficar_I_vs_T(titulo, datos_temperatura):
             
     plt.title(titulo)
     plt.xlabel("Temperatura [°C]")
-    plt.ylabel(r"Corriente $I_D$ @ $V_D = -5$V [$\mu$A]")
+    plt.ylabel(r"Corriente $I_D$ @ $V_D = -4.5$V [$\mu$A]")
     plt.grid(True, linestyle=":", alpha=0.6)
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     st.pyplot(plt.gcf(), clear_figure=True)
@@ -278,7 +278,7 @@ def graficar_I_vs_T(titulo, datos_temperatura):
             'yanchor': 'top'
         },
         xaxis=dict(title="Temperatura [°C]"),
-        yaxis=dict(title="Corriente I_D @ V_D = -5V [uA]"),
+        yaxis=dict(title="Corriente I_D @ V_D = -4.5V [uA]"),
         template="plotly_white",
         # Ubicamos la leyenda a la derecha de forma limpia para que no compita con el título
         legend=dict(
