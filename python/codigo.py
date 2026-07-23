@@ -8,15 +8,8 @@ import proc_temp
 
 st.title("Resumen mediciones Chaves-Litardo")
 import plotly.express as px
+import streamlit as st
 import streamlit.components.v1 as components
-
-# Inyectar el motor de MathJax para que Plotly pueda procesarlo
-components.html(
-    """
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-    """,
-    height=0,
-)
 
 fig = px.line(
     x=[1, 2, 3, 4], 
@@ -29,7 +22,11 @@ fig.update_layout(
     yaxis_title=r"$\alpha_{1c} = 352 \pm 11 \text{ km/s}$"
 )
 
-st.plotly_chart(fig)
+# Convertir la figura a HTML inyectando MathJax explícitamente
+fig_html = fig.to_html(include_mathjax="cdn", full_html=False)
+
+# Renderizar el HTML interactivo en Streamlit
+components.html(fig_html, height=500)
 # =====================================================================
 # CONFIGURACIÓN DE CHECKBOXES
 # =====================================================================
