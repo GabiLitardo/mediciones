@@ -36,8 +36,6 @@ def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
     for disp, datos in datos_sensibilidad_discreto.items():
         fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines+markers', name=disp))
         
-
-    
     fig_ply.update_layout(title=titulo, xaxis_title=r"Corriente Promedio Normalizada I_D_norm [$\mu$A]", yaxis_title=r"Tasa de Cambio normalizada[($\mu$A)/min]", template="plotly_white")
 
     st.plotly_chart(fig_ply, width='stretch')
@@ -191,9 +189,7 @@ def graficar_evolucion_ruido(titulo, todas_las_evos, corrientes_a_graficar):
             #type="log"
         ),
         yaxis=dict(title=r"Corriente de Ruido Neto [$\mu$A]"),
-        template="plotly_white",
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5)
-    )
+        template="plotly_white")
     st.plotly_chart(fig_ply, width='stretch')
 
 def graficar_I_vs_T(titulo, datos_temperatura):
