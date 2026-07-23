@@ -147,7 +147,7 @@ if mostrar_temperatura:
 # =====================================================================
 if mostrar_resumen:
     st.markdown("---")
-    st.header("Sensibilidad absoluta, ruido y coef. térmico vs I_D normalizada")
+    st.header("Sensibilidad absoluta, ruido y coef. térmico vs $I_D$ normalizada")
     
     dispositivos_cruce = ["PFGIW1", "PFGIW2", "PFGIP2"]
     corrientes_ruido = [100, 150, 200, 250, 350]
