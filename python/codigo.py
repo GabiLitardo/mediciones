@@ -8,10 +8,19 @@ import proc_temp
 
 st.title("Resumen mediciones Chaves-Litardo")
 import plotly.express as px
+import streamlit.components.v1 as components
+
+# Inyectar el motor de MathJax para que Plotly pueda procesarlo
+components.html(
+    """
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    """,
+    height=0,
+)
 
 fig = px.line(
     x=[1, 2, 3, 4], 
-    y=[1, 4, 9, 16],
+    y=[1, 4, 9, 16], 
     title=r"$\text{Ecuación: } f(x) = x^2$"
 )
 
@@ -20,7 +29,7 @@ fig.update_layout(
     yaxis_title=r"$\alpha_{1c} = 352 \pm 11 \text{ km/s}$"
 )
 
-fig.show()
+st.plotly_chart(fig)
 # =====================================================================
 # CONFIGURACIÓN DE CHECKBOXES
 # =====================================================================
