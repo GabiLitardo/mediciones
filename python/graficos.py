@@ -360,11 +360,16 @@ def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t, corri
             if corr in evos_disp:
                 x_data = evos_disp[corr]["x"]
                 y_data = evos_disp[corr]["y"]
-                plt.plot(x_data, y_data, alpha=0.7, label=f"{disp} @ {corr} uA")
+                y_fit = evos_disp[corr]["y_fit"]
+                
+                # Puntos para las mediciones crudas
+                plt.plot(x_data, y_data, ".", alpha=0.5, label=f"{disp} @ {corr} uA")
+                # Línea para la tendencia lineal
+                plt.plot(x_data, y_fit, "-", linewidth=1.5)
                 
     plt.title(titulo)
     plt.xlabel("Temperatura [°C]")
-    plt.ylabel("Corriente $I_D$ [$\mu$A]")
+    plt.ylabel(r"Corriente $I_D$ [$\mu$A]")
     plt.grid(True, which="both", linestyle=":", alpha=0.6)
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     st.pyplot(plt.gcf(), clear_figure=True)
@@ -377,18 +382,30 @@ def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t, corri
             if corr in evos_disp:
                 x_data = evos_disp[corr]["x"]
                 y_data = evos_disp[corr]["y"]
+                y_fit = evos_disp[corr]["y_fit"]
+                
+                # Traza de puntos medidos
                 fig_ply.add_trace(go.Scatter(
                     x=x_data, 
                     y=y_data, 
-                    mode='lines', 
+                    mode='markers', 
                     name=f"{disp} @ {corr} uA",
-                    opacity=0.8
+                    marker=dict(size=4),
+                    opacity=0.6
+                ))
+                # Traza de la recta del ajuste
+                fig_ply.add_trace(go.Scatter(
+                    x=x_data, 
+                    y=y_fit, 
+                    mode='lines', 
+                    name=f"{disp} @ {corr} uA (Fit)",
+                    line=dict(width=2)
                 ))
                 
     fig_ply.update_layout(
         title=titulo,
         xaxis=dict(title="Temperatura [°C]"),
-        yaxis=dict(title="Corriente I_D [uA]"),
+        yaxis=dict(title=r"Corriente I_D [uA]"),
         template="plotly_white",
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5)
     )
