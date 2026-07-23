@@ -362,9 +362,7 @@ def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t, corri
                 y_data = evos_disp[corr]["y"]
                 y_fit = evos_disp[corr]["y_fit"]
                 
-                # Puntos para las mediciones crudas
                 plt.plot(x_data, y_data, ".", alpha=0.5, label=f"{disp} @ {corr} uA")
-                # Línea para la tendencia lineal
                 plt.plot(x_data, y_fit, "-", linewidth=1.5)
                 
     plt.title(titulo)
@@ -384,21 +382,27 @@ def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t, corri
                 y_data = evos_disp[corr]["y"]
                 y_fit = evos_disp[corr]["y_fit"]
                 
+                grupo_id = f"{disp}_{corr}uA"
+                
                 # Traza de puntos medidos
                 fig_ply.add_trace(go.Scatter(
                     x=x_data, 
                     y=y_data, 
                     mode='markers', 
                     name=f"{disp} @ {corr} uA",
+                    legendgroup=grupo_id,
                     marker=dict(size=4),
                     opacity=0.6
                 ))
-                # Traza de la recta del ajuste
+                
+                # Traza de la recta lineal (mismo grupo, sin duplicar la leyenda)
                 fig_ply.add_trace(go.Scatter(
                     x=x_data, 
                     y=y_fit, 
                     mode='lines', 
                     name=f"{disp} @ {corr} uA (Fit)",
+                    legendgroup=grupo_id,
+                    showlegend=False,  # Oculta la entrada redundante para no saturar la leyenda
                     line=dict(width=2)
                 ))
                 
