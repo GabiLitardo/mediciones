@@ -152,9 +152,6 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
             overlaying='y', side='right',
             anchor='free', position=0.94
         ),
-        legend=dict(
-            orientation="h", yanchor="bottom", y=1.05, xanchor="center", x=0.4
-        ),
         template="plotly_white"
     )
     st.plotly_chart(fig_ply, width='stretch')
@@ -214,14 +211,6 @@ def graficar_I_vs_T(titulo, datos_temperatura):
         xaxis=dict(title="Temperatura [°C]"),
         yaxis=dict(title="Corriente I_D @ V_D = -4.5V [uA]"),
         template="plotly_white",
-        # Ubicamos la leyenda a la derecha de forma limpia para que no compita con el título
-        legend=dict(
-            orientation="v",
-            yanchor="middle",
-            y=0.5,
-            xanchor="left",
-            x=1.02
-        ),
         margin=dict(t=100) # Agregamos margen superior para darle aire al título
     )
     st.plotly_chart(fig_ply, width='stretch')
@@ -264,8 +253,7 @@ def graficar_evolucion_temperatura(titulo, todas_las_evos_temp, corrientes_a_gra
         title=titulo,
         xaxis=dict(title="Tiempo [s]"),
         yaxis=dict(title="Temperatura [°C]"),
-        template="plotly_white",
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5)
+        template="plotly_white"
     )
     st.plotly_chart(fig_ply, width='stretch')
     
