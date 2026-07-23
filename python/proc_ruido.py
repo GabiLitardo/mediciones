@@ -84,7 +84,7 @@ def obtener_corriente_vs_temperatura_ruido(lista_dispositivos, corrientes_nomina
                 datos = lista_mediciones[0]
                 
                 # Datos extraídos directamente por columna en orden temporal original
-                corriente_cruda = datos[:, 1]  # Corriente tal cual viene en el archivo (A)
+                corriente_cruda = datos[:, 1] *1e6  # Corriente tal cual viene en el archivo (uA)
                 resistencia = datos[:, 2]      # Resistencia tal cual viene en el archivo (Ohm)
                 
                 # Conversión de resistencia a temperatura por Steinhart-Hart
