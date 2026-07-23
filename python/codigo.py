@@ -114,6 +114,13 @@ if mostrar_ruido:
         todas_las_evos_temp=evos_temp,
         corrientes_a_graficar=corrientes_nominales
     )
+
+    evos_i_vs_t = proc_ruido.obtener_corriente_vs_temperatura_ruido(lista_dispositivos, corrientes_nominales, False)
+    graficos.graficar_corriente_vs_temperatura_ruido(
+        titulo="Corriente vs Temperatura durante medición de ruido",
+        todas_las_evos_i_vs_t=evos_i_vs_t,
+        corrientes_a_graficar=corrientes_nominales
+    )
 # =====================================================================
 # SECCIÓN 4: TEMPERATURA
 # =====================================================================
