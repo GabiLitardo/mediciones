@@ -364,7 +364,7 @@ def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t, corri
                 
     plt.title(titulo)
     plt.xlabel("Temperatura [°C]")
-    plt.ylabel("Corriente $I_D$ [A]")
+    plt.ylabel("Corriente $I_D$ [$\mu$A]")
     plt.grid(True, which="both", linestyle=":", alpha=0.6)
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     st.pyplot(plt.gcf(), clear_figure=True)
@@ -388,7 +388,7 @@ def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t, corri
     fig_ply.update_layout(
         title=titulo,
         xaxis=dict(title="Temperatura [°C]"),
-        yaxis=dict(title="Corriente I_D [A]"),
+        yaxis=dict(title="Corriente I_D [uA]"),
         template="plotly_white",
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5)
     )
