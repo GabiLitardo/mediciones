@@ -7,7 +7,20 @@ import proc_ruido
 import proc_temp
 
 st.title("Resumen mediciones Chaves-Litardo")
+import plotly.express as px
 
+fig = px.line(
+    x=[1, 2, 3, 4], 
+    y=[1, 4, 9, 16],
+    title=r"$\text{Ecuación: } f(x) = x^2$"
+)
+
+fig.update_layout(
+    xaxis_title=r"$\sqrt{x}$",
+    yaxis_title=r"$\alpha_{1c} = 352 \pm 11 \text{ km/s}$"
+)
+
+fig.show()
 # =====================================================================
 # CONFIGURACIÓN DE CHECKBOXES
 # =====================================================================
