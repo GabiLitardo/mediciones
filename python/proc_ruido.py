@@ -82,15 +82,18 @@ def obtener_corriente_vs_temperatura_ruido(lista_dispositivos, corrientes_nomina
             lista_mediciones = matchear_archivos(nombre_archivo, tipo_medicion="ruido")
             if lista_mediciones:
                 datos = lista_mediciones[0]
-                corriente_uA = np.abs(datos[:, 1]) * 1e6
-                resistencia = datos[:, 2]
+                
+                # Datos extraídos directamente por columna en orden temporal original
+                corriente_cruda = datos[:, 1]  # Corriente tal cual viene en el archivo (A)
+                resistencia = datos[:, 2]      # Resistencia tal cual viene en el archivo (Ohm)
+                
+                # Conversión de resistencia a temperatura por Steinhart-Hart
                 temperatura_C = convertir_r_a_temp_steinhart(resistencia)
                 
-                # Ordenamos por temperatura para un trazado limpio
-                indices = np.argsort(temperatura_C)
+                # Guardamos en la secuencia temporal pura sin ordenar por X
                 resultado[disp][corr] = {
-                    "x": temperatura_C[indices],
-                    "y": corriente_uA[indices]
+                    "x": temperatura_C,      # Eje X: Temperatura (°C) en tiempo real
+                    "y": corriente_cruda     # Eje Y: Corriente (A) cruda del archivo
                 }
             
     return resultado
