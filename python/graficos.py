@@ -204,7 +204,7 @@ def graficar_evolucion_ruido(titulo, todas_las_evos, corrientes_a_graficar):
                 
     #plt.xscale('log')
     plt.title(titulo)
-    plt.xlabel("Tiempo [s] (Escala Log)")
+    plt.xlabel("Tiempo [s]")
     plt.ylabel(r"Corriente de Ruido Neto [$\mu$A]")
     plt.grid(True, which="both", linestyle=":", alpha=0.6)
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
