@@ -7,26 +7,7 @@ import proc_ruido
 import proc_temp
 
 st.title("Resumen mediciones Chaves-Litardo")
-import plotly.express as px
-import streamlit as st
-import streamlit.components.v1 as components
 
-fig = px.line(
-    x=[1, 2, 3, 4], 
-    y=[1, 4, 9, 16], 
-    title=r"$\text{Ecuación: } f(x) = x^2$"
-)
-
-fig.update_layout(
-    xaxis_title=r"$\sqrt{x}$",
-    yaxis_title=r"$\alpha_{1c} = 352 \pm 11 \text{ km/s}$"
-)
-
-# Convertir la figura a HTML inyectando MathJax explícitamente
-fig_html = fig.to_html(include_mathjax="cdn", full_html=False)
-
-# Renderizar el HTML interactivo en Streamlit
-components.html(fig_html, height=500)
 # =====================================================================
 # CONFIGURACIÓN DE CHECKBOXES
 # =====================================================================
