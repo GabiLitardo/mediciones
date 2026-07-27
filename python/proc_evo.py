@@ -84,7 +84,7 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda):
                     
                     # —— PARCHE POR EFECTO SUSTRATO (BULK SUELTO) ——
                     # Compensamos el desvío de ~3.5 V en los dispositivos afectados
-                    if disp in ["FFC1", "FFL", "FFS"]:
+                    #if disp in ["FFC1", "FFL", "FFS"]:
                         #v_interp += 3.7326412644
                     
                     valores.append(v_interp)
