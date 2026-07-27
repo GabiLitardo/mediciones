@@ -80,7 +80,7 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda):
                     x_sort = corrientes_abs[indices_orden]
                     y_sort = tensiones[indices_orden]
                     
-                    v_interp = np.interp(1e-5, x_sort, y_sort)
+                    v_interp = np.interp(1e-7, x_sort, y_sort)
                     
                     # —— PARCHE POR EFECTO SUSTRATO (BULK SUELTO) ——
                     # Compensamos el desvío de ~3.5 V en los dispositivos afectados
