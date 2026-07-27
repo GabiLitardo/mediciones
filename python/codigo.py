@@ -49,7 +49,7 @@ if mostrar_evolucion:
 
     datos_foxfet = proc_evo.obtener_datos_crudos_tanda(["FFC1", "FFC2", "FFC3", "FFL", "FFS"], "FOXFET")
     graficos.graficar_dispositivos(
-        titulo="Evolución FOXFETs (Tensión interpolada @ I = 10 uA)",
+        titulo="Evolución FOXFETs (Tensión interpolada @ I = 0.1 uA)",
         ylabel="Tensión [V]",
         datos_procesados=datos_foxfet,
         tanda = 0, 
