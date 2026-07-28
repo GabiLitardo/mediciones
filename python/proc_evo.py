@@ -16,7 +16,15 @@ def calcular_tiempo_acumulado(nro, tipo_tanda):
             elif i <= 52: t += 30
             elif i <= 53: t += 35
             else: t += 10
-        else:
+        if tipo_tanda == "FG_tanda1":
+            if i <= 9: t += 10
+            elif i <= 21: t += 15
+            elif i <= 24: t += 20
+            elif i <= 27: t += 25
+            elif i <= 29: t += 30
+            elif i <= 30: t += 35
+            else: t += 10
+        if tipo_tanda == "FG_tanda2":
             if i <= 9: t += 10
             elif i <= 21: t += 15
             elif i <= 24: t += 20
