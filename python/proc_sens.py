@@ -10,9 +10,6 @@ def calcular_fit_polinomico(tiempos_list, valores_list):
     return coeficientes.tolist()
 
 def calcular_sensibilidad_vg_ventana(tiempos, tensiones_vg, n_ventana):
-    """
-    Calcula la tasa dV_FG/dt usando ventana deslizante con pares simétricos.
-    """
     if n_ventana % 2 != 0 or n_ventana <= 0:
         raise ValueError("El tamaño de ventana N debe ser un número entero par y mayor a 0.")
         
@@ -42,10 +39,7 @@ def calcular_sensibilidad_vg_ventana(tiempos, tensiones_vg, n_ventana):
             
     return np.array(eje_x), np.array(eje_y)
 
-def procesar_sensibilidad_vg(lista_dispositivos, tipo_tanda, n_ventana=6):
-    """
-    Procesa la sensibilidad en tensión V_FG: devuelve dV_FG/dt vs V_FG.
-    """
+def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ventana=6):
     datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda)
     resultado_fit = {}
     resultado_discreto = {}
@@ -55,7 +49,6 @@ def procesar_sensibilidad_vg(lista_dispositivos, tipo_tanda, n_ventana=6):
         corrientes = datos["valores"] # uA
         factor = factores_normalizacion.get(disp, 1.0)
         
-        # Mapeo a V_FG segun dispositivo
         tensiones_vg = []
         tiempos_validos = []
         
@@ -79,8 +72,8 @@ def procesar_sensibilidad_vg(lista_dispositivos, tipo_tanda, n_ventana=6):
         a_v, b_v, c_v, d_v, e_v = coefs_v
         
         t_cont = np.linspace(t_arr.min(), t_arr.max(), 200)
-        eje_y_fit = np.abs(4*a_v*(t_cont**3) + 3*b_v*(t_cont**2) + 2*c_v*t_cont + d_v) # dV_FG/dt
-        eje_x_fit = a_v*(t_cont**4) + b_v*(t_cont**3) + c_v*(t_cont**2) + d_v*t_cont + e_v # V_FG
+        eje_y_fit = np.abs(4*a_v*(t_cont**3) + 3*b_v*(t_cont**2) + 2*c_v*t_cont + d_v)
+        eje_x_fit = a_v*(t_cont**4) + b_v*(t_cont**3) + c_v*(t_cont**2) + d_v*t_cont + e_v
         
         resultado_fit[disp] = {"x": eje_x_fit, "y": eje_y_fit}
         
