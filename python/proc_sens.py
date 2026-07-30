@@ -1,87 +1,91 @@
 # proc_sens.py
 import numpy as np
 import streamlit as st
-from proc_evo import obtener_datos_crudos_tanda
-from proc_evo import obtener_datos_evolucion_vg
+from proc_evo import obtener_datos_crudos_tanda, obtener_vg_por_corriente
 
 factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2": 1.0}
 
-def calcular_fit_polinomico(tiempos_list, corrientes_list):
-    coeficientes = np.polyfit(tiempos_list, corrientes_list, deg=4)
+def calcular_fit_polinomico(tiempos_list, valores_list):
+    coeficientes = np.polyfit(tiempos_list, valores_list, deg=4)
     return coeficientes.tolist()
 
-def calcular_sensibilidad_ventana(tiempos, corrientes_proc, corrientes_norm, n_ventana):   
+def calcular_sensibilidad_vg_ventana(tiempos, tensiones_vg, n_ventana):
+    """
+    Calcula la tasa dV_FG/dt usando ventana deslizante con pares simétricos.
+    """
+    if n_ventana % 2 != 0 or n_ventana <= 0:
+        raise ValueError("El tamaño de ventana N debe ser un número entero par y mayor a 0.")
+        
     eje_x, eje_y = [], []
-    k = n_ventana // 2  # Número de pares simétricos dentro de la ventana
+    k = n_ventana // 2
     
-    # Recorremos todas las ventanas posibles
-    for i in range(len(corrientes_proc) - n_ventana + 1):
+    for i in range(len(tensiones_vg) - n_ventana + 1):
         sub_t = tiempos[i : i + n_ventana]
-        sub_i_proc = corrientes_proc[i : i + n_ventana]
-        sub_i_norm = corrientes_norm[i : i + n_ventana]
+        sub_v = tensiones_vg[i : i + n_ventana]
         
         tasas_pares = []
-        # Para N=6 (k=3): pares (idx_izq, idx_der) son (2,3), (1,4), (0,5)
         for p in range(k):
             idx_izq = (k - 1) - p
             idx_der = k + p
             
             dt = sub_t[idx_der] - sub_t[idx_izq]
             if dt > 0:
-                tasa_par = np.abs(sub_i_proc[idx_der] - sub_i_proc[idx_izq]) / dt
+                tasa_par = np.abs(sub_v[idx_der] - sub_v[idx_izq]) / dt
                 tasas_pares.append(tasa_par)
                 
         if tasas_pares:
             tasa_promedio_ventana = np.mean(tasas_pares)
-            corriente_promedio_ventana = np.mean(sub_i_norm)
+            v_promedio_ventana = np.mean(sub_v)
             
             eje_y.append(tasa_promedio_ventana)
-            eje_x.append(corriente_promedio_ventana)
+            eje_x.append(v_promedio_ventana)
             
     return np.array(eje_x), np.array(eje_y)
 
-def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ventana=6):
+def procesar_sensibilidad_vg(lista_dispositivos, tipo_tanda, n_ventana=6):
+    """
+    Procesa la sensibilidad en tensión V_FG: devuelve dV_FG/dt vs V_FG.
+    """
     datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda)
     resultado_fit = {}
     resultado_discreto = {}
     
-    # 1. Ajuste Polinómico Grado 4
     for disp, datos in datos_crudos.items():
         tiempos = datos["tiempos"]
-        corrientes = datos["valores"]
+        corrientes = datos["valores"] # uA
         factor = factores_normalizacion.get(disp, 1.0)
         
-        corrientes_norm = corrientes / factor
-        corrientes_proc = corrientes_norm if normalizado else corrientes
+        # Mapeo a V_FG segun dispositivo
+        tensiones_vg = []
+        tiempos_validos = []
         
-        coefs_y = calcular_fit_polinomico(tiempos.tolist(), corrientes_proc.tolist())
-        a_y, b_y, c_y, d_y, e_y = coefs_y
-        
-        coefs_x = calcular_fit_polinomico(tiempos.tolist(), corrientes_norm.tolist())
-        a_x, b_x, c_x, d_x, e_x = coefs_x
-        
-        t_cont = np.linspace(tiempos.min(), tiempos.max(), 200)
-        eje_y = np.abs(4*a_y*(t_cont**3) + 3*b_y*(t_cont**2) + 2*c_y*t_cont + d_y)
-        eje_x = a_x*(t_cont**4) + b_x*(t_cont**3) + c_x*(t_cont**2) + d_x*t_cont + e_x
-        
-        resultado_fit[disp] = {"x": eje_x, "y": eje_y}
-        
-    # 2. Sensibilidad Discreta mediante Ventana Deslizante
-    for disp, datos in datos_crudos.items():   
-        tiempos = datos["tiempos"]
-        corrientes = datos["valores"]
-        factor = factores_normalizacion.get(disp, 1.0)
-        
-        corrientes_norm = corrientes / factor
-        corrientes_proc = corrientes_norm if normalizado else corrientes
-        
-        eje_x, eje_y = calcular_sensibilidad_ventana(
-            tiempos=tiempos, 
-            corrientes_proc=corrientes_proc, 
-            corrientes_norm=corrientes_norm, 
-            n_ventana=n_ventana
-        )
+        for t, i_ua in zip(tiempos, corrientes):
+            # Para PFGIW3 normalizamos previamente por su W/L=56
+            i_norm_amp = (i_ua / factor) * 1e-6
+            disp_mapeo = "PFGIW2" if disp == "PFGIW3" else disp
             
-        resultado_discreto[disp] = {"x": eje_x, "y": eje_y}
+            try:
+                vg_val = obtener_vg_por_corriente(disp_mapeo, i_norm_amp)
+                tensiones_vg.append(vg_val)
+                tiempos_validos.append(t)
+            except:
+                continue
+                
+        t_arr = np.array(tiempos_validos)
+        v_arr = np.array(tensiones_vg)
+        
+        # 1. Fit Continuo (Polinomio Grado 4 sobre V_FG vs t)
+        coefs_v = calcular_fit_polinomico(t_arr.tolist(), v_arr.tolist())
+        a_v, b_v, c_v, d_v, e_v = coefs_v
+        
+        t_cont = np.linspace(t_arr.min(), t_arr.max(), 200)
+        eje_y_fit = np.abs(4*a_v*(t_cont**3) + 3*b_v*(t_cont**2) + 2*c_v*t_cont + d_v) # dV_FG/dt
+        eje_x_fit = a_v*(t_cont**4) + b_v*(t_cont**3) + c_v*(t_cont**2) + d_v*t_cont + e_v # V_FG
+        
+        resultado_fit[disp] = {"x": eje_x_fit, "y": eje_y_fit}
+        
+        # 2. Sensibilidad Discreta (Ventana Deslizante)
+        eje_x_disc, eje_y_disc = calcular_sensibilidad_vg_ventana(t_arr, v_arr, n_ventana)
+        resultado_discreto[disp] = {"x": eje_x_disc, "y": eje_y_disc}
         
     return [resultado_fit, resultado_discreto]

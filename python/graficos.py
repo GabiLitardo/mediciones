@@ -24,19 +24,26 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     fig_ply.update_layout(title=titulo, xaxis_title="Tiempo de irradiación [min]", yaxis_title=ylabel, template="plotly_white")
     st.plotly_chart(fig_ply, width='stretch')
     
-def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
-    """Dibuja la sensibilidad normalizada"""
+def graficar_sensibilidad_vg(titulo, datos_sensibilidad):
+    """Dibuja la tasa de descarga dV_FG/dt vs V_FG."""
     fig_ply = go.Figure()
     
-    datos_sensibilidad_continuo = datos_sensibilidad[0]
-    for disp, datos in datos_sensibilidad_continuo.items():
-        fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines', name=f"{disp} (Poly)"))
+    # 1. Fit Continuo
+    datos_fit = datos_sensibilidad[0]
+    for disp, datos in datos_fit.items():
+        fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines', name=f"{disp} (Fit)"))
     
-    datos_sensibilidad_discreto = datos_sensibilidad[1]
-    for disp, datos in datos_sensibilidad_discreto.items():
-        fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines+markers', name=disp))
-        
-    fig_ply.update_layout(title=titulo, xaxis_title=r"Corriente Promedio Normalizada I_D_norm [$\mu$A]", yaxis_title=r"Tasa de Cambio normalizada[($\mu$A)/min]", template="plotly_white")
+    # 2. Puntos por Ventana
+    datos_disc = datos_sensibilidad[1]
+    for disp, datos in datos_disc.items():
+        fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines+markers', name=f"{disp} (Ventana)"))
+    
+    fig_ply.update_layout(
+        title=titulo, 
+        xaxis_title=r"Tensión Equivalente V_FG [V]", 
+        yaxis_title=r"Tasa de Descarga dV_FG/dt [V/min]", 
+        template="plotly_white"
+    )
 
     st.plotly_chart(fig_ply, width='stretch')
 

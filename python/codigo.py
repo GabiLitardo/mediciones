@@ -85,6 +85,18 @@ if mostrar_sensibilidad:
     sens_abs_t2 = proc_sens.procesar_sensibilidad(["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"], "FG_tanda2", normalizado=False)
     graficos.graficar_sensibilidad_fg(titulo="Sensibilidad absoluta FG Tanda 2 (Tasa absoluta vs $I_D$ normalizado)", datos_sensibilidad=sens_abs_t2, xlabel = r"Corriente normalizada $I_{D_{norm}}$ [$\mu$A]", ylabel = r"Tasa de cambio absoluta [$\mu$A/min]")
     
+    sens_vg_t1 = proc_sens.procesar_sensibilidad_vg(["PFGIW1", "PFGIW2", "PFGIW3"], "FG_tanda1", n_ventana=6)
+    graficos.graficar_sensibilidad_vg(
+        titulo="Sensibilidad FG Tanda 1 (Tasa de Descarga dV_FG/dt vs V_FG)", 
+        datos_sensibilidad=sens_vg_t1
+    )
+        
+    sens_vg_t2 = proc_sens.procesar_sensibilidad_vg(["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"], "FG_tanda2", n_ventana=6)
+    graficos.graficar_sensibilidad_vg(
+        titulo="Sensibilidad FG Tanda 2 (Tasa de Descarga dV_FG/dt vs V_FG)", 
+        datos_sensibilidad=sens_vg_t2
+    )
+
 # =====================================================================
 # SECCIÓN 3: RUIDO
 # =====================================================================
