@@ -306,7 +306,6 @@ def graficar_snr(titulo, datos_sensibilidad, datos_ruido):
     - datos_sensibilidad: dict con {disp: {"x": array_I_norm, "y": array_sens_abs}} (fit continuo)
     - datos_ruido: dict con {disp: {"x": array_I_nom, "y": array_std_ruido_nA}}
     """
-    fig_mpl = plt.figure(figsize=(10, 5))
     fig_ply = go.Figure()
     
     colores = {"PFGIW1": "#1f77b4", "PFGIW2": "#ff7f0e", "PFGIP2": "#2ca02c"}
@@ -330,9 +329,6 @@ def graficar_snr(titulo, datos_sensibilidad, datos_ruido):
 
             color = colores.get(disp, None)
 
-            # Matplotlib
-            plt.plot(x_ruido, snr, "o-", label=f"{disp}", color=color)
-
             # Plotly
             fig_ply.add_trace(go.Scatter(
                 x=x_ruido,
@@ -341,15 +337,6 @@ def graficar_snr(titulo, datos_sensibilidad, datos_ruido):
                 name=f"{disp}",
                 line=dict(color=color)
             ))
-
-    # Configuración Matplotlib
-    plt.title(titulo)
-    plt.xlabel(r"Corriente Normalizada $I_{D_{norm}}$ [$\mu$A]")
-    plt.ylabel(r"Relación Señal/Ruido $S/\sigma$ [1/min]")
-    plt.grid(True, linestyle=":", alpha=0.6)
-    plt.legend()
-    st.pyplot(fig_mpl)
-    plt.close(fig_mpl)
 
     # Configuración Plotly
     fig_ply.update_layout(
