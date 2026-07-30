@@ -69,35 +69,48 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ve
     # 2. Sensibilidad Discreta mediante Ventana Deslizante
     for disp, datos in datos_crudos.items():   
         tiempos = datos["tiempos"]
-        corrientes_ua = datos["valores"] # Corrientes crudas en uA
+        corrientes = datos["valores"] # uA
         factor = factores_normalizacion.get(disp, 1.0)
-
-        tensiones_vg = []
-        tiempos_validos = []
-
-        for t, i_ua in zip(tiempos, corrientes_ua):
-            # Solo PFGIW3 necesita escalarse (/56) para entrar a la IV del STD1
-            if disp == "PFGIW3":
-                i_mapeo_amp = (i_ua / 56.0) * 1e-6
-                disp_mapeo = "PFGIW2"  # Usa STD1
-            else:
-                i_mapeo_amp = i_ua * 1e-6  # Corriente cruda en Amperes
-                disp_mapeo = disp      # PFGIW1 usa STD2; PFGIW2 y PFGIP2 usan STD1
-
-            try:
-                vg_val = obtener_vg_por_corriente(disp_mapeo, i_mapeo_amp)
-                tensiones_vg.append(vg_val)
-                tiempos_validos.append(t)
-            except Exception:
-                continue
-
-        # Aplicamos la ventana deslizante sobre los vectores de tension V_FG
-        eje_x, eje_y = calcular_sensibilidad_ventana(
-            tiempos=np.array(tiempos_validos), 
-            valores=np.array(tensiones_vg), 
-            n_ventana=n_ventana
-        )
-
+        
+        if normalizado:
+            # === CASO NORMALIZADO: Tensión V_FG ===
+            tensiones_vg = []
+            tiempos_validos = []
+            
+            for t, i_ua in zip(tiempos, corrientes):
+                # PFGIW3 se normaliza por 56 para entrar a la IV del STD1 (PFGIW2)
+                if disp == "PFGIW3":
+                    i_norm_amp = (i_ua / 56.0) * 1e-6
+                    disp_mapeo = "PFGIW2"
+                else:
+                    i_norm_amp = i_ua * 1e-6
+                    disp_mapeo = disp
+                
+                try:
+                    vg_val = obtener_vg_por_corriente(disp_mapeo, i_norm_amp)
+                    tensiones_vg.append(vg_val)
+                    tiempos_validos.append(t)
+                except Exception:
+                    continue
+            
+            # Tasa dV_FG/dt vs V_FG usando ventana deslizante
+            eje_x, eje_y = calcular_sensibilidad_ventana(
+                tiempos=np.array(tiempos_validos), 
+                valores=np.array(tensiones_vg), 
+                n_ventana=n_ventana
+            )
+            
+        else:
+            # === CASO SIN NORMALIZAR: Corriente pura (Intacto como lo tenías) ===
+            corrientes_proc = corrientes
+            corrientes_norm = corrientes / factor
+            
+            eje_x, eje_y = calcular_sensibilidad_ventana(
+                tiempos=tiempos, 
+                valores=corrientes_proc, 
+                n_ventana=n_ventana
+            )
+            
         resultado_discreto[disp] = {"x": eje_x, "y": eje_y}
 
     return [resultado_fit, resultado_discreto]
