@@ -9,49 +9,21 @@ def calcular_fit_polinomico(tiempos_list, corrientes_list):
     coeficientes = np.polyfit(tiempos_list, corrientes_list, deg=4)
     return coeficientes.tolist()
 
-def calcular_sensibilidad_ventana(tiempos, corrientes_proc, corrientes_norm, n_ventana):   
-    eje_x, eje_y = [], []
-    k = n_ventana // 2  # Número de pares simétricos dentro de la ventana
-    
-    # Recorremos todas las ventanas posibles
-    for i in range(len(corrientes_proc) - n_ventana + 1):
-        sub_t = tiempos[i : i + n_ventana]
-        sub_i_proc = corrientes_proc[i : i + n_ventana]
-        sub_i_norm = corrientes_norm[i : i + n_ventana]
-        
-        tasas_pares = []
-        # Para N=6 (k=3): pares (idx_izq, idx_der) son (2,3), (1,4), (0,5)
-        for p in range(k):
-            idx_izq = (k - 1) - p
-            idx_der = k + p
-            
-            dt = sub_t[idx_der] - sub_t[idx_izq]
-            if dt > 0:
-                tasa_par = np.abs(sub_i_proc[idx_der] - sub_i_proc[idx_izq]) / dt
-                tasas_pares.append(tasa_par)
-                
-        if tasas_pares:
-            tasa_promedio_ventana = np.mean(tasas_pares)
-            corriente_promedio_ventana = np.mean(sub_i_norm)
-            
-            eje_y.append(tasa_promedio_ventana)
-            eje_x.append(corriente_promedio_ventana)
-            
-    return np.array(eje_x), np.array(eje_y)
-
-def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ventana=6):
+def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True):
     datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda)
     resultado_fit = {}
     resultado_discreto = {}
     
-    # 1. Ajuste Polinómico Grado 4
     for disp, datos in datos_crudos.items():
         tiempos = datos["tiempos"]
         corrientes = datos["valores"]
         factor = factores_normalizacion.get(disp, 1.0)
         
         corrientes_norm = corrientes / factor
-        corrientes_proc = corrientes_norm if normalizado else corrientes
+        if normalizado:
+            corrientes_proc = corrientes_norm
+        else:
+            corrientes_proc = corrientes       
         
         coefs_y = calcular_fit_polinomico(tiempos.tolist(), corrientes_proc.tolist())
         a_y, b_y, c_y, d_y, e_y = coefs_y
@@ -65,22 +37,25 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ve
         
         resultado_fit[disp] = {"x": eje_x, "y": eje_y}
         
-    # 2. Sensibilidad Discreta mediante Ventana Deslizante
     for disp, datos in datos_crudos.items():   
         tiempos = datos["tiempos"]
         corrientes = datos["valores"]
         factor = factores_normalizacion.get(disp, 1.0)
         
         corrientes_norm = corrientes / factor
-        corrientes_proc = corrientes_norm if normalizado else corrientes
+        if normalizado:
+            corrientes_proc = corrientes_norm
+        else:
+            corrientes_proc = corrientes
         
-        eje_x, eje_y = calcular_sensibilidad_ventana(
-            tiempos=tiempos, 
-            corrientes_proc=corrientes_proc, 
-            corrientes_norm=corrientes_norm, 
-            n_ventana=n_ventana
-        )
+        eje_x, eje_y = [], []
+        for k in range(len(corrientes_proc) - 1):
+            dt = tiempos[k+1] - tiempos[k]
+            tasa = np.abs(corrientes_proc[k+1] - corrientes_proc[k]) / dt
+            promedio = (corrientes_norm[k+1] + corrientes_norm[k]) / 2.0
+            eje_y.append(tasa)
+            eje_x.append(promedio)
             
-        resultado_discreto[disp] = {"x": eje_x, "y": eje_y}
+        resultado_discreto[disp] = {"x": np.array(eje_x), "y": np.array(eje_y)}
         
     return [resultado_fit, resultado_discreto]
