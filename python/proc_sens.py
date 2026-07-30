@@ -10,33 +10,37 @@ def calcular_fit_polinomico(tiempos_list, corrientes_list):
     coeficientes = np.polyfit(tiempos_list, corrientes_list, deg=4)
     return coeficientes.tolist()
 
-def calcular_sensibilidad_ventana(tiempos, corrientes_proc, corrientes_norm, n_ventana):   
+def calcular_sensibilidad_ventana(tiempos, valores, n_ventana):
+    """
+    Calcula la tasa dY/dt usando ventana deslizante con pares simétricos.
+    Sirve tanto para corrientes (Y = I_D) como para tensiones (Y = V_FG).
+    """
+    if n_ventana % 2 != 0 or n_ventana <= 0:
+        raise ValueError("El tamaño de ventana N debe ser un número entero par y mayor a 0.")
+        
     eje_x, eje_y = [], []
-    k = n_ventana // 2  # Número de pares simétricos dentro de la ventana
+    k = n_ventana // 2
     
-    # Recorremos todas las ventanas posibles
-    for i in range(len(corrientes_proc) - n_ventana + 1):
+    for i in range(len(valores) - n_ventana + 1):
         sub_t = tiempos[i : i + n_ventana]
-        sub_i_proc = corrientes_proc[i : i + n_ventana]
-        sub_i_norm = corrientes_norm[i : i + n_ventana]
+        sub_v = valores[i : i + n_ventana]
         
         tasas_pares = []
-        # Para N=6 (k=3): pares (idx_izq, idx_der) son (2,3), (1,4), (0,5)
         for p in range(k):
             idx_izq = (k - 1) - p
             idx_der = k + p
             
             dt = sub_t[idx_der] - sub_t[idx_izq]
             if dt > 0:
-                tasa_par = np.abs(sub_i_proc[idx_der] - sub_i_proc[idx_izq]) / dt
+                tasa_par = np.abs(sub_v[idx_der] - sub_v[idx_izq]) / dt
                 tasas_pares.append(tasa_par)
                 
         if tasas_pares:
             tasa_promedio_ventana = np.mean(tasas_pares)
-            corriente_promedio_ventana = np.mean(sub_i_norm)
+            v_promedio_ventana = np.mean(sub_v)
             
             eje_y.append(tasa_promedio_ventana)
-            eje_x.append(corriente_promedio_ventana)
+            eje_x.append(v_promedio_ventana)
             
     return np.array(eje_x), np.array(eje_y)
 
@@ -78,7 +82,6 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ve
             tiempos_validos = []
             
             for t, i_ua in zip(tiempos, corrientes):
-                # PFGIW3 se normaliza por 56 para entrar a la IV del STD1 (PFGIW2)
                 if disp == "PFGIW3":
                     i_norm_amp = (i_ua / 56.0) * 1e-6
                     disp_mapeo = "PFGIW2"
@@ -87,7 +90,7 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ve
                     disp_mapeo = disp
                 
                 try:
-                    vg_val = obtener_vg_por_corriente(disp_mapeo, i_norm_amp)
+                    vg_val = obtener_vg_por_corriente(disp_mapeo, i_norm_amp)[cite: 4]
                     tensiones_vg.append(vg_val)
                     tiempos_validos.append(t)
                 except Exception:
@@ -101,13 +104,10 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ve
             )
             
         else:
-            # === CASO SIN NORMALIZAR: Corriente pura (Intacto como lo tenías) ===
-            corrientes_proc = corrientes
-            corrientes_norm = corrientes / factor
-            
+            # === CASO SIN NORMALIZAR: Corriente pura (Intacto) ===
             eje_x, eje_y = calcular_sensibilidad_ventana(
                 tiempos=tiempos, 
-                valores=corrientes_proc, 
+                valores=corrientes, 
                 n_ventana=n_ventana
             )
             
