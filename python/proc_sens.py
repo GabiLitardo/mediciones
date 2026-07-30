@@ -2,6 +2,7 @@
 import numpy as np
 import streamlit as st
 from proc_evo import obtener_datos_crudos_tanda
+from proc_evo import obtener_datos_evolucion_vg
 
 factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2": 1.0}
 
@@ -41,6 +42,7 @@ def calcular_sensibilidad_ventana(tiempos, corrientes_proc, corrientes_norm, n_v
 
 def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ventana=6):
     datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda)
+    tensiones_vg = obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda)
     resultado_fit = {}
     resultado_discreto = {}
     
@@ -51,7 +53,12 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ve
         factor = factores_normalizacion.get(disp, 1.0)
         
         corrientes_norm = corrientes / factor
-        corrientes_proc = corrientes_norm if normalizado else corrientes
+        #corrientes_proc = corrientes_norm if normalizado else corrientes
+        if normalizado:            
+            disp_aux, datos_vg = tensiones_vg.items
+            corrientes_proc = datos_vg["valores"]
+        else:
+            corrientes_proc = corrientes
         
         coefs_y = calcular_fit_polinomico(tiempos.tolist(), corrientes_proc.tolist())
         a_y, b_y, c_y, d_y, e_y = coefs_y
@@ -72,7 +79,12 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ve
         factor = factores_normalizacion.get(disp, 1.0)
         
         corrientes_norm = corrientes / factor
-        corrientes_proc = corrientes_norm if normalizado else corrientes
+        #corrientes_proc = corrientes_norm if normalizado else corrientes
+        if normalizado:            
+            disp_aux, datos_vg = tensiones_vg.items
+            corrientes_proc = datos_vg["valores"]
+        else:
+            corrientes_proc = corrientes
         
         eje_x, eje_y = calcular_sensibilidad_ventana(
             tiempos=tiempos, 
