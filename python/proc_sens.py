@@ -69,19 +69,35 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ve
     # 2. Sensibilidad Discreta mediante Ventana Deslizante
     for disp, datos in datos_crudos.items():   
         tiempos = datos["tiempos"]
-        corrientes = datos["valores"]
+        corrientes_ua = datos["valores"] # Corrientes crudas en uA
         factor = factores_normalizacion.get(disp, 1.0)
-        
-        corrientes_norm = corrientes / factor
-        corrientes_proc = corrientes_norm if normalizado else corrientes
-        
+
+        tensiones_vg = []
+        tiempos_validos = []
+
+        for t, i_ua in zip(tiempos, corrientes_ua):
+            # Solo PFGIW3 necesita escalarse (/56) para entrar a la IV del STD1
+            if disp == "PFGIW3":
+                i_mapeo_amp = (i_ua / 56.0) * 1e-6
+                disp_mapeo = "PFGIW2"  # Usa STD1
+            else:
+                i_mapeo_amp = i_ua * 1e-6  # Corriente cruda en Amperes
+                disp_mapeo = disp      # PFGIW1 usa STD2; PFGIW2 y PFGIP2 usan STD1
+
+            try:
+                vg_val = obtener_vg_por_corriente(disp_mapeo, i_mapeo_amp)
+                tensiones_vg.append(vg_val)
+                tiempos_validos.append(t)
+            except Exception:
+                continue
+
+        # Aplicamos la ventana deslizante sobre los vectores de tension V_FG
         eje_x, eje_y = calcular_sensibilidad_ventana(
-            tiempos=tiempos, 
-            corrientes_proc=corrientes_proc, 
-            corrientes_norm=corrientes_norm, 
+            tiempos=np.array(tiempos_validos), 
+            valores=np.array(tensiones_vg), 
             n_ventana=n_ventana
         )
-            
+
         resultado_discreto[disp] = {"x": eje_x, "y": eje_y}
-        
+
     return [resultado_fit, resultado_discreto]
