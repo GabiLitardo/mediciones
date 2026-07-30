@@ -42,7 +42,6 @@ def calcular_sensibilidad_ventana(tiempos, corrientes_proc, corrientes_norm, n_v
 
 def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ventana=6):
     datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda)
-    tensiones_vg = obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda)
     resultado_fit = {}
     resultado_discreto = {}
     
