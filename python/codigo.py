@@ -165,7 +165,7 @@ if mostrar_resumen:
     
     # Pasamos los 4 argumentos correspondientes
     graficos.graficar_superposicion_sens_ruido(
-        titulo="Sensibilidad absoluta, ruido y coef. térmico vs I_D normalizada",
+        titulo=r"Sensibilidad absoluta, ruido y coef. térmico vs I_D normalizada",
         datos_sensibilidad=sens_resumen,
         datos_ruido=ruido_resumen,
         datos_temp=datos_temp_resumen
@@ -173,7 +173,7 @@ if mostrar_resumen:
     
     st.subheader("Relación Señal a Ruido ($S/\\sigma$)")
     graficos.graficar_snr(
-        titulo="Relación Señal/Ruido (S/$\sigma$) vs Corriente Normalizada",
+        titulo=r"Relación Señal/Ruido (S/$\sigma$) vs Corriente Normalizada",
         datos_sensibilidad=sens_resumen,
         datos_ruido=ruido_resumen
     )

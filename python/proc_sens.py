@@ -74,28 +74,37 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ve
             t_arr = np.array(tiempos_validos)
             v_arr = np.array(tensiones_vg)
             
+            # --- PROTECCIÓN CONTRA VECTORES VACÍOS ---
+            # Necesitamos al menos 5 puntos para fittear grado 4 y al menos n_ventana para la ventana
+            if len(t_arr) < 5:
+                continue
+            
             # 1. PARTE CONTINUA (Fit en Tensión)
             coefs_v = calcular_fit_polinomico(t_arr.tolist(), v_arr.tolist())
             a_v, b_v, c_v, d_v, e_v = coefs_v
             
             t_cont = np.linspace(t_arr.min(), t_arr.max(), 200)
-            eje_y_fit = np.abs(4*a_v*(t_cont**3) + 3*b_v*(t_cont**2) + 2*c_v*t_cont + d_v) # dV_FG/dt
-            eje_x_fit = a_v*(t_cont**4) + b_v*(t_cont**3) + c_v*(t_cont**2) + d_v*t_cont + e_v # V_FG
+            eje_y_fit = np.abs(4*a_v*(t_cont**3) + 3*b_v*(t_cont**2) + 2*c_v*t_cont + d_v)
+            eje_x_fit = a_v*(t_cont**4) + b_v*(t_cont**3) + c_v*(t_cont**2) + d_v*t_cont + e_v
             
             resultado_fit[disp] = {"x": eje_x_fit, "y": eje_y_fit}
             
             # 2. PARTE DISCRETA (Ventana en Tensión)
-            eje_x_disc, eje_y_disc = calcular_sensibilidad_ventana(
-                tiempos=t_arr, 
-                valores=v_arr, 
-                n_ventana=n_ventana
-            )
-            resultado_discreto[disp] = {"x": eje_x_disc, "y": eje_y_disc}
+            if len(t_arr) >= n_ventana:
+                eje_x_disc, eje_y_disc = calcular_sensibilidad_ventana(
+                    tiempos=t_arr, 
+                    valores=v_arr, 
+                    n_ventana=n_ventana
+                )
+                resultado_discreto[disp] = {"x": eje_x_disc, "y": eje_y_disc}
 
         else:
             # =========================================================
             # CASO SIN NORMALIZAR: Corriente pura (Fit + Discreto original)
             # =========================================================
+            if len(tiempos) < 5:
+                continue
+
             # 1. PARTE CONTINUA (Fit en Corriente)
             coefs_y = calcular_fit_polinomico(tiempos.tolist(), corrientes.tolist())
             a_y, b_y, c_y, d_y, e_y = coefs_y
@@ -111,11 +120,12 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ve
             resultado_fit[disp] = {"x": eje_x_fit, "y": eje_y_fit}
             
             # 2. PARTE DISCRETA (Ventana en Corriente)
-            eje_x_disc, eje_y_disc = calcular_sensibilidad_ventana(
-                tiempos=tiempos, 
-                valores=corrientes, 
-                n_ventana=n_ventana
-            )
-            resultado_discreto[disp] = {"x": eje_x_disc, "y": eje_y_disc}
+            if len(tiempos) >= n_ventana:
+                eje_x_disc, eje_y_disc = calcular_sensibilidad_ventana(
+                    tiempos=tiempos, 
+                    valores=corrientes, 
+                    n_ventana=n_ventana
+                )
+                resultado_discreto[disp] = {"x": eje_x_disc, "y": eje_y_disc}
             
     return [resultado_fit, resultado_discreto]
