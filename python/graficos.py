@@ -298,3 +298,64 @@ def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t, corri
     )
     st.plotly_chart(fig_ply, width='stretch')
     
+def graficar_snr(titulo, datos_sensibilidad, datos_ruido):
+    """
+    Grafica la relación Señal-a-Ruido (Sensibilidad Absoluta / Desvío de Ruido)
+    en función de la Corriente Normalizada.
+    
+    - datos_sensibilidad: dict con {disp: {"x": array_I_norm, "y": array_sens_abs}} (fit continuo)
+    - datos_ruido: dict con {disp: {"x": array_I_nom, "y": array_std_ruido_nA}}
+    """
+    fig_mpl = plt.figure(figsize=(10, 5))
+    fig_ply = go.Figure()
+    
+    colores = {"PFGIW1": "#1f77b4", "PFGIW2": "#ff7f0e", "PFGIP2": "#2ca02c"}
+
+    for disp in datos_sensibilidad.keys():
+        if disp in datos_ruido:
+            # Corrientes nominales donde tenemos mediciones de ruido (en uA)
+            x_ruido = datos_ruido[disp]["x"]
+            # Desvío estándar de ruido (convertido de nA a uA para mantener unidades consistentes)
+            sigma_ruido_uA = datos_ruido[disp]["y"] / 1000.0
+
+            # Interpolamos la sensibilidad absoluta continua a las corrientes exactas de ruido
+            sens_interpolada = np.interp(
+                x_ruido, 
+                datos_sensibilidad[disp]["x"], 
+                datos_sensibilidad[disp]["y"]
+            )
+
+            # Calculamos la relación Señal / Ruido
+            snr = sens_interpolada / sigma_ruido_uA
+
+            color = colores.get(disp, None)
+
+            # Matplotlib
+            plt.plot(x_ruido, snr, "o-", label=f"{disp}", color=color)
+
+            # Plotly
+            fig_ply.add_trace(go.Scatter(
+                x=x_ruido,
+                y=snr,
+                mode='markers+lines',
+                name=f"{disp}",
+                line=dict(color=color)
+            ))
+
+    # Configuración Matplotlib
+    plt.title(titulo)
+    plt.xlabel(r"Corriente Normalizada $I_{D_{norm}}$ [$\mu$A]")
+    plt.ylabel(r"Relación Señal/Ruido $S/\sigma$ [1/min]")
+    plt.grid(True, linestyle=":", alpha=0.6)
+    plt.legend()
+    st.pyplot(fig_mpl)
+    plt.close(fig_mpl)
+
+    # Configuración Plotly
+    fig_ply.update_layout(
+        title=dict(text=titulo, x=0.5, xanchor="center"),
+        xaxis=dict(title=r"Corriente Normalizada I_D_norm [uA]"),
+        yaxis=dict(title=r"Relación Señal/Ruido S/sigma [1/min]"),
+        template="plotly_white"
+    )
+    st.plotly_chart(fig_ply, width='stretch')

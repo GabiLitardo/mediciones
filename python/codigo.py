@@ -170,3 +170,10 @@ if mostrar_resumen:
         datos_ruido=ruido_resumen,
         datos_temp=datos_temp_resumen
     )
+    
+    st.subheader("Relación Señal a Ruido ($S/\\sigma$)")
+    graficos.graficar_snr(
+        titulo="Relación Señal/Ruido (S/σ) vs Corriente Normalizada",
+        datos_sensibilidad=sens_resumen,
+        datos_ruido=ruido_resumen
+    )
