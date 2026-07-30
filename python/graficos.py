@@ -342,7 +342,7 @@ def graficar_snr(titulo, datos_sensibilidad, datos_ruido):
     fig_ply.update_layout(
         title=dict(text=titulo, x=0.5, xanchor="center"),
         xaxis=dict(title=r"Corriente Normalizada I_D_norm [uA]"),
-        yaxis=dict(title=r"Relación Señal/Ruido S/sigma [1/min]"),
+        yaxis=dict(title=r"SNR"),
         template="plotly_white"
     )
     st.plotly_chart(fig_ply, width='stretch')
