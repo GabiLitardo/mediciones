@@ -6,6 +6,14 @@ import proc_sens
 import proc_ruido
 import proc_temp
 
+# Carga de MathJax 3 mediante CDN
+mathjax_script = """
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+"""
+components.html(mathjax_script, height=0, width=0)
+
 st.title("Resumen mediciones Chaves-Litardo")
 
 # =====================================================================
