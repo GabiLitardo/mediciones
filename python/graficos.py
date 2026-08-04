@@ -46,10 +46,9 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     raw_html = pio.to_html(
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
-    st.html(
-        f'<div style="background-color: transparent;">{raw_html}</div>',
-        height=500,
-    )
+    transparent_html = f'<div style="background-color: transparent;">{raw_html}</div>'
+
+    st.iframe(srcdoc=transparent_html, height=500)
     
 def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
     """Dibuja la sensibilidad normalizada"""
