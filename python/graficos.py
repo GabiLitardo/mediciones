@@ -4,6 +4,7 @@ import streamlit as st
 import plotly.graph_objects as go
 from proc_sens import calcular_fit_polinomico
 import pandas as pd
+import plotly.io as pio
 import streamlit.components.v1 as components
 
 # Carga de MathJax 3 mediante CDN
@@ -31,7 +32,14 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
             i_fitteada = a * (t_continuo ** 4) + b * (t_continuo ** 3) + c * (t_continuo ** 2) + d * t_continuo + e
             fig_ply.add_trace(go.Scatter(x=t_continuo, y=i_fitteada, mode='lines', name=f"{disp} (Fit Poly g4)"))        
     fig_ply.update_layout(title=titulo, xaxis_title="Tiempo de irradiación [min]", yaxis_title=ylabel, template="plotly_white")
-    st.plotly_chart(fig_ply, width='stretch')
+    raw_html = pio.to_html(
+        fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
+    )
+    components.html(
+        f'<div style="background-color: transparent;">{raw_html}</div>',
+        height=500,
+        scrolling=False,
+    )
     
 def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
     """Dibuja la sensibilidad normalizada"""
