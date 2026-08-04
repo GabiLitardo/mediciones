@@ -46,10 +46,9 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     raw_html = pio.to_html(
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
-    components.html(
+    st.html(
         f'<div style="background-color: transparent;">{raw_html}</div>',
         height=500,
-        scrolling=False,
     )
     
 def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
