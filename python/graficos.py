@@ -5,7 +5,6 @@ import plotly.graph_objects as go
 from proc_sens import calcular_fit_polinomico
 import pandas as pd
 import plotly.io as pio
-import base64
 
 def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     """Dibuja la evolución temporal absoluta de corrientes o tensiones interpoladas."""
@@ -44,16 +43,11 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
         ),
     )
     raw_html = pio.to_html(
-        fig_ply,
-        include_plotlyjs="cdn",
-        include_mathjax="cdn",
-        full_html=False,
-        config={"displayModeBar": True},
+        fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
-    b64_html = base64.b64encode(raw_html.encode("utf-8")).decode("utf-8")
-    st.html(
-        f'<iframe src="data:text/html;base64,{b64_html}" style="width:100%; height:500px; border:none;" allowfullscreen></iframe>'
-    )
+    transparent_html = f'<div style="background-color: transparent;">{raw_html}</div>'
+
+    st.iframe(transparent_html, height=500)
     
 def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
     """Dibuja la sensibilidad normalizada"""
