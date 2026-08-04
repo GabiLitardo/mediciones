@@ -5,6 +5,7 @@ import proc_evo
 import proc_sens
 import proc_ruido
 import proc_temp
+import streamlit.components.v1 as components
 
 # Carga de MathJax 3 mediante CDN
 mathjax_script = """
