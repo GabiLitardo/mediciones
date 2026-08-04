@@ -241,7 +241,7 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
         legend=dict(
             orientation="h",
             yanchor="bottom",
-            y=1.5,
+            y=1.3,
             xanchor="center",
             x=0.5,
         ),        
