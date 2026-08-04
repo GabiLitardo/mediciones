@@ -363,8 +363,8 @@ def graficar_I_vs_T(titulo, datos_temperatura):
             if "alpha" in curvas:
                 filas_tabla.append({
                     "Dispositivo": disp,
-                    r"Corriente Nominal [$\alpha$A]": corr,
-                    r"Coef. Térmico ($\alpha$) [$\mu$A/°C]": round(curvas["alpha"], 4)
+                    "Corriente Nominal [μA]": corr,
+                    "Coef. Térmico (α) [μA/°C]": round(curvas["alpha"], 4)
                 })
                 
     if filas_tabla:
