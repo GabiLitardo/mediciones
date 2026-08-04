@@ -66,8 +66,8 @@ def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
         
     fig_ply.update_layout(
         title=titulo,
-        xaxis_title="$\text{Corriente promedio normalizada }I_{D_{norm}}\text{ [}\mu \text{A]}$",
-        yaxis_title="$\text{Tasa de cambio [}\mu\text{A/min}]$",
+        xaxis_title=r"$\text{Corriente promedio normalizada }I_{D_{norm}}\text{ [}\mu \text{A]}$",
+        yaxis_title=r"$\text{Tasa de cambio [}\mu\text{A/min}]$",
         template="plotly_white",
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
