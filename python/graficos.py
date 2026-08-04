@@ -42,12 +42,11 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
             zeroline=False,
         ),
     )
-    raw_html = pio.to_html(
+    html = pio.to_html(
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
-    transparent_html = f'<div style="background-color: transparent;">{raw_html}</div>'
 
-    st.iframe(raw_html, height=500)
+    st.iframe(html, height=500)
     
 def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
     """Dibuja la sensibilidad normalizada"""
@@ -81,12 +80,11 @@ def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
             zeroline=False,
         ),
     )
-    raw_html = pio.to_html(
+    html = pio.to_html(
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
-    transparent_html = f'<div style="background-color: transparent;">{raw_html}</div>'
 
-    st.iframe(transparent_html, height=500)
+    st.iframe(html, height=500)
 
 def graficar_ruido(titulo, datos_ruido):
     fig_ply = go.Figure()
@@ -117,12 +115,11 @@ def graficar_ruido(titulo, datos_ruido):
             zeroline=False,
         ),
     )
-    raw_html = pio.to_html(
+    html = pio.to_html(
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
-    transparent_html = f'<div style="background-color: transparent;">{raw_html}</div>'
 
-    st.iframe(transparent_html, height=500)
+    st.iframe(html, height=500)
 
 def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, datos_temp):
     fig_ply = go.Figure()
@@ -246,12 +243,11 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
             x=0.5,
         ),        
     )
-    raw_html = pio.to_html(
+    html = pio.to_html(
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
-    transparent_html = f'<div style="background-color: transparent;">{raw_html}</div>'
 
-    st.iframe(transparent_html, height=500)
+    st.iframe(html, height=500)
     
 def graficar_evolucion_ruido(titulo, todas_las_evos, corrientes_a_graficar, es_log):    
     for disp, evos_disp in todas_las_evos.items():
@@ -297,12 +293,11 @@ def graficar_evolucion_ruido(titulo, todas_las_evos, corrientes_a_graficar, es_l
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(color="white"),
     )
-    raw_html = pio.to_html(
+    html = pio.to_html(
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
-    transparent_html = f'<div style="background-color: transparent;">{raw_html}</div>'
 
-    st.iframe(transparent_html, height=500)
+    st.iframe(html, height=500)
 
 def graficar_I_vs_T(titulo, datos_temperatura):
     fig_ply = go.Figure()
@@ -342,12 +337,12 @@ def graficar_I_vs_T(titulo, datos_temperatura):
         font=dict(color="white"),        
         margin=dict(t=100)
     )
-    raw_html = pio.to_html(
+    html = pio.to_html(
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
-    transparent_html = f'<div style="background-color: transparent;">{raw_html}</div>'
 
-    st.iframe(transparent_html, height=500)
+    st.iframe(html, height=500)
+
     # —— 3. CÁLCULO Y PRESENTACIÓN DE LA TABLA DE COEFICIENTES ——
     st.markdown("### Tabla de Coeficientes Térmicos")
     
@@ -402,12 +397,11 @@ def graficar_evolucion_temperatura(titulo, todas_las_evos_temp, corrientes_a_gra
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(color="white"),            
     )
-    raw_html = pio.to_html(
+    html = pio.to_html(
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
-    transparent_html = f'<div style="background-color: transparent;">{raw_html}</div>'
 
-    st.iframe(transparent_html, height=500)
+    st.iframe(html, height=500)
 
 def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t, corrientes_a_graficar):
     fig_ply = go.Figure()
@@ -462,12 +456,11 @@ def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t, corri
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(color="white"),    
     )
-    raw_html = pio.to_html(
+    html = pio.to_html(
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
-    transparent_html = f'<div style="background-color: transparent;">{raw_html}</div>'
 
-    st.iframe(transparent_html, height=500)
+    st.iframe(html, height=500)
     
 def graficar_snr(titulo, datos_sensibilidad, datos_ruido):
     """
@@ -530,9 +523,8 @@ def graficar_snr(titulo, datos_sensibilidad, datos_ruido):
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(color="white"),         
     )
-    raw_html = pio.to_html(
+    html = pio.to_html(
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
-    transparent_html = f'<div style="background-color: transparent;">{raw_html}</div>'
 
-    st.iframe(transparent_html, height=500)
+    st.iframe(html, height=500)
