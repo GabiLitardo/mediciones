@@ -369,7 +369,7 @@ def graficar_I_vs_T(titulo, datos_temperatura):
                 
     if filas_tabla:
         df_coefs = pd.DataFrame(filas_tabla)
-        st.dataframe(df_coefs, use_container_width=True, hide_index=True)
+        st.dataframe(df_coefs, width='stretch', hide_index=True)
     else:
         st.warning("No se encontraron coeficientes térmicos calculados para mostrar.")
         
