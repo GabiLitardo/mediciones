@@ -363,8 +363,8 @@ def graficar_I_vs_T(titulo, datos_temperatura):
             if "alpha" in curvas:
                 filas_tabla.append({
                     "Dispositivo": disp,
-                    "Corriente Nominal [uA]": corr,
-                    "Coef. Térmico (α) [uA/°C]": round(curvas["alpha"], 4)
+                    "Corriente Nominal [$\alpha$A]": corr,
+                    "Coef. Térmico ($\alpha$) [$\mu$A/°C]": round(curvas["alpha"], 4)
                 })
                 
     if filas_tabla:
@@ -548,4 +548,3 @@ def graficar_snr(titulo, datos_sensibilidad, datos_ruido):
         height=500,
         scrolling=False,
     )
-    
