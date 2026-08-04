@@ -42,11 +42,9 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
             zeroline=False,
         ),
     )
-    raw_html = pio.to_html(
-        fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False, config={"displayModeBar": True}
-    )
+    escaped_html = raw_html.replace('"', "&quot;")
     st.html(
-        f'<iframe srcdoc="{raw_html.replace('"', '&quot;')}" style="width:100%; height:500px; border:none;" allowfullscreen></iframe>'
+        f'<iframe srcdoc="{escaped_html}" style="width:100%; height:500px; border:none;" allowfullscreen></iframe>'
     )
     
 def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
