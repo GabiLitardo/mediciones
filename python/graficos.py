@@ -23,10 +23,8 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
             t_continuo = np.linspace(tiempos_ordenados.min(), tiempos_ordenados.max(), 200)
             i_fitteada = a * (t_continuo ** 4) + b * (t_continuo ** 3) + c * (t_continuo ** 2) + d * t_continuo + e
             fig_ply.add_trace(go.Scatter(x=t_continuo, y=i_fitteada, mode='lines', name=f"{disp} (Fit Poly g4)"))        
-    fig_ply.update_layout(title=titulo, xaxis_title="Tiempo de irradiación [min]", yaxis_title=ylabel, template="plotly_white")
-    raw_html = pio.to_html(
-        fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
-    )
+    fig_ply.update_layout(title=titulo, xaxis_title="Tiempo de irradiación [min]", yaxis_title=ylabel, template="plotly_white", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", xaxis=dict(showgrid=False), yaxis=dict(showgrid=False))    
+    raw_html = pio.to_html(fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False)
     components.html(
         f'<div style="background-color: transparent;">{raw_html}</div>',
         height=500,
