@@ -46,7 +46,7 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
 
-    st.iframe(html, height=500)
+    st.iframe(html, height="content")
     
 def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
     """Dibuja la sensibilidad normalizada"""
@@ -84,7 +84,7 @@ def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
 
-    st.iframe(html, height=500)
+    st.iframe(html, height="content")
 
 def graficar_ruido(titulo, datos_ruido):
     fig_ply = go.Figure()
@@ -119,7 +119,7 @@ def graficar_ruido(titulo, datos_ruido):
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
 
-    st.iframe(html, height=500)
+    st.iframe(html, height="content")
 
 def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, datos_temp):
     fig_ply = go.Figure()
@@ -247,7 +247,7 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
 
-    st.iframe(html, height=500)
+    st.iframe(html, height="content")
     
 def graficar_evolucion_ruido(titulo, todas_las_evos, corrientes_a_graficar, es_log):    
     for disp, evos_disp in todas_las_evos.items():
@@ -297,7 +297,7 @@ def graficar_evolucion_ruido(titulo, todas_las_evos, corrientes_a_graficar, es_l
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
 
-    st.iframe(html, height=500)
+    st.iframe(html, height="content")
 
 def graficar_I_vs_T(titulo, datos_temperatura):
     fig_ply = go.Figure()
@@ -341,7 +341,7 @@ def graficar_I_vs_T(titulo, datos_temperatura):
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
 
-    st.iframe(html, height=500)
+    st.iframe(html, height="content")
 
     # —— 3. CÁLCULO Y PRESENTACIÓN DE LA TABLA DE COEFICIENTES ——
     st.markdown("### Tabla de Coeficientes Térmicos")
@@ -401,7 +401,7 @@ def graficar_evolucion_temperatura(titulo, todas_las_evos_temp, corrientes_a_gra
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
 
-    st.iframe(html, height=500)
+    st.iframe(html, height="content")
 
 def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t, corrientes_a_graficar):
     fig_ply = go.Figure()
@@ -460,7 +460,7 @@ def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t, corri
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
 
-    st.iframe(html, height=500)
+    st.iframe(html, height="content")
     
 def graficar_snr(titulo, datos_sensibilidad, datos_ruido):
     """
@@ -527,4 +527,4 @@ def graficar_snr(titulo, datos_sensibilidad, datos_ruido):
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
 
-    st.iframe(html, height=500)
+    st.iframe(html, height="content")
