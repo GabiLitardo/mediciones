@@ -7,14 +7,6 @@ import pandas as pd
 import plotly.io as pio
 import streamlit.components.v1 as components
 
-# Carga de MathJax 3 mediante CDN
-mathjax_script = """
-<script type="text/javascript" id="MathJax-script" async
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-</script>
-"""
-components.html(mathjax_script, height=0, width=0)
-
 def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     """Dibuja la evolución temporal absoluta de corrientes o tensiones interpoladas."""
     fig_ply = go.Figure()    
