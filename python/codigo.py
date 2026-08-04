@@ -100,7 +100,7 @@ if mostrar_ruido:
 
     evos = proc_ruido.obtener_evolucion_ruido(["PFGIW1", "PFGIW2", "PFGIP2"], [100, 150, 200, 250, 350], False)
     
-    log = st.checkbox("0. Resumen", value=False)
+    log = st.checkbox("Graficar Semilog?", value=False)
 
     graficos.graficar_evolucion_ruido(
         titulo="Corriente vs tiempo",
