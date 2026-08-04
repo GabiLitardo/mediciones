@@ -64,9 +64,34 @@ def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
     for disp, datos in datos_sensibilidad_discreto.items():
         fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines+markers', name=disp))
         
-    fig_ply.update_layout(title=titulo, xaxis_title=r"Corriente Promedio Normalizada I_D_norm [$\mu$A]", yaxis_title=r"Tasa de Cambio normalizada[($\mu$A)/min]", template="plotly_white")
-
-    st.plotly_chart(fig_ply, width='stretch')
+    fig_ply.update_layout(
+        title=titulo,
+        xaxis_title="$\text{Corriente promedio normalizada }I_{D_{norm}}\text{ [}\mu \text{A]}$",
+        yaxis_title="$\text{Tasa de cambio [}\mu\text{A/min}]$",
+        template="plotly_white",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="white"),
+        xaxis=dict(
+            showgrid=False,
+            showline=False,
+            zeroline=False,
+        ),
+        yaxis=dict(
+            showgrid=True,
+            gridcolor="rgba(255, 255, 255, 0.2)",
+            showline=False,
+            zeroline=False,
+        ),
+    )
+    raw_html = pio.to_html(
+        fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
+    )
+    components.html(
+        f'<div style="background-color: transparent;">{raw_html}</div>',
+        height=500,
+        scrolling=False,
+    )
 
 def graficar_ruido(titulo, datos_ruido):
     fig_ply = go.Figure()
