@@ -48,7 +48,7 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     )
     transparent_html = f'<div style="background-color: transparent;">{raw_html}</div>'
 
-    st.iframe(srcdoc=transparent_html, height=500)
+    st.iframe(transparent_html, height=500)
     
 def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
     """Dibuja la sensibilidad normalizada"""
