@@ -31,8 +31,17 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(color="white"),
-        xaxis=dict(showgrid=True, gridcolor="rgba(255, 255, 255, 0.2)"),
-        yaxis=dict(showgrid=False),
+        xaxis=dict(
+            showgrid=False,
+            showline=False,
+            zeroline=False,
+        ),
+        yaxis=dict(
+            showgrid=True,
+            gridcolor="rgba(255, 255, 255, 0.2)",
+            showline=False,
+            zeroline=False,
+        ),
     )
     raw_html = pio.to_html(
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
