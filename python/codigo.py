@@ -32,7 +32,7 @@ if mostrar_evolucion:
     datos_fg_t1 = proc_evo.obtener_datos_crudos_tanda(["PFGIW1", "PFGIW2", "PFGIW3"], "FG_tanda1")
     graficos.graficar_dispositivos(
         titulo="Evolución Floating Gates tanda 1 (I @ V = -4.5 V)",
-        ylabel=r"$I_D$ [$\mu$A]",
+        ylabel=r"$I_D \, [\mu \text{A}]$",
         datos_procesados=datos_fg_t1,
         tanda = 1,
         es_fg = True
@@ -41,7 +41,7 @@ if mostrar_evolucion:
     datos_fg_t2 = proc_evo.obtener_datos_crudos_tanda(["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"], "FG_tanda2")
     graficos.graficar_dispositivos(
         titulo="Evolución Floating Gates tanda 2 (I @ V = -4.5 V)",
-        ylabel=r"$I_D$ [$\mu$A]",
+        ylabel=r"$I_D \, [\mu \text{A}]$",
         datos_procesados=datos_fg_t2,
         tanda = 2,
         es_fg = True
@@ -59,10 +59,10 @@ if mostrar_evolucion:
     st.subheader("Evolución de la tensión de compuerta equivalente ($V_{FG}$)")
     
     datos_vg_t1 = proc_evo.obtener_datos_evolucion_vg(["PFGIW1", "PFGIW2"], "FG_tanda1")
-    graficos.graficar_dispositivos(titulo="Descarga temporal de Floating Gates tanda 1 en tensión", ylabel = r"Tensión $V_{FG}$ [V]", datos_procesados = datos_vg_t1, tanda = 1, es_fg = True)
+    graficos.graficar_dispositivos(titulo="Descarga temporal de Floating Gates tanda 1 en tensión", ylabel = r"$\text{Tensión} V_{FG} \, \text{[V]}$", datos_procesados = datos_vg_t1, tanda = 1, es_fg = True)
     
     datos_vg_t2 = proc_evo.obtener_datos_evolucion_vg(["PFGIW1", "PFGIW2", "PFGIP2"], "FG_tanda2")
-    graficos.graficar_dispositivos(titulo="Descarga temporal de Floating Gates tanda 2 en tensión", ylabel = r"Tensión $V_{FG}$ [V]", datos_procesados = datos_vg_t2, tanda = 2, es_fg = True)
+    graficos.graficar_dispositivos(titulo="Descarga temporal de Floating Gates tanda 2 en tensión", ylabel = r"$\text{Tensión} V_{FG} \, \text{[V]}$", datos_procesados = datos_vg_t2, tanda = 2, es_fg = True)
 # =====================================================================
 # SECCIÓN 2: SENSIBILIDAD
 # =====================================================================

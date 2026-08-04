@@ -4,8 +4,6 @@ import streamlit as st
 import plotly.graph_objects as go
 from proc_sens import calcular_fit_polinomico
 import pandas as pd
-import plotly.io as pio
-pio.renderers.default = 'iframe'
 
 def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     """Dibuja la evolución temporal absoluta de corrientes o tensiones interpoladas."""
