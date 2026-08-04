@@ -253,7 +253,7 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
 
     st.iframe(transparent_html, height=500)
     
-def graficar_evolucion_ruido(titulo, todas_las_evos, corrientes_a_graficar):    
+def graficar_evolucion_ruido(titulo, todas_las_evos, corrientes_a_graficar, es_log):    
     for disp, evos_disp in todas_las_evos.items():
         for corr in corrientes_a_graficar:
             if corr in evos_disp:
@@ -283,7 +283,7 @@ def graficar_evolucion_ruido(titulo, todas_las_evos, corrientes_a_graficar):
             showgrid=False,
             showline=False,
             zeroline=False,            
-            #type="log"
+            type="log" if es_log else "-"
         ),
         yaxis=dict(
             title=r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$",

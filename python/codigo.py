@@ -100,10 +100,13 @@ if mostrar_ruido:
 
     evos = proc_ruido.obtener_evolucion_ruido(["PFGIW1", "PFGIW2", "PFGIP2"], [100, 150, 200, 250, 350], False)
     
+    log = st.checkbox("0. Resumen", value=False)
+
     graficos.graficar_evolucion_ruido(
         titulo="Corriente vs tiempo",
         todas_las_evos=evos,
-        corrientes_a_graficar=[100, 150, 200, 250, 350]
+        corrientes_a_graficar=[100, 150, 200, 250, 350],
+        es_log = log
     )
 
     evos_temp = proc_ruido.obtener_evolucion_temperatura_ruido(lista_dispositivos, corrientes_nominales, False)
