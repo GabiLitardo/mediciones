@@ -101,14 +101,35 @@ def graficar_ruido(titulo, datos_ruido):
         y_data = datos["y"]
         
         fig_ply.add_trace(go.Scatter(x=x_data, y=y_data, mode='markers', name=disp))            
-    
+
     fig_ply.update_layout(
-        title=titulo, 
-        xaxis_title="Corriente Nominal I_D [uA]", 
+        title=titulo,
+        xaxis_title=r"$\text{Corriente Nominal }I_D\text{ [}\mu \text{A]}$", 
         yaxis_title="Desvío de Ruido [nA]", 
-        template="plotly_white"
+        template="plotly_white",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="white"),
+        xaxis=dict(
+            showgrid=False,
+            showline=False,
+            zeroline=False,
+        ),
+        yaxis=dict(
+            showgrid=True,
+            gridcolor="rgba(255, 255, 255, 0.2)",
+            showline=False,
+            zeroline=False,
+        ),
     )
-    st.plotly_chart(fig_ply, width='stretch')
+    raw_html = pio.to_html(
+        fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
+    )
+    components.html(
+        f'<div style="background-color: transparent;">{raw_html}</div>',
+        height=500,
+        scrolling=False,
+    )
 
 def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, datos_temp):
     fig_ply = go.Figure()
@@ -187,27 +208,52 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
             y=0.98, yanchor="top", x=0.5, xanchor="center"
         ),
         xaxis=dict(
-            title=r"Corriente Normalizada $I_{D_norm}$ [$\mu$A]",
-            domain=[0, 0.82]
+            title=r"$\text{Corriente Normalizada }I_{D_{norm}}\text{ [}\mu\text{A]}$",
+            domain=[0, 0.82],
+            showgrid=False,
+            showline=False,
+            zeroline=False,
         ),
         yaxis=dict(
-            title=dict(text="Tasa de Cambio Absoluta [uA/min]", font=dict(color="#1f77b4")),
-            range=[0, s_max * 1.1]
+            title=dict(text=r"$\text{Tasa de Cambio Absoluta [}\mu\text{A/min]}$", font=dict(color="#1f77b4")),
+            range=[0, s_max * 1.1],
+            showgrid=True,
+            gridcolor="rgba(255, 255, 255, 0.2)",
+            showline=False,
+            zeroline=False,
         ),
         yaxis2=dict(
             title=dict(text="Desvío de Ruido [nA]", font=dict(color="#ff7f0e")),
             range=[0, r_max * 1.1],
-            overlaying='y', side='right'
+            overlaying='y', side='right',
+            showgrid=True,
+            gridcolor="rgba(255, 255, 255, 0.2)",
+            showline=False,
+            zeroline=False,            
         ),
         yaxis3=dict(
-            title=dict(text="Módulo de Coeficiente Térmico [uA/°C]", font=dict(color="#2ca02c")),
+            title=dict(text=r"$\text{Módulo de Coeficiente Térmico [}\mu\text{A/°C]}$", font=dict(color="#2ca02c")),
             range=[tc_min, tc_max], 
             overlaying='y', side='right',
-            anchor='free', position=0.94
+            anchor='free', position=0.94,
+            showgrid=True,
+            gridcolor="rgba(255, 255, 255, 0.2)",
+            showline=False,
+            zeroline=False,            
         ),
-        template="plotly_white"
+        template="plotly_white",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="white"),
     )
-    st.plotly_chart(fig_ply, width='stretch')
+    raw_html = pio.to_html(
+        fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
+    )
+    components.html(
+        f'<div style="background-color: transparent;">{raw_html}</div>',
+        height=500,
+        scrolling=False,
+    )
     
 def graficar_evolucion_ruido(titulo, todas_las_evos, corrientes_a_graficar):    
     for disp, evos_disp in todas_las_evos.items():
@@ -236,11 +282,31 @@ def graficar_evolucion_ruido(titulo, todas_las_evos, corrientes_a_graficar):
         title=titulo,
         xaxis=dict(
             title="Tiempo [s]",
+            showgrid=False,
+            showline=False,
+            zeroline=False,            
             #type="log"
         ),
-        yaxis=dict(title=r"Corriente de Ruido Neto [$\mu$A]"),
-        template="plotly_white")
-    st.plotly_chart(fig_ply, width='stretch')
+        yaxis=dict(
+            title=r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$",
+            showgrid=True,
+            gridcolor="rgba(255, 255, 255, 0.2)",
+            showline=False,
+            zeroline=False,            
+        ),
+        template="plotly_white",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="white"),
+    )
+    raw_html = pio.to_html(
+        fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
+    )
+    components.html(
+        f'<div style="background-color: transparent;">{raw_html}</div>',
+        height=500,
+        scrolling=False,
+    )
 
 def graficar_I_vs_T(titulo, datos_temperatura):
     fig_ply = go.Figure()
@@ -261,13 +327,33 @@ def graficar_I_vs_T(titulo, datos_temperatura):
             'xanchor': 'center',
             'yanchor': 'top'
         },
-        xaxis=dict(title="Temperatura [°C]"),
-        yaxis=dict(title="Corriente I_D @ V_D = -4.5V [uA]"),
+        xaxis=dict(
+            title="Temperatura [°C]",
+            showgrid=False,
+            showline=False,
+            zeroline=False,             
+        ),
+        yaxis=dict(
+            title=r"$\text{Corriente }I_D \text{ @ }V_D \text{ = -4.5V [}\mu \text{A]}$",
+            showgrid=True,
+            gridcolor="rgba(255, 255, 255, 0.2)",
+            showline=False,
+            zeroline=False,            
+        ),
         template="plotly_white",
-        margin=dict(t=100) # Agregamos margen superior para darle aire al título
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="white"),        
+        margin=dict(t=100)
     )
-    st.plotly_chart(fig_ply, width='stretch')
-
+    raw_html = pio.to_html(
+        fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
+    )
+    components.html(
+        f'<div style="background-color: transparent;">{raw_html}</div>',
+        height=500,
+        scrolling=False,
+    )
     # —— 3. CÁLCULO Y PRESENTACIÓN DE LA TABLA DE COEFICIENTES ——
     st.markdown("### Tabla de Coeficientes Térmicos")
     
@@ -304,12 +390,33 @@ def graficar_evolucion_temperatura(titulo, todas_las_evos_temp, corrientes_a_gra
                 
     fig_ply.update_layout(
         title=titulo,
-        xaxis=dict(title="Tiempo [s]"),
-        yaxis=dict(title="Temperatura [°C]"),
-        template="plotly_white"
+        xaxis=dict(
+            title="Tiempo [s]",
+            showgrid=False,
+            showline=False,
+            zeroline=False,             
+        ),
+        yaxis=dict(
+            title="Temperatura [°C]",
+            showgrid=True,
+            gridcolor="rgba(255, 255, 255, 0.2)",
+            showline=False,
+            zeroline=False,              
+        ),
+        template="plotly_white",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="white"),            
     )
-    st.plotly_chart(fig_ply, width='stretch')
-    
+    raw_html = pio.to_html(
+        fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
+    )
+    components.html(
+        f'<div style="background-color: transparent;">{raw_html}</div>',
+        height=500,
+        scrolling=False,
+    )
+
 def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t, corrientes_a_graficar):
     fig_ply = go.Figure()
     for disp, evos_disp in todas_las_evos_i_vs_t.items():
@@ -345,11 +452,32 @@ def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t, corri
                 
     fig_ply.update_layout(
         title=titulo,
-        xaxis=dict(title="Temperatura [°C]"),
-        yaxis=dict(title=r"Corriente I_D [uA]"),
+        xaxis=dict(
+            title="Temperatura [°C]",
+            showgrid=False,
+            showline=False,
+            zeroline=False,             
+        ),
+        yaxis=dict(
+            title=r"$\text{Corriente }I_D \text{ [}\mu \text{A]}$",
+            showgrid=True,
+            gridcolor="rgba(255, 255, 255, 0.2)",
+            showline=False,
+            zeroline=False,              
+        ),
         template="plotly_white",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="white"),    
     )
-    st.plotly_chart(fig_ply, width='stretch')
+    raw_html = pio.to_html(
+        fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
+    )
+    components.html(
+        f'<div style="background-color: transparent;">{raw_html}</div>',
+        height=500,
+        scrolling=False,
+    )
     
 def graficar_snr(titulo, datos_sensibilidad, datos_ruido):
     """
@@ -394,8 +522,30 @@ def graficar_snr(titulo, datos_sensibilidad, datos_ruido):
     # Configuración Plotly
     fig_ply.update_layout(
         title=dict(text=titulo, x=0.5, xanchor="center"),
-        xaxis=dict(title=r"Corriente Normalizada I_D_norm [uA]"),
-        yaxis=dict(title=r"SNR [1/min]"),
-        template="plotly_white"
+        xaxis=dict(
+            title=r"$\text{Corriente Normalizada }I_{D_{norm}} \text{ [}\mu \text{A]}$",
+            showgrid=False,
+            showline=False,
+            zeroline=False,             
+        ),
+        yaxis=dict(
+            title="SNR [1/min]",
+            showgrid=True,
+            gridcolor="rgba(255, 255, 255, 0.2)",
+            showline=False,
+            zeroline=False,             
+        ),
+        template="plotly_white",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="white"),         
     )
-    st.plotly_chart(fig_ply, width='stretch')
+    raw_html = pio.to_html(
+        fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
+    )
+    components.html(
+        f'<div style="background-color: transparent;">{raw_html}</div>',
+        height=500,
+        scrolling=False,
+    )
+    
