@@ -75,12 +75,11 @@ def obtener_evolucion_temperatura_ruido(lista_dispositivos, corrientes_nominales
             nombre_archivo = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1_LARGA.txt" if es_larga else f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1.txt"
             datos = procesar_archivo_ruido(nombre_archivo)
             
-            if datos is not None:
-                resultado[disp][corr] = {
-                    "x": datos["tiempo_s"], 
-                    "y": datos["temperatura_C"],
-                    "y_fit": datos["temperatura_fit_C"]
-                }
+            resultado[disp][corr] = {
+                "x": datos["tiempo_s"], 
+                "y": datos["temperatura_C"],
+                "y_fit": datos["temperatura_fit_C"]
+            }
 
     return resultado
 
