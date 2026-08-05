@@ -56,9 +56,9 @@ def obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales, es_larga, 
             
     return resultado
 
-def procesar_ruido(lista_dispositivos, corrientes_nominales, es_larga = False):
+def procesar_ruido(lista_dispositivos, corrientes_nominales, es_larga = False, restar_deriva = True):
     resultado = {}
-    todas_las_evos = obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales, es_larga)
+    todas_las_evos = obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales, es_larga, restar_deriva)
     for disp in lista_dispositivos:    
         resultado[disp] = {
             "x": np.array([float(corr) for corr in corrientes_nominales]),
