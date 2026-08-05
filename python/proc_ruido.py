@@ -58,6 +58,7 @@ def obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales, es_larga=F
         for corr in corrientes_nominales:
             nombre_archivo = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1_LARGA.txt" if es_larga else f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1.txt"
             datos = procesar_archivo_ruido(nombre_archivo)
+            print(nombre_archivo)
             
             y_val = datos["i_ruido_neto_uA"] if restar_deriva else datos["corriente_uA"]
             resultado[disp][corr] = {"x": datos["tiempo_s"], "y": y_val}
