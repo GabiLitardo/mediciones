@@ -36,8 +36,8 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
         xaxis_title="Tiempo de irradiación [min]",
         yaxis_title=ylabel,
         template="plotly_dark",
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="#0e1117",
+        plot_bgcolor="#0e1117",
         font=dict(color="white"),
         xaxis=dict(
             showgrid=False,
@@ -82,8 +82,8 @@ def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
         xaxis_title=xlabel,
         yaxis_title=ylabel,
         template="plotly_dark",
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="#0e1117",
+        plot_bgcolor="#0e1117",
         font=dict(color="white"),
         xaxis=dict(
             showgrid=False,
@@ -124,8 +124,8 @@ def graficar_ruido(titulo, datos_ruido):
         xaxis_title=r"$\text{Corriente Nominal }I_D\text{ [}\mu \text{A]}$", 
         yaxis_title="Desvío de Ruido [nA]", 
         template="plotly_dark",
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="#0e1117",
+        plot_bgcolor="#0e1117",
         font=dict(color="white"),
         xaxis=dict(
             showgrid=False,
@@ -256,8 +256,8 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
             zeroline=False,            
         ),
         template="plotly_dark",
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="#0e1117",
+        plot_bgcolor="#0e1117",
         font=dict(color="white"),
         legend=dict(
             orientation="h",
@@ -314,8 +314,8 @@ def graficar_evolucion_ruido(titulo, todas_las_evos, es_log):
             zeroline=False,            
         ),
         template="plotly_dark",
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="#0e1117",
+        plot_bgcolor="#0e1117",
         font=dict(color="white"),
     )
     html = pio.to_html(
@@ -365,8 +365,8 @@ def graficar_I_vs_T(titulo, datos_temperatura):
             zeroline=False,            
         ),
         template="plotly_dark",
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="#0e1117",
+        plot_bgcolor="#0e1117",
         font=dict(color="white"),        
         margin=dict(t=100)
     )
@@ -431,8 +431,8 @@ def graficar_evolucion_temperatura(titulo, datos_temp):
             zeroline=False,              
         ),
         template="plotly_dark",
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="#0e1117",
+        plot_bgcolor="#0e1117",
         font=dict(color="white"),            
     )
     html = pio.to_html(
@@ -494,8 +494,8 @@ def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t):
             zeroline=False,              
         ),
         template="plotly_dark",
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="#0e1117",
+        plot_bgcolor="#0e1117",
         font=dict(color="white"),    
     )
     html = pio.to_html(
@@ -557,8 +557,8 @@ def graficar_snr(titulo, datos_sensibilidad, datos_ruido):
             zeroline=False,             
         ),
         template="plotly_dark",
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="#0e1117",
+        plot_bgcolor="#0e1117",
         font=dict(color="white"),         
     )
     html = pio.to_html(
