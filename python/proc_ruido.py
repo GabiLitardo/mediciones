@@ -29,7 +29,7 @@ def procesar_archivo_ruido(nombre_archivo):
     temperatura_C = convertir_r_a_temp_steinhart(resistencia)
 
     # 1. Ajuste lineal de la Temperatura vs Tiempo
-    coefs_T = np.polyfit(tiempo_s, temperatura_C, deg=5)
+    coefs_T = np.polyfit(tiempo_s, temperatura_C, deg=10)
     temperatura_fit_C = np.polyval(coefs_T, tiempo_s)
 
     # 2. Hallamos el coeficiente térmico (dI/dT)
