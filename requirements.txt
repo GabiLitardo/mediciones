@@ -5,3 +5,4 @@ plotly
 scipy
 streamlit
 pathlib
+starlette<0.40.0
