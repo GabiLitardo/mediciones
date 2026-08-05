@@ -15,8 +15,8 @@ def convertir_r_a_temp_steinhart(resistencia):
 def procesar_archivo_ruido(nombre_archivo):
     """
     Lee un archivo de ruido y calcula todas las magnitudes asociadas.
-    Devuelve un diccionario con: tiempo_s, corriente_uA, temperatura_C, 
-    corriente_fit_uA e i_ruido_neto_uA.
+    Filtra el ruido propio del sensor de temperatura antes de restar 
+    la deriva térmica para no inflar el desvío estándar final.
     """
     lista_mediciones = matchear_archivos(nombre_archivo, tipo_medicion="ruido")
     if not lista_mediciones:
@@ -28,9 +28,17 @@ def procesar_archivo_ruido(nombre_archivo):
     resistencia = datos[:, 2]
     temperatura_C = convertir_r_a_temp_steinhart(resistencia)
 
-    # Tendencia térmica mediante ajuste lineal
-    coefs = np.polyfit(temperatura_C, corriente_uA, deg=1)
-    corriente_fit_uA = np.polyval(coefs, temperatura_C)
+    # 1. Suavizamos el ruido propio del termistor ajustando T vs tiempo
+    coefs_T = np.polyfit(tiempo_s, temperatura_C, deg=1)
+    temperatura_suave = np.polyval(coefs_T, tiempo_s)
+
+    # 2. Hallamos el coeficiente térmico (dI/dT)
+    coefs_I = np.polyfit(temperatura_C, corriente_uA, deg=1)
+
+    # 3. Evaluamos la tendencia térmica sobre la temperatura suave (sin ruido de alta frecuencia del sensor)
+    corriente_fit_uA = np.polyval(coefs_I, temperatura_suave)
+    
+    # 4. Restamos únicamente la deriva térmica de baja frecuencia
     i_ruido_neto_uA = corriente_uA - corriente_fit_uA
 
     return {
