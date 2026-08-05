@@ -19,8 +19,6 @@ def procesar_archivo_ruido(nombre_archivo):
     inyectar ruido del sensor al restar la deriva térmica.
     """
     lista_mediciones = matchear_archivos(nombre_archivo, tipo_medicion="ruido")
-    if not lista_mediciones:
-        return None
 
     datos = lista_mediciones[0]
     tiempo_s = datos[:, 0]
