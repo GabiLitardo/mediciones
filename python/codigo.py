@@ -96,7 +96,7 @@ if mostrar_ruido:
     corrientes_nominales = [100, 150, 200, 250, 350]
 
     restar_deriva = st.checkbox("Restar deriva térmica para visualizar el ruido?", value=True)
-    resultados_ruido = proc_ruido.procesar_ruido(lista_dispositivos, corrientes_nominales, restar_deriva)
+    resultados_ruido = proc_ruido.procesar_ruido(lista_dispositivos, corrientes_nominales, False, restar_deriva)
     graficos.graficar_ruido(titulo="Desvío estándar del ruido neto vs Corriente nominal", datos_ruido=resultados_ruido)
 
     evos = proc_ruido.obtener_evolucion_ruido(["PFGIW1", "PFGIW2", "PFGIP2"], [100, 150, 200, 250, 350], False, restar_deriva)
