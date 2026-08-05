@@ -25,7 +25,7 @@ def obtener_ruido_neto_archivo(nombre_archivo, restar_deriva):
     Calcula 
     """
     lista_mediciones = matchear_archivos(nombre_archivo, tipo_medicion="ruido")
-    if lista_mediciones == None:
+    if not lista_mediciones:
         print(nombre_archivo)
     datos = lista_mediciones[0]
     tiempo_s = datos[:, 0]
