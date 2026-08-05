@@ -100,7 +100,7 @@ if mostrar_ruido:
     graficos.graficar_ruido(titulo="Desvío estándar del ruido neto vs Corriente nominal", datos_ruido=resultados_ruido)
 
     #evos = proc_ruido.obtener_evolucion_ruido(["PFGIW1", "PFGIW2", "PFGIP2"], [100, 150, 200, 250, 350], False, restar_deriva)
-    evos = proc_ruido.obtener_evolucion_ruido(["PFGIW1"], [350], False, restar_deriva)    
+    evos = proc_ruido.obtener_evolucion_ruido(["PFGIW1"], [250, 350], False, restar_deriva)    
 
     log = st.checkbox("Graficar Semilog?", value=False)
 
