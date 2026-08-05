@@ -396,24 +396,44 @@ def graficar_I_vs_T(titulo, datos_temperatura):
         
 def graficar_evolucion_temperatura(titulo, datos_temp):
     """
-    Dibuja en plotly la evolución temporal de la temperatura.
+    Dibuja en plotly la evolución temporal de la temperatura medida junto con su fit lineal.
+    Agrupa las leyendas por dispositivo y corriente para una visualización más limpia.
 
     Args:
         titulo (str): Título a mostrar en el gráfico
-        datos_temp (dict): dict con {disp: {corr: {"x": array_tiempo, "y": array_temp}}}
+        datos_temp (dict): dict con {disp: {corr: {"x": array_tiempo, "y": array_temp, "y_fit": array_temp_fit}}}
     """    
     fig_ply = go.Figure()
+    
     for disp, evos_disp in datos_temp.items():
         for corr in evos_disp:
             x_data = evos_disp[corr]["x"]
             y_data = evos_disp[corr]["y"]
+            y_fit = evos_disp[corr].get("y_fit", None)
+            
+            grupo_id = f"temp_{disp}_{corr}uA"
+            
+            # Traza de la medición real
             fig_ply.add_trace(go.Scatter(
                 x=x_data, 
                 y=y_data, 
                 mode='lines', 
                 name=f"{disp} @ {corr} uA",
-                opacity=0.8
+                legendgroup=grupo_id,
+                opacity=0.5
             ))
+            
+            # Traza del ajuste lineal (si está disponible)
+            if y_fit is not None:
+                fig_ply.add_trace(go.Scatter(
+                    x=x_data, 
+                    y=y_fit, 
+                    mode='lines', 
+                    name=f"{disp} @ {corr} uA (Fit)",
+                    legendgroup=grupo_id,
+                    showlegend=False,
+                    line=dict(width=2, dash='dash')
+                ))
             
     fig_ply.update_layout(
         title=titulo,
@@ -435,6 +455,7 @@ def graficar_evolucion_temperatura(titulo, datos_temp):
         plot_bgcolor="#0e1117",
         font=dict(color="white"),            
     )
+    
     html = pio.to_html(
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )

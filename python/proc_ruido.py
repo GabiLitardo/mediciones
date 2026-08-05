@@ -15,8 +15,8 @@ def convertir_r_a_temp_steinhart(resistencia):
 def procesar_archivo_ruido(nombre_archivo):
     """
     Lee un archivo de ruido y calcula todas las magnitudes asociadas.
-    Filtra el ruido propio del sensor de temperatura antes de restar 
-    la deriva térmica para no inflar el desvío estándar final.
+    Filtra la tendencia de la temperatura respecto al tiempo para evitar 
+    inyectar ruido del sensor al restar la deriva térmica.
     """
     lista_mediciones = matchear_archivos(nombre_archivo, tipo_medicion="ruido")
     if not lista_mediciones:
@@ -28,23 +28,24 @@ def procesar_archivo_ruido(nombre_archivo):
     resistencia = datos[:, 2]
     temperatura_C = convertir_r_a_temp_steinhart(resistencia)
 
-    # 1. Suavizamos el ruido propio del termistor ajustando T vs tiempo
+    # 1. Ajuste lineal de la Temperatura vs Tiempo
     coefs_T = np.polyfit(tiempo_s, temperatura_C, deg=1)
-    temperatura_suave = np.polyval(coefs_T, tiempo_s)
+    temperatura_fit_C = np.polyval(coefs_T, tiempo_s)
 
     # 2. Hallamos el coeficiente térmico (dI/dT)
     coefs_I = np.polyfit(temperatura_C, corriente_uA, deg=1)
 
-    # 3. Evaluamos la tendencia térmica sobre la temperatura suave (sin ruido de alta frecuencia del sensor)
-    corriente_fit_uA = np.polyval(coefs_I, temperatura_suave)
+    # 3. Evaluamos la tendencia térmica sobre la temperatura fitteada suave
+    corriente_fit_uA = np.polyval(coefs_I, temperatura_fit_C)
     
-    # 4. Restamos únicamente la deriva térmica de baja frecuencia
+    # 4. Restamos únicamente la deriva térmica
     i_ruido_neto_uA = corriente_uA - corriente_fit_uA
 
     return {
         "tiempo_s": tiempo_s,
         "corriente_uA": corriente_uA,
         "temperatura_C": temperatura_C,
+        "temperatura_fit_C": temperatura_fit_C,
         "corriente_fit_uA": corriente_fit_uA,
         "i_ruido_neto_uA": i_ruido_neto_uA
     }
@@ -64,7 +65,9 @@ def obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales, es_larga=F
     return resultado
 
 def obtener_evolucion_temperatura_ruido(lista_dispositivos, corrientes_nominales, es_larga=False):
-    """Obtiene la evolución temporal de la temperatura (°C)."""
+    """
+    Obtiene la evolución temporal de la temperatura (°C) medida y su fit lineal.
+    """
     resultado = {}
     for disp in lista_dispositivos:
         resultado[disp] = {}
@@ -72,7 +75,12 @@ def obtener_evolucion_temperatura_ruido(lista_dispositivos, corrientes_nominales
             nombre_archivo = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1_LARGA.txt" if es_larga else f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1.txt"
             datos = procesar_archivo_ruido(nombre_archivo)
             
-            resultado[disp][corr] = {"x": datos["tiempo_s"], "y": datos["temperatura_C"]}
+            if datos is not None:
+                resultado[disp][corr] = {
+                    "x": datos["tiempo_s"], 
+                    "y": datos["temperatura_C"],
+                    "y_fit": datos["temperatura_fit_C"]
+                }
 
     return resultado
 
