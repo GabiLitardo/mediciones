@@ -111,7 +111,7 @@ if mostrar_ruido:
     evos_temp = proc_ruido.obtener_evolucion_temperatura_ruido(lista_dispositivos, corrientes_nominales, False)
     graficos.graficar_evolucion_temperatura(
         titulo="Evolución de Temperatura vs Tiempo durante medición de ruido",
-        todas_las_evos_temp=evos_temp
+        datos_temp=evos_temp
     )
 
     evos_i_vs_t = proc_ruido.obtener_corriente_vs_temperatura_ruido(lista_dispositivos, corrientes_nominales, False)
