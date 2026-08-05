@@ -1,4 +1,3 @@
-# graficos.py
 import numpy as np
 import streamlit as st
 import plotly.graph_objects as go
@@ -7,7 +6,17 @@ import pandas as pd
 import plotly.io as pio
 
 def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
-    """Dibuja la evolución temporal absoluta de corrientes o tensiones interpoladas."""
+    """
+    Dibuja en plotly la evolución temporal de corrientes o tensiones interpoladas para Floating Gate o 
+    FOXFET respectivamente.
+
+    Args:
+        titulo (str): Título a mostrar en el gráfico
+        ylabel (str): Label a mostrar en el eje y del gráfico
+        datos_procesados (dict): dict con {disp: {"tiempos": array_tiempos, "valores": array_valores}}
+        tanda (int): Indicador de a qué tanda corresponden los datos (1, 2)
+        es_fg (bool): Indicador de si corresponde a datos de Floating Gates
+    """
     fig_ply = go.Figure()    
     for disp, datos in datos_procesados.items():
         tiempos_ordenados = datos["tiempos"]
@@ -49,7 +58,15 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     st.iframe(html, height="content")
     
 def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
-    """Dibuja la sensibilidad normalizada"""
+    """
+    Dibuja en plotly la sensibilidad calculada como derivada de un fitteo y con diferencias finitas.
+    
+    Args:
+        titulo (str): Título a mostrar en el gráfico
+        datos_sensibilidad (list): list de dicts [dict_continuo, dict_discreto] donde cada dict es {disp: {"x": array_x, "y": array_y}}
+        xlabel (str): Label a mostrar en el eje x del gráfico
+        ylabel (str): Label a mostrar en el eje y del gráfico
+    """
     fig_ply = go.Figure()
     
     datos_sensibilidad_continuo = datos_sensibilidad[0]
@@ -62,8 +79,8 @@ def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
         
     fig_ply.update_layout(
         title=titulo,
-        xaxis_title=r"$\text{Corriente promedio normalizada }I_{D_{norm}}\text{ [}\mu \text{A]}$",
-        yaxis_title=r"$\text{Tasa de cambio [}\mu\text{A/min}]$",
+        xaxis_title=xlabel,
+        yaxis_title=ylabel,
         template="plotly_white",
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
@@ -87,6 +104,13 @@ def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
     st.iframe(html, height="content")
 
 def graficar_ruido(titulo, datos_ruido):
+    """
+    Dibuja en plotly el desvío de ruido en función de la corriente normalizada para cada dispositivo.
+    
+    Args:
+        titulo (str): Título a mostrar en el gráfico
+        datos_ruido (dict): dict con {disp: {"x": array_I_normalizada, "y": array_std_ruido}}
+    """
     fig_ply = go.Figure()
     
     for disp, datos in datos_ruido.items():
@@ -122,6 +146,16 @@ def graficar_ruido(titulo, datos_ruido):
     st.iframe(html, height="content")
 
 def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, datos_temp):
+    """
+    Dibuja en plotly la superposición entre sensibilidad absoluta, desvío de ruido y coeficiente térmico en función 
+    de la corriente normalizada.
+
+    Args:
+        titulo (str): Título a mostrar en el gráfico
+        datos_sensibilidad (dict): dict con {disp: {"x": array_I_norm, "y": array_sens_abs}} (solo fiteo continuo)
+        datos_ruido (dict): dict con {disp: {"x": array_I_nom, "y": array_std_ruido}}
+        datos_temp (dict): dict con {disp: {corr: {"alpha": float_coef}}}
+    """
     fig_ply = go.Figure()
     colores = {"PFGIW1": "#1f77b4", "PFGIW2": "#ff7f0e", "PFGIP2": "#2ca02c"}
     
@@ -130,20 +164,16 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
 
     datos_tc = {}
 
-    # —— RESOLUCIÓN CORECTA USANDO LAS CLAVES REALES DE TEMPERATURA ——
     for disp in datos_sensibilidad.keys():
         x_coefs = []
         y_coefs = []
         
-        # Iteramos únicamente sobre las corrientes que de verdad se midieron y existen en datos_temp
         if datos_temp and disp in datos_temp:
             for corr_nominal, curvas in datos_temp[disp].items():
                 if "alpha" in curvas:
-                    # Convertimos la clave nominal (ej: 150) a float para el eje X
                     x_coefs.append(float(corr_nominal))
                     y_coefs.append(np.abs(curvas["alpha"]))
         
-        # Ordenamos los puntos por corriente para que Plotly no dibuje líneas cruzadas
         if x_coefs:
             indices_orden = np.argsort(x_coefs)
             datos_tc[disp] = {
@@ -153,13 +183,11 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
         else:
             datos_tc[disp] = {"x": np.array([]), "y": np.array([])}
 
-    # Calculamos los límites reales del eje Y3 de forma dinámica (soporta positivos y negativos)
     lista_valores_tc = []
     for d in datos_tc.values():
         if len(d["y"]) > 0:
             lista_valores_tc.extend(d["y"])
 
-    # Si la lista tiene datos, calculamos los mínimos y máximos; si no, asignamos un rango por defecto
     if lista_valores_tc:
         tc_min = min(min(lista_valores_tc) * 1.1, -0.05)
         tc_max = max(max(lista_valores_tc) * 1.1, 0.05)
@@ -167,24 +195,20 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
         tc_min = -0.05
         tc_max = 0.05
 
-    # —— GENERACIÓN DE TRAZAS ——
     for disp in datos_sensibilidad.keys():
         color = colores.get(disp, None)
         
-        # 1. Sensibilidad (Eje Y principal)
         fig_ply.add_trace(go.Scatter(
             x=datos_sensibilidad[disp]["x"], y=datos_sensibilidad[disp]["y"],
             mode='lines', name=f"{disp} (Sens)", line=dict(dash = 'solid', color=color)
         ))
         
-        # 2. Ruido (Eje Y2 - Derecho externo)
         fig_ply.add_trace(go.Scatter(
             x=datos_ruido[disp]["x"], y=datos_ruido[disp]["y"],
             mode='markers+lines', name=f"{disp} (Ruido)", 
             line=dict(dash='longdash', color=color), yaxis='y2'
         ))
         
-        # 3. Coeficiente Térmico REAL (Eje Y3 - Derecho interno desplazado)
         if len(datos_tc[disp]["x"]) > 0:
             fig_ply.add_trace(go.Scatter(
                 x=datos_tc[disp]["x"], y=datos_tc[disp]["y"],
@@ -249,28 +273,29 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
 
     st.iframe(html, height="content")
     
-def graficar_evolucion_ruido(titulo, todas_las_evos, corrientes_a_graficar, es_log):    
-    for disp, evos_disp in todas_las_evos.items():
-        for corr in corrientes_a_graficar:
-            if corr in evos_disp:
-                x_data = evos_disp[corr]["x"]
-                y_data = evos_disp[corr]["y"]
-    
+def graficar_evolucion_ruido(titulo, todas_las_evos, es_log):
+    """
+    Dibuja en plotly la corriente en función del tiempo.
+
+    Args:
+        titulo (str): Título a mostrar en el gráfico
+        todas_las_evos (dict): dict con {disp: {corr: {"x": array_tiempo, "y": array_corr_ruido}}}
+        es_log (bool): Booleano que indica si el gráfico se dibujará en escala semilogarítmica o lineal
+    """ 
     fig_ply = go.Figure()
     
     for disp, evos_disp in todas_las_evos.items():
-        for corr in corrientes_a_graficar:
-            if corr in evos_disp:
-                x_data = evos_disp[corr]["x"]
-                y_data = evos_disp[corr]["y"]
-                
-                fig_ply.add_trace(go.Scatter(
-                    x=x_data, 
-                    y=y_data, 
-                    mode='lines', 
-                    name=f"{disp} @ {corr} uA",
-                    opacity=0.8
-                ))
+        for corr in evos_disp:
+            x_data = evos_disp[corr]["x"]
+            y_data = evos_disp[corr]["y"]
+            
+            fig_ply.add_trace(go.Scatter(
+                x=x_data, 
+                y=y_data, 
+                mode='lines', 
+                name=f"{disp} @ {corr} uA",
+                opacity=0.8
+            ))
                 
     fig_ply.update_layout(
         title=titulo,
@@ -300,6 +325,14 @@ def graficar_evolucion_ruido(titulo, todas_las_evos, corrientes_a_graficar, es_l
     st.iframe(html, height="content")
 
 def graficar_I_vs_T(titulo, datos_temperatura):
+    """
+    Dibuja en plotly la medición de corriente vs temperatura usada para calcular coeficientes térmicos.
+    Muestra también en una tabla los coeficientes térmicos.
+
+    Args:
+        titulo (str): Título a mostrar en el gráfico
+        datos_temperatura (dict): dict con {disp: {corr: {"x": array_temp, "y": array_corr, "alpha": float_coef}}}
+    """
     fig_ply = go.Figure()
     for disp, corrientes_dict in datos_temperatura.items():
         for corr, curvas in corrientes_dict.items():
@@ -343,7 +376,6 @@ def graficar_I_vs_T(titulo, datos_temperatura):
 
     st.iframe(html, height="content")
 
-    # —— 3. CÁLCULO Y PRESENTACIÓN DE LA TABLA DE COEFICIENTES ——
     st.markdown("### Tabla de Coeficientes Térmicos")
     
     filas_tabla = []
@@ -362,21 +394,27 @@ def graficar_I_vs_T(titulo, datos_temperatura):
     else:
         st.warning("No se encontraron coeficientes térmicos calculados para mostrar.")
         
-def graficar_evolucion_temperatura(titulo, todas_las_evos_temp, corrientes_a_graficar):
+def graficar_evolucion_temperatura(titulo, datos_temp):
+    """
+    Dibuja en plotly la evolución temporal de la temperatura.
+
+    Args:
+        titulo (str): Título a mostrar en el gráfico
+        datos_temp (dict): dict con {disp: {corr: {"x": array_tiempo, "y": array_temp}}}
+    """    
     fig_ply = go.Figure()
-    for disp, evos_disp in todas_las_evos_temp.items():
-        for corr in corrientes_a_graficar:
-            if corr in evos_disp:
-                x_data = evos_disp[corr]["x"]
-                y_data = evos_disp[corr]["y"]
-                fig_ply.add_trace(go.Scatter(
-                    x=x_data, 
-                    y=y_data, 
-                    mode='lines', 
-                    name=f"{disp} @ {corr} uA",
-                    opacity=0.8
-                ))
-                
+    for disp, evos_disp in datos_temp.items():
+        for corr in evos_disp:
+            x_data = evos_disp[corr]["x"]
+            y_data = evos_disp[corr]["y"]
+            fig_ply.add_trace(go.Scatter(
+                x=x_data, 
+                y=y_data, 
+                mode='lines', 
+                name=f"{disp} @ {corr} uA",
+                opacity=0.8
+            ))
+            
     fig_ply.update_layout(
         title=titulo,
         xaxis=dict(
@@ -403,38 +441,42 @@ def graficar_evolucion_temperatura(titulo, todas_las_evos_temp, corrientes_a_gra
 
     st.iframe(html, height="content")
 
-def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t, corrientes_a_graficar):
+def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t):
+    """
+    Dibuja en plotly la medición de corriente vs temperatura para verificar la linealidad.
+
+    Args:
+        titulo (str): Título a mostrar en el gráfico
+        todas_las_evos_i_vs_t (dict): dict con {disp: {corr: {"x": array_temp, "y": array_I_medida, "y_fit": array_I_interpolada}}}
+    """
     fig_ply = go.Figure()
     for disp, evos_disp in todas_las_evos_i_vs_t.items():
-        for corr in corrientes_a_graficar:
-            if corr in evos_disp:
-                x_data = evos_disp[corr]["x"]
-                y_data = evos_disp[corr]["y"]
-                y_fit = evos_disp[corr]["y_fit"]
-                
-                grupo_id = f"{disp}_{corr}uA"
-                
-                # Traza de puntos medidos
-                fig_ply.add_trace(go.Scatter(
-                    x=x_data, 
-                    y=y_data, 
-                    mode='markers', 
-                    name=f"{disp} @ {corr} uA",
-                    legendgroup=grupo_id,
-                    marker=dict(size=4),
-                    opacity=0.6
-                ))
-                
-                # Traza de la recta lineal (mismo grupo, sin duplicar la leyenda)
-                fig_ply.add_trace(go.Scatter(
-                    x=x_data, 
-                    y=y_fit, 
-                    mode='lines', 
-                    name=f"{disp} @ {corr} uA (Fit)",
-                    legendgroup=grupo_id,
-                    showlegend=False,  # Oculta la entrada redundante para no saturar la leyenda
-                    line=dict(width=2)
-                ))
+        for corr in evos_disp:
+            x_data = evos_disp[corr]["x"]
+            y_data = evos_disp[corr]["y"]
+            y_fit = evos_disp[corr]["y_fit"]
+            
+            grupo_id = f"{disp}_{corr}uA"
+            
+            fig_ply.add_trace(go.Scatter(
+                x=x_data, 
+                y=y_data, 
+                mode='markers', 
+                name=f"{disp} @ {corr} uA",
+                legendgroup=grupo_id,
+                marker=dict(size=4),
+                opacity=0.6
+            ))
+            
+            fig_ply.add_trace(go.Scatter(
+                x=x_data, 
+                y=y_fit, 
+                mode='lines', 
+                name=f"{disp} @ {corr} uA (Fit)",
+                legendgroup=grupo_id,
+                showlegend=False,
+                line=dict(width=2)
+            ))
                 
     fig_ply.update_layout(
         title=titulo,
@@ -462,13 +504,15 @@ def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t, corri
 
     st.iframe(html, height="content")
     
-def graficar_snr(titulo, datos_sensibilidad, datos_ruido):
+def graficar_snr(titulo, datos_sensibilidad, datos_ruido): 
     """
-    Grafica la relación Señal-a-Ruido (Sensibilidad Absoluta / Desvío de Ruido)
+    Dibuja en plotly la relación Señal-a-Ruido (Sensibilidad Absoluta / Desvío de Ruido)
     en función de la Corriente Normalizada.
-    
-    - datos_sensibilidad: dict con {disp: {"x": array_I_norm, "y": array_sens_abs}} (fit continuo)
-    - datos_ruido: dict con {disp: {"x": array_I_nom, "y": array_std_ruido_nA}}
+
+    Args:
+        titulo (str): Título a mostrar en el gráfico
+        datos_sensibilidad (dict): dict con {disp: {"x": array_I_norm, "y": array_sens_abs}}
+        datos_ruido (dict): dict con {disp: {"x": array_I_nom, "y": array_std_ruido_nA}}
     """
     fig_ply = go.Figure()
     
@@ -476,24 +520,19 @@ def graficar_snr(titulo, datos_sensibilidad, datos_ruido):
 
     for disp in datos_sensibilidad.keys():
         if disp in datos_ruido:
-            # Corrientes nominales donde tenemos mediciones de ruido (en uA)
             x_ruido = datos_ruido[disp]["x"]
-            # Desvío estándar de ruido (convertido de nA a uA para mantener unidades consistentes)
             sigma_ruido_uA = datos_ruido[disp]["y"] / 1000.0
 
-            # Interpolamos la sensibilidad absoluta continua a las corrientes exactas de ruido
             sens_interpolada = np.interp(
                 x_ruido, 
                 datos_sensibilidad[disp]["x"], 
                 datos_sensibilidad[disp]["y"]
             )
 
-            # Calculamos la relación Señal / Ruido
             snr = sens_interpolada / sigma_ruido_uA
 
             color = colores.get(disp, None)
 
-            # Plotly
             fig_ply.add_trace(go.Scatter(
                 x=x_ruido,
                 y=snr,
@@ -502,7 +541,6 @@ def graficar_snr(titulo, datos_sensibilidad, datos_ruido):
                 line=dict(color=color)
             ))
 
-    # Configuración Plotly
     fig_ply.update_layout(
         title=dict(text=titulo, x=0.5, xanchor="center"),
         xaxis=dict(

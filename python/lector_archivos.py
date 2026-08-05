@@ -6,7 +6,10 @@ import streamlit as st
 def matchear_archivos(nombre_archivo_generico, tipo_medicion="iv"):
     """
     Busca archivos recursivamente y devuelve una lista con sus matrices de datos.
-    Acepta tipo_medicion="iv", tipo_medicion="ruido" o tipo_medicion="temperatura".
+
+    Args:
+        nombre_archivo_generico (str): Indica el nombre generico a buscar, usando "*" como comodín.
+        tipo_medicion (str): Indica el tipo de medicion a buscar, acepta "iv", "ruido" y "temperatura"
     """
     directorio_base = Path(".")
     lista_de_rutas = directorio_base.glob("**/" + nombre_archivo_generico)

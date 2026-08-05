@@ -5,7 +5,15 @@ from lector_archivos import matchear_archivos
 import streamlit as st
 
 def calcular_tiempo_acumulado(nro, tipo_tanda):
-    """Calcula el tiempo acumulado según el historial de intervalos de irradiación."""
+    """
+    Calcula el tiempo acumulado según el historial de intervalos de irradiación.
+
+    Args:
+        nro (int): Indica en que postrad nos encontramos
+        tipo_tanda (str): Indica el tipo de tanda que estamos graficando, acepta "FOXFET", "FG_tanda1" y "FG_tanda2"
+    Returns:
+        Devuelve el tiempo acumulado hasta ese momento
+    """
     t = 0
     for i in range(1, nro + 1):
         if tipo_tanda == "FOXFET":
@@ -35,8 +43,17 @@ def calcular_tiempo_acumulado(nro, tipo_tanda):
     return t
 
 def obtener_vg_por_corriente(dispositivo, corriente_buscada):
-    """Obtiene la tensión de Floating Gate equivalente a partir de las curvas de transferencia de los dispositivos estándar"""
-    if dispositivo in ["PFGIW2", "PFGIP2"]:
+    """
+    Obtiene la tensión de Floating Gate equivalente a partir de las curvas de transferencia de los dispositivos estándar
+
+    Args:
+        dispositivo (str): Indica el dispositivo para el cual requerimos la tensión equivalente de Floating Gate, 
+            acepta "PFGIW1", "PFGIW2", "PFGIW3" y "PFGIP2"
+        corriente_buscada (float): Valor de corriente para el cuals  ebusca obtener la tensión de Floating Gate equivalente
+    Returns:
+        tension (float): Devuelve la tensión equivalente de Floating gate para la corriente buscada
+    """
+    if dispositivo in ["PFGIW2", "PFGIP2", "PFGIW3"]:
         nombre_archivo = "MOSISV72M_DIE4_PMOS_STD1_IV_VD=-4.5V_M1.ri"
     elif dispositivo == "PFGIW1":
         nombre_archivo = "MOSISV72M_DIE4_PMOS_STD2_IV_VD=-4.5V_M1.ri"
@@ -53,14 +70,27 @@ def obtener_vg_por_corriente(dispositivo, corriente_buscada):
     corrientes_d = np.abs(datos[:, 1])
 
     indices_ordenados = np.argsort(corrientes_d)
+    if dispositivo == "PFGIW3":
+        corriente_buscada = corriente_buscada / 56.0
     return np.interp(corriente_buscada, corrientes_d[indices_ordenados], tensiones_g[indices_ordenados])
 
-def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda):
-    """Barre los archivos del postrad0 al postrad100 y extrae los arrays de tiempos y valores (Corriente o Tensión)."""
+def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, rng = 60):
+    """
+    Barre los archivos del postrad0 al postrad<rng> y extrae los arrays de tiempos y valores (Corriente o Tensión).
+
+    Args:
+        lista_dispositivos (list): Lista de strings con nombres de dispositivos requeridos, 
+            acepta "PFGIW1", "PFGIW2", "PFGIW3" y "PFGIP2"
+        tipo_tanda (str): Indica el tipo de tanda que se busca procesar, acepta "FG_tanda1", "FG_tanda2" y "FOXFET"
+        rng (int): Indica hasta que número de postrad iterar
+
+    Returns:
+        resultado (dict): dict con {disp: {"tiempos": array_tiempos, "valores": array_valores}}
+    """
     resultado = {}
     for disp in lista_dispositivos:
         tiempos, valores = [], []
-        for nro in range(0, 100):
+        for nro in range(0, rng):
             if tipo_tanda == "FG_tanda1":
                 sufijo = ".ri"; prefijo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_"
             elif tipo_tanda == "FG_tanda2":
@@ -112,7 +142,17 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda):
     return resultado
 
 def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda):
-    """Genera la evolución temporal mapeada a la tensión equivalente V_FG."""
+    """
+    Genera la evolución temporal mapeada a la tensión equivalente V_FG.
+
+    Args:
+        lista_dispositivos (list): Lista de strings con nombres de dispositivos requeridos, 
+            acepta "PFGIW1", "PFGIW2", "PFGIW3" y "PFGIP2"
+        tipo_tanda (str): Indica el tipo de tanda que se busca procesar, acepta "FG_tanda1", "FG_tanda2" y "FOXFET"
+
+    Returns:
+        resultado (dict): dict con {disp: {"tiempos": array_tiempos, "tensiones": array_tensiones}}
+    """
     datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda)
     resultado = {}
     for disp, datos in datos_crudos.items():

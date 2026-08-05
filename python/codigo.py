@@ -105,22 +105,19 @@ if mostrar_ruido:
     graficos.graficar_evolucion_ruido(
         titulo="Corriente vs tiempo",
         todas_las_evos=evos,
-        corrientes_a_graficar=[100, 150, 200, 250, 350],
         es_log = log
     )
 
     evos_temp = proc_ruido.obtener_evolucion_temperatura_ruido(lista_dispositivos, corrientes_nominales, False)
     graficos.graficar_evolucion_temperatura(
         titulo="Evolución de Temperatura vs Tiempo durante medición de ruido",
-        todas_las_evos_temp=evos_temp,
-        corrientes_a_graficar=corrientes_nominales
+        todas_las_evos_temp=evos_temp
     )
 
     evos_i_vs_t = proc_ruido.obtener_corriente_vs_temperatura_ruido(lista_dispositivos, corrientes_nominales, False)
     graficos.graficar_corriente_vs_temperatura_ruido(
         titulo="Corriente vs Temperatura durante medición de ruido",
-        todas_las_evos_i_vs_t=evos_i_vs_t,
-        corrientes_a_graficar=corrientes_nominales
+        todas_las_evos_i_vs_t=evos_i_vs_t
     )
 # =====================================================================
 # SECCIÓN 4: TEMPERATURA

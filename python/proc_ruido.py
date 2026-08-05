@@ -2,15 +2,28 @@
 import numpy as np
 from lector_archivos import matchear_archivos
 
+# Definición de variables
 A_SH = 1.12924e-3
 B_SH = 2.34108e-4
 C_SH = 8.77550e-8
 
 def convertir_r_a_temp_steinhart(resistencia):
+    """
+    Calcula la temperatura asociada a la resistencia d eun termistor con la fórmula de Steinhart-Hart
+
+    Args:
+        resistencia (float): Valor de resistencia
+
+    Returns:
+        temperatura (float): Devuelve la temperatura asociada al valor de resistencia del termistor
+    """
     ln_R = np.log(resistencia)
     return (1.0 / (A_SH + B_SH * ln_R + C_SH * (ln_R ** 3))) - 273.15
 
-def obtener_ruido_neto_archivo(nombre_archivo):
+def obtener_ruido_neto_archivo(nombre_archivo, restar_deriva):
+    """
+    Calcula 
+    """
     lista_mediciones = matchear_archivos(nombre_archivo, tipo_medicion="ruido")
     datos = lista_mediciones[0]
     tiempo_s = datos[:, 0]
@@ -20,11 +33,16 @@ def obtener_ruido_neto_archivo(nombre_archivo):
     coefs = np.polyfit(temperatura_C, corriente_uA, deg=1)
     corriente_tendencia = np.polyval(coefs, temperatura_C)
     corriente_ruido = (corriente_uA - corriente_tendencia)
-    
-    #return tiempo_s, corriente_ruido
-    return tiempo_s, corriente_uA
 
-def obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales, es_larga):
+    if restar_deriva:
+        return tiempo_s, corriente_ruido
+    else:
+        return tiempo_s, corriente_uA
+
+def obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales, es_larga, restar_deriva = True):
+    """
+    Calcula
+    """
     resultado = {}
     for disp in lista_dispositivos:
         resultado[disp] = {}
@@ -33,13 +51,12 @@ def obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales, es_larga):
                 nombre_archivo = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1_LARGA.txt"
             else:
                 nombre_archivo = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1.txt"            
-            tiempo_s, corriente_ruido = obtener_ruido_neto_archivo(nombre_archivo)
+            tiempo_s, corriente_ruido = obtener_ruido_neto_archivo(nombre_archivo, restar_deriva)
             resultado[disp][corr] = {"x": tiempo_s, "y": corriente_ruido}
             
     return resultado
 
 def procesar_ruido(lista_dispositivos, corrientes_nominales, es_larga = False):
-    factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2": 1.0}
     resultado = {}
     todas_las_evos = obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales, es_larga)
     for disp in lista_dispositivos:    
@@ -95,7 +112,6 @@ def obtener_corriente_vs_temperatura_ruido(lista_dispositivos, corrientes_nomina
                     "x": temperatura_C,
                     "y": corriente_uA,
                     "y_fit": corriente_fit
-                }
-            
+                }            
     return resultado
     
