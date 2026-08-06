@@ -72,10 +72,10 @@ if mostrar_sensibilidad:
     st.subheader("Normalizada")
     
     sens_norm_t1 = proc_sens.procesar_sensibilidad(["PFGIW1", "PFGIW2", "PFGIW3"], "FG_tanda1", normalizado=True)
-    graficos.graficar_sensibilidad_fg(titulo=r"$\text{Sensibilidad FG tanda 1 (Sensibilidad vs }V_{FG}\text{ Normalizado)}$", datos_sensibilidad=sens_norm_t1, xlabel = r"$\text{Tensión equivalente }V_{FG}\text{ [V]}$", ylabel = r"$\text{Tasa de cambio normalizada [V/Gy]}$")
+    graficos.graficar_sensibilidad_fg(titulo=r"$\text{Sensibilidad FG tanda 1 (Sensibilidad vs }V_{FG}\text{)}$", datos_sensibilidad=sens_norm_t1, xlabel = r"$\text{Tensión equivalente }V_{FG}\text{ [V]}$", ylabel = r"$\text{Tasa de cambio normalizada [V/Gy]}$")
         
     sens_norm_t2 = proc_sens.procesar_sensibilidad(["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"], "FG_tanda2", normalizado=True)
-    graficos.graficar_sensibilidad_fg(titulo=r"$\text{Sensibilidad FG tanda 2 (Sensibilidad vs }V_{FG}\text{ Normalizado)}$", datos_sensibilidad=sens_norm_t2, xlabel = r"$\text{Tensión equivalente }V_{FG}\text{ [V]}$", ylabel = r"$\text{Tasa de cambio normalizada [V/Gy]}$")
+    graficos.graficar_sensibilidad_fg(titulo=r"$\text{Sensibilidad FG tanda 2 (Sensibilidad vs }V_{FG}\text{)}$", datos_sensibilidad=sens_norm_t2, xlabel = r"$\text{Tensión equivalente }V_{FG}\text{ [V]}$", ylabel = r"$\text{Tasa de cambio normalizada [V/Gy]}$")
         
     st.subheader("Sin normalizar")
     
