@@ -737,7 +737,7 @@ def graficar_error_termico_equivalente(titulo, datos_sensibilidad, datos_temp):
             zeroline=False,
         ),
         yaxis=dict(
-            title=r"$\text{Error Térmico Equivalente [min/°C]}$",
+            title=r"$\text{Error Térmico Equivalente [Gy/°C]}$",
             showgrid=True,
             gridcolor="rgba(255, 255, 255, 0.2)",
             showline=False,
