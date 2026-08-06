@@ -1,11 +1,10 @@
 # proc_sens.py
 import numpy as np
 import streamlit as st
-from proc_evo import obtener_datos_crudos_tanda
-from proc_evo import obtener_datos_evolucion_vg
+from proc_evo import obtener_datos_crudos_tanda, obtener_datos_evolucion_vg
 
 factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2": 1.0}
-tasa_dosis = 0.18 #Gy/min
+tasa_dosis = 0.18
 
 def calcular_fit_polinomico(tiempos_list, corrientes_list):
     coeficientes = np.polyfit(tiempos_list, corrientes_list, deg=4)
@@ -13,16 +12,14 @@ def calcular_fit_polinomico(tiempos_list, corrientes_list):
 
 def calcular_sensibilidad_ventana(tiempos, corrientes_proc, corrientes_norm, n_ventana):   
     eje_x, eje_y = [], []
-    k = n_ventana // 2  # Número de pares simétricos dentro de la ventana
+    k = n_ventana // 2
     
-    # Recorremos todas las ventanas posibles
     for i in range(len(corrientes_proc) - n_ventana + 1):
         sub_t = tiempos[i : i + n_ventana]
         sub_i_proc = corrientes_proc[i : i + n_ventana]
         sub_i_norm = corrientes_norm[i : i + n_ventana]
         
         tasas_pares = []
-        # Para N=6 (k=3): pares (idx_izq, idx_der) son (2,3), (1,4), (0,5)
         for p in range(k):
             idx_izq = (k - 1) - p
             idx_der = k + p
@@ -41,7 +38,11 @@ def calcular_sensibilidad_ventana(tiempos, corrientes_proc, corrientes_norm, n_v
             
     return np.array(eje_x), np.array(eje_y) / tasa_dosis
 
+@st.cache_data
 def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ventana=6):
+    """
+    Calcula las curvas de sensibilidad fitteadas y discretas.
+    """
     if normalizado:
         datos_crudos = obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda)
     else:
@@ -49,7 +50,6 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ve
     resultado_fit = {}
     resultado_discreto = {}
     
-    # 1. Ajuste Polinómico Grado 4
     for disp, datos in datos_crudos.items():
         tiempos = datos["tiempos"]
         corrientes = datos["valores"]
@@ -68,7 +68,6 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ve
         
         resultado_fit[disp] = {"x": eje_x, "y": eje_y}
         
-    # 2. Sensibilidad Discreta mediante Ventana Deslizante
     for disp, datos in datos_crudos.items():   
         tiempos = datos["tiempos"]
         corrientes = datos["valores"]

@@ -1,7 +1,13 @@
+# proc_temp.py
 import numpy as np
+import streamlit as st
 from lector_archivos import matchear_archivos
 
+@st.cache_data
 def obtener_datos_I_vs_T(lista_dispositivos, corrientes_nominales, lista_temperaturas):
+    """
+    Obtiene los datos de corriente en función de la temperatura y calcula el coeficiente térmico.
+    """
     resultado = {}
     
     for disp in lista_dispositivos:
@@ -27,9 +33,7 @@ def obtener_datos_I_vs_T(lista_dispositivos, corrientes_nominales, lista_tempera
                 if archivo_encontrado is not None:
                     v_drain = archivo_encontrado[:, 0]
                     i_drain = archivo_encontrado[:, 1]
-                    
                     idx_vd = np.argmin(np.abs(v_drain - (-4.5)))
-                    
                     i_en_v5 = np.abs(i_drain[idx_vd]) * 1e6
                     
                     temps_aux.append(float(temp))

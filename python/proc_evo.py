@@ -7,12 +7,6 @@ import streamlit as st
 def calcular_tiempo_acumulado(nro, tipo_tanda):
     """
     Calcula el tiempo acumulado según el historial de intervalos de irradiación.
-
-    Args:
-        nro (int): Indica en que postrad nos encontramos
-        tipo_tanda (str): Indica el tipo de tanda que estamos graficando, acepta "FOXFET", "FG_tanda1" y "FG_tanda2"
-    Returns:
-        Devuelve el tiempo acumulado hasta ese momento
     """
     t = 0
     for i in range(1, nro + 1):
@@ -24,15 +18,7 @@ def calcular_tiempo_acumulado(nro, tipo_tanda):
             elif i <= 52: t += 30
             elif i <= 53: t += 35
             else: t += 10
-        if tipo_tanda == "FG_tanda1":
-            if i <= 9: t += 10
-            elif i <= 21: t += 15
-            elif i <= 24: t += 20
-            elif i <= 27: t += 25
-            elif i <= 29: t += 30
-            elif i <= 30: t += 35
-            else: t += 10
-        if tipo_tanda == "FG_tanda2":
+        if tipo_tanda in ["FG_tanda1", "FG_tanda2"]:
             if i <= 9: t += 10
             elif i <= 21: t += 15
             elif i <= 24: t += 20
@@ -42,16 +28,10 @@ def calcular_tiempo_acumulado(nro, tipo_tanda):
             else: t += 10
     return t
 
+@st.cache_data
 def obtener_vg_por_corriente(dispositivo, corriente_buscada):
     """
-    Obtiene la tensión de Floating Gate equivalente a partir de las curvas de transferencia de los dispositivos estándar
-
-    Args:
-        dispositivo (str): Indica el dispositivo para el cual requerimos la tensión equivalente de Floating Gate, 
-            acepta "PFGIW1", "PFGIW2", "PFGIW3" y "PFGIP2"
-        corriente_buscada (float): Valor de corriente para el cuals  ebusca obtener la tensión de Floating Gate equivalente
-    Returns:
-        tension (float): Devuelve la tensión equivalente de Floating gate para la corriente buscada
+    Obtiene la tensión de Floating Gate equivalente a partir de las curvas de transferencia.
     """
     if dispositivo in ["PFGIW2", "PFGIP2", "PFGIW3"]:
         nombre_archivo = "MOSISV72M_DIE4_PMOS_STD1_IV_VD=-4.5V_M1.ri"
@@ -74,18 +54,10 @@ def obtener_vg_por_corriente(dispositivo, corriente_buscada):
         corriente_buscada = corriente_buscada / 56.0
     return np.interp(corriente_buscada, corrientes_d[indices_ordenados], tensiones_g[indices_ordenados])
 
-def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, rng = 60):
+@st.cache_data
+def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, rng=60):
     """
-    Barre los archivos del postrad0 al postrad<rng> y extrae los arrays de tiempos y valores (Corriente o Tensión).
-
-    Args:
-        lista_dispositivos (list): Lista de strings con nombres de dispositivos requeridos, 
-            acepta "PFGIW1", "PFGIW2", "PFGIW3" y "PFGIP2"
-        tipo_tanda (str): Indica el tipo de tanda que se busca procesar, acepta "FG_tanda1", "FG_tanda2" y "FOXFET"
-        rng (int): Indica hasta que número de postrad iterar
-
-    Returns:
-        resultado (dict): dict con {disp: {"tiempos": array_tiempos, "valores": array_valores}}
+    Barre los archivos del postrad0 al postrad<rng> y extrae los arrays de tiempos y valores.
     """
     resultado = {}
     for disp in lista_dispositivos:
@@ -99,7 +71,7 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, rng = 60):
                 sufijo = ".ri"; prefijo = f"MOSISV72M_DIE4_{disp}_IV_VD=5V_postrad{nro}_"
                 
             archivo_encontrado = None    
-            for m_ver in ["M2", "M1"]:#le doy prioridad a la última medición (M2 por sobre M1)
+            for m_ver in ["M2", "M1"]:
                 nombre_buscar = f"{prefijo}{m_ver}{sufijo}"
                 datos = matchear_archivos(nombre_buscar)
                 if datos:
@@ -114,17 +86,9 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, rng = 60):
                 if tipo_tanda == "FOXFET":
                     corrientes_abs = np.abs(corrientes)
                     indices_orden = np.argsort(corrientes_abs)
-                    
                     x_sort = corrientes_abs[indices_orden]
                     y_sort = tensiones[indices_orden]
-                    
                     v_interp = np.interp(1e-7, x_sort, y_sort)
-                    
-                    # —— PARCHE POR EFECTO SUSTRATO (BULK SUELTO) ——
-                    # Compensamos el desvío de ~3.5 V en los dispositivos afectados
-                    #if disp in ["FFC1", "FFL", "FFS"]:
-                        #v_interp += 3.7326412644
-                    
                     valores.append(v_interp)
                     tiempos.append(t)
                 else:
@@ -141,17 +105,10 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, rng = 60):
             }
     return resultado
 
+@st.cache_data
 def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda):
     """
     Genera la evolución temporal mapeada a la tensión equivalente V_FG.
-
-    Args:
-        lista_dispositivos (list): Lista de strings con nombres de dispositivos requeridos, 
-            acepta "PFGIW1", "PFGIW2", "PFGIW3" y "PFGIP2"
-        tipo_tanda (str): Indica el tipo de tanda que se busca procesar, acepta "FG_tanda1", "FG_tanda2" y "FOXFET"
-
-    Returns:
-        resultado (dict): dict con {disp: {"tiempos": array_tiempos, "tensiones": array_tensiones}}
     """
     datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda)
     resultado = {}
