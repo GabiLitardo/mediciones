@@ -381,18 +381,60 @@ def graficar_I_vs_T(titulo, datos_temperatura):
     filas_tabla = []
     for disp, corrientes_dict in datos_temperatura.items():
         for corr, curvas in corrientes_dict.items():
-            if "alpha" in curvas:
-                filas_tabla.append({
-                    "Dispositivo": disp,
-                    "Corriente Nominal [μA]": corr,
-                    "Coef. Térmico (α) [μA/°C]": round(curvas["alpha"], 4)
-                })
+            filas_tabla.append({
+                "Dispositivo": disp,
+                "Corriente Nominal [μA]": corr,
+                "Coef. Térmico (α) [μA/°C]": round(curvas["alpha"], 4)
+            })
                 
     if filas_tabla:
         df_coefs = pd.DataFrame(filas_tabla)
         st.dataframe(df_coefs, width='stretch', hide_index=True)
     else:
         st.warning("No se encontraron coeficientes térmicos calculados para mostrar.")
+
+    fig_ply = go.Figure()
+    for disp, corrientes_dict in datos_temperatura.items():
+        for corr, curvas in corrientes_dict.items():
+            fig_ply.add_trace(go.Scatter(
+                x=corr, 
+                y=curvas["alpha"],
+                mode='markers+lines', 
+                name=f"{disp} ({corr} uA)"
+            ))
+            
+    fig_ply.update_layout(
+        title={
+            'text': r"$\alpha\text{ vs }I_{D_{norm}}$",
+            'y': 0.95,
+            'x': 0.5,
+            'xanchor': 'center',
+            'yanchor': 'top'
+        },
+        xaxis=dict(
+            title="r$I_{D_{norm}}\text{ [}\mu\text{A]}$",
+            showgrid=False,
+            showline=False,
+            zeroline=False,             
+        ),
+        yaxis=dict(
+            title=r"$\alpha\text{ [°C/}\mu\text{A]}$",
+            showgrid=True,
+            gridcolor="rgba(255, 255, 255, 0.2)",
+            showline=False,
+            zeroline=False,            
+        ),
+        template="plotly_dark",
+        paper_bgcolor="#0e1117",
+        plot_bgcolor="#0e1117",
+        font=dict(color="white"),        
+        margin=dict(t=100)
+    )
+    html = pio.to_html(
+        fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
+    )
+
+    st.iframe(html, height="content")
         
 def graficar_evolucion_temperatura(titulo, datos_temp):
     """
@@ -550,7 +592,7 @@ def graficar_snr(titulo, datos_sensibilidad, datos_ruido):
                 datos_sensibilidad[disp]["y"]
             )
 
-            snr = sens_interpolada / sigma_ruido_uA
+            snr = sigma_ruido_uA / sens_interpolada
 
             color = colores.get(disp, None)
 
@@ -571,7 +613,7 @@ def graficar_snr(titulo, datos_sensibilidad, datos_ruido):
             zeroline=False,             
         ),
         yaxis=dict(
-            title="SNR [1/min]",
+            title="Resolución [Gy]",
             showgrid=True,
             gridcolor="rgba(255, 255, 255, 0.2)",
             showline=False,
