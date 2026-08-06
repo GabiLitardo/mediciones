@@ -34,7 +34,7 @@ def procesar_archivo_ruido(nombre_archivo):
     coefs_I = np.polyfit(temperatura_C, corriente_uA, deg=1)
 
     # 3. Evaluamos la tendencia térmica sobre la temperatura fitteada suave
-    corriente_fit_uA = np.polyval(coefs_I, temperatura_fit_C)# REVISAR ESTO, NO QUEDA LINEAL EL I_fit VS T
+    corriente_fit_uA = np.polyval(coefs_I, temperatura_C)# REVISAR ESTO, NO QUEDA LINEAL EL I_fit VS T
     
     # 4. Restamos únicamente la deriva térmica
     i_ruido_neto_uA = corriente_uA - corriente_fit_uA
