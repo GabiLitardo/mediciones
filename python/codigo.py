@@ -109,6 +109,11 @@ if mostrar_ruido:
         es_log = log
     )
 
+    graficos.graficar_histograma_ruido(
+        titulo="Distribución del Ruido Neto (Verificación Gaussiana)",
+        todas_las_evos=evos
+    )
+
     evos_temp = proc_ruido.obtener_evolucion_temperatura_ruido(lista_dispositivos, corrientes_nominales, False)
     graficos.graficar_evolucion_temperatura(
         titulo="Evolución de Temperatura vs Tiempo durante medición de ruido",

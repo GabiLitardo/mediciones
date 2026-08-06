@@ -632,3 +632,54 @@ def graficar_snr(titulo, datos_sensibilidad, datos_ruido):
     )
 
     st.iframe(html, height="content")
+
+def graficar_histograma_ruido(titulo, todas_las_evos):
+    """
+    Dibuja en Plotly el histograma del ruido neto (en nA) usando densidad de probabilidad
+    para verificar su distribución gaussiana.
+
+    Args:
+        titulo (str): Título a mostrar en el gráfico
+        todas_las_evos (dict): dict con {disp: {corr: {"x": array_tiempo, "y": array_ruido}}}
+    """
+    fig_ply = go.Figure()
+
+    for disp, evos_disp in todas_las_evos.items():
+        for corr, datos in evos_disp.items():
+            # Convertimos uA a nA para que la escala sea más legible
+            ruido_nA = datos["y"] * 1000.0
+
+            fig_ply.add_trace(go.Histogram(
+                x=ruido_nA,
+                name=f"{disp} @ {corr} uA",
+                opacity=0.5,
+                histnorm='probability density'  # Normaliza la campana
+            ))
+
+    fig_ply.update_layout(
+        title=titulo,
+        barmode='overlay',  # Superpone los histogramas con transparencia
+        xaxis=dict(
+            title="Ruido Neto [nA]",
+            showgrid=False,
+            showline=False,
+            zeroline=False,
+        ),
+        yaxis=dict(
+            title="Densidad de Probabilidad",
+            showgrid=True,
+            gridcolor="rgba(255, 255, 255, 0.2)",
+            showline=False,
+            zeroline=False,
+        ),
+        template="plotly_white",
+        paper_bgcolor="#0e1117",
+        plot_bgcolor="#0e1117",
+        font=dict(color="white"),
+    )
+
+    html = pio.to_html(
+        fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
+    )
+
+    st.iframe(html, height="content")
