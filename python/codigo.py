@@ -11,11 +11,10 @@ st.title("Resumen mediciones Chaves-Litardo")
 # =====================================================================
 # CONFIGURACIÓN DE CHECKBOXES
 # =====================================================================
-mostrar_resumen = st.checkbox("0. Resumen", value=False)
-mostrar_evolucion = st.checkbox("1. Análisis temporal", value=False)
-mostrar_sensibilidad = st.checkbox("2. Análisis de sensibilidad a radiación", value=False)
-mostrar_ruido = st.checkbox("3. Análisis de Ruido", value=False)
-mostrar_temperatura = st.checkbox("4. Mostrar Efectos de Temperatura", value=False)
+opcion = st.sidebar.radio(
+    "Seleccionar Análisis",
+    ["Evolución temporal", "Sensibilidad", "Ruido", "Temperatura", "Resumen"]
+)
 
 # variables auxiliares
 
@@ -25,7 +24,7 @@ resultados_ruido = None
 # =====================================================================
 # SECCIÓN 1: EVOLUCIÓN TEMPORAL
 # =====================================================================
-if mostrar_evolucion:
+if opcion == "Evolución temporal":
     st.markdown("---")
     st.header("Evolución Temporal")
     
@@ -66,7 +65,7 @@ if mostrar_evolucion:
 # =====================================================================
 # SECCIÓN 2: SENSIBILIDAD
 # =====================================================================
-if mostrar_sensibilidad:
+if opcion == "Sensibilidad":
     st.markdown("---")
     st.header("Análisis de sensibilidad")
     st.subheader("Normalizada")
@@ -88,7 +87,7 @@ if mostrar_sensibilidad:
 # =====================================================================
 # SECCIÓN 3: RUIDO
 # =====================================================================
-if mostrar_ruido:
+if opcion == "Ruido":
     st.markdown("---")
     st.header("Análisis de Ruido")
     
@@ -128,7 +127,7 @@ if mostrar_ruido:
 # =====================================================================
 # SECCIÓN 4: TEMPERATURA
 # =====================================================================
-if mostrar_temperatura:
+if opcion == "Temperatura":
     st.markdown("---")
     st.header("Análisis de Coeficiente Térmico")
     
@@ -149,7 +148,7 @@ if mostrar_temperatura:
 # =====================================================================
 # SECCIÓN 4: RESUMEN
 # =====================================================================
-if mostrar_resumen:
+if opcion == "Resumen":
     st.markdown("---")
     st.header("Sensibilidad absoluta, ruido y coef. térmico vs $I_D$ normalizada")
     
@@ -190,4 +189,3 @@ if mostrar_resumen:
         datos_sensibilidad=sens_resumen,
         datos_temp=datos_temp_resumen
     )
-    

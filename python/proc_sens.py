@@ -40,47 +40,25 @@ def calcular_sensibilidad_ventana(tiempos, corrientes_proc, corrientes_norm, n_v
 
 @st.cache_data
 def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ventana=6):
-    """
-    Calcula las curvas de sensibilidad fitteadas y discretas.
-    """
-    if normalizado:
-        datos_crudos = obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda)
-    else:
-        datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda)
-    resultado_fit = {}
-    resultado_discreto = {}
+    datos_crudos = obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda) if normalizado else obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda)
+    resultado_fit, resultado_discreto = {}, {}
     
     for disp, datos in datos_crudos.items():
-        tiempos = datos["tiempos"]
-        corrientes = datos["valores"]
-        factor = factores_normalizacion.get(disp, 1.0)
-        corrientes_norm = corrientes if normalizado else corrientes / factor        
-        
-        coefs_y = calcular_fit_polinomico(tiempos.tolist(), corrientes.tolist())
-        a_y, b_y, c_y, d_y, e_y = coefs_y
-        
-        coefs_x = calcular_fit_polinomico(tiempos.tolist(), corrientes_norm.tolist())
-        a_x, b_x, c_x, d_x, e_x = coefs_x
-        
-        t_cont = np.linspace(tiempos.min(), tiempos.max(), 200)
-        eje_y = np.abs(4*a_y*(t_cont**3) + 3*b_y*(t_cont**2) + 2*c_y*t_cont + d_y) / tasa_dosis
-        eje_x = a_x*(t_cont**4) + b_x*(t_cont**3) + c_x*(t_cont**2) + d_x*t_cont + e_x
-        
-        resultado_fit[disp] = {"x": eje_x, "y": eje_y}
-        
-    for disp, datos in datos_crudos.items():   
-        tiempos = datos["tiempos"]
-        corrientes = datos["valores"]
+        tiempos, corrientes = datos["tiempos"], datos["valores"]
         factor = factores_normalizacion.get(disp, 1.0)
         corrientes_norm = corrientes if normalizado else corrientes / factor
         
-        eje_x, eje_y = calcular_sensibilidad_ventana(
-            tiempos=tiempos, 
-            corrientes_proc=corrientes, 
-            corrientes_norm=corrientes_norm, 
-            n_ventana=n_ventana
-        )
-            
-        resultado_discreto[disp] = {"x": eje_x, "y": eje_y}
+        # Fit polinómico
+        coefs_y = calcular_fit_polinomico(tiempos.tolist(), corrientes.tolist())
+        coefs_x = calcular_fit_polinomico(tiempos.tolist(), corrientes_norm.tolist())
+        t_cont = np.linspace(tiempos.min(), tiempos.max(), 200)
+        
+        eje_y = np.abs(4*coefs_y[0]*(t_cont**3) + 3*coefs_y[1]*(t_cont**2) + 2*coefs_y[2]*t_cont + coefs_y[3]) / tasa_dosis
+        eje_x = coefs_x[0]*(t_cont**4) + coefs_x[1]*(t_cont**3) + coefs_x[2]*(t_cont**2) + coefs_x[3]*t_cont + coefs_x[4]
+        resultado_fit[disp] = {"x": eje_x, "y": eje_y}
+        
+        # Discreto por ventana
+        ex_disc, ey_disc = calcular_sensibilidad_ventana(tiempos, corrientes, corrientes_norm, n_ventana)
+        resultado_discreto[disp] = {"x": ex_disc, "y": ey_disc}
         
     return [resultado_fit, resultado_discreto]
