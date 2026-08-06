@@ -326,13 +326,14 @@ def graficar_evolucion_ruido(titulo, todas_las_evos, es_log):
 
 def graficar_I_vs_T(titulo, datos_temperatura):
     """
-    Dibuja en plotly la medición de corriente vs temperatura usada para calcular coeficientes térmicos.
-    Muestra también en una tabla los coeficientes térmicos.
+    Dibuja en plotly la medición de corriente vs temperatura usada para calcular coeficientes térmicos
+    y un gráfico de Coeficiente Térmico (alpha) vs Corriente Nominal.
 
     Args:
-        titulo (str): Título a mostrar en el gráfico
+        titulo (str): Título a mostrar en el gráfico principal
         datos_temperatura (dict): dict con {disp: {corr: {"x": array_temp, "y": array_corr, "alpha": float_coef}}}
     """
+    # 1. Gráfico principal: I_D vs Temperatura
     fig_ply = go.Figure()
     for disp, corrientes_dict in datos_temperatura.items():
         for corr, curvas in corrientes_dict.items():
@@ -364,78 +365,79 @@ def graficar_I_vs_T(titulo, datos_temperatura):
             showline=False,
             zeroline=False,            
         ),
-        template="plotly_dark",
+        template="plotly_white",
         paper_bgcolor="#0e1117",
         plot_bgcolor="#0e1117",
         font=dict(color="white"),        
         margin=dict(t=100)
     )
-    html = pio.to_html(
-        fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
-    )
-
-    st.iframe(html, height="content")
-
-    st.markdown("### Tabla de Coeficientes Térmicos")
     
-    filas_tabla = []
-    for disp, corrientes_dict in datos_temperatura.items():
-        for corr, curvas in corrientes_dict.items():
-            filas_tabla.append({
-                "Dispositivo": disp,
-                "Corriente Nominal [μA]": corr,
-                "Coef. Térmico (α) [μA/°C]": round(curvas["alpha"], 4)
-            })
-                
-    if filas_tabla:
-        df_coefs = pd.DataFrame(filas_tabla)
-        st.dataframe(df_coefs, width='stretch', hide_index=True)
-    else:
-        st.warning("No se encontraron coeficientes térmicos calculados para mostrar.")
-
-    fig_ply = go.Figure()
-    for disp, corrientes_dict in datos_temperatura.items():
-        for corr, curvas in corrientes_dict.items():
-            print(curvas["alpha"], flush = True)
-            fig_ply.add_trace(go.Scatter(
-                x=curvas["y"], 
-                y=curvas["alpha"],
-                mode='markers+lines', 
-                name=f"{disp} ({corr} uA)"
-            ))
-            
-    fig_ply.update_layout(
-        title={
-            'text': r"$\alpha\text{ vs }I_{D_{norm}}$",
-            'y': 0.95,
-            'x': 0.5,
-            'xanchor': 'center',
-            'yanchor': 'top'
-        },
-        xaxis=dict(
-            title="r$I_{D_{norm}}\text{ [}\mu\text{A]}$",
-            showgrid=False,
-            showline=False,
-            zeroline=False,             
-        ),
-        yaxis=dict(
-            title=r"$\alpha\text{ [°C/}\mu\text{A]}$",
-            showgrid=True,
-            gridcolor="rgba(255, 255, 255, 0.2)",
-            showline=False,
-            zeroline=False,            
-        ),
-        template="plotly_dark",
-        paper_bgcolor="#0e1117",
-        plot_bgcolor="#0e1117",
-        font=dict(color="white"),        
-        margin=dict(t=100)
-    )
     html = pio.to_html(
         fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
     )
-
     st.iframe(html, height="content")
+
+    # 2. Gráfico secundario: Coeficiente Térmico (alpha) vs Corriente Nominal
+    fig_alpha = go.Figure()
+    colores = {"PFGIW1": "#1f77b4", "PFGIW2": "#ff7f0e", "PFGIP2": "#2ca02c"}
+
+    hay_datos_alpha = False
+    for disp, corrientes_dict in datos_temperatura.items():
+        x_corr = []
+        y_alpha = []
+        for corr, curvas in corrientes_dict.items():
+            if "alpha" in curvas:
+                x_corr.append(float(corr))
+                y_alpha.append(curvas["alpha"])
+        
+        if x_corr:
+            hay_datos_alpha = True
+            # Ordenamos por valor de corriente nominal
+            indices_orden = np.argsort(x_corr)
+            x_arr = np.array(x_corr)[indices_orden]
+            y_arr = np.array(y_alpha)[indices_orden]
+            
+            color = colores.get(disp, None)
+            fig_alpha.add_trace(go.Scatter(
+                x=x_arr,
+                y=y_arr,
+                mode='markers+lines',
+                name=disp,
+                line=dict(color=color) if color else None
+            ))
+
+    if hay_datos_alpha:
+        fig_alpha.update_layout(
+            title={
+                'text': r"$\text{Coeficiente Térmico (}\alpha\text{) vs Corriente Nominal}$",
+                'y': 0.95,
+                'x': 0.5,
+                'xanchor': 'center',
+                'yanchor': 'top'
+            },
+            xaxis=dict(
+                title=r"$\text{Corriente Nominal }I_D\text{ [}\mu \text{A]}$",
+                showgrid=False,
+                showline=False,
+                zeroline=False,
+            ),
+            yaxis=dict(
+                title=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu \text{A/°C]}$",
+                showgrid=True,
+                gridcolor="rgba(255, 255, 255, 0.2)",
+                showline=False,
+                zeroline=False,
+            ),
+            template="plotly_white",
+            paper_bgcolor="#0e1117",
+            plot_bgcolor="#0e1117",
+            font=dict(color="white"),
+        )
+
+        html_alpha = pio.to_html(
+            fig_alpha, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
+        )
+        st.iframe(html_alpha, height="content")
         
 def graficar_evolucion_temperatura(titulo, datos_temp):
     """
