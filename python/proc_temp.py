@@ -1,7 +1,28 @@
 # proc_temp.py
+import re
 import numpy as np
 import streamlit as st
-from lector_archivos import matchear_archivos
+from pathlib import Path
+
+def _obtener_archivo_mas_reciente(disp, corr, temp):
+    """
+    Busca en el sistema de archivos todas las mediciones para un dispositivo, 
+    corriente y temperatura, devolviendo únicamente la de mayor versión M.
+    """
+    directorio_base = Path(".")
+    patron_uA = f"*_UTN_DIE4_{disp}_{corr}uA_{temp}_M*.csv"
+    patron_u = f"*_UTN_DIE4_{disp}_{corr}u_{temp}_M*.csv"
+    
+    archivos = list(directorio_base.glob(f"**/{patron_uA}")) + list(directorio_base.glob(f"**/{patron_u}"))
+    
+    if not archivos:
+        return None
+
+    def extraer_m(path):
+        match = re.search(r"_M(\d+)\.csv$", path.name)
+        return int(match.group(1)) if match else -1
+
+    return max(archivos, key=extraer_m)
 
 @st.cache_data
 def obtener_datos_I_vs_T(lista_dispositivos, corrientes_nominales, lista_temperaturas):
@@ -17,22 +38,13 @@ def obtener_datos_I_vs_T(lista_dispositivos, corrientes_nominales, lista_tempera
             corrientes_aux = []
             
             for temp in lista_temperaturas:
-                archivo_encontrado = None
+                archivo_reciente = _obtener_archivo_mas_reciente(disp, corr, temp)
                 
-                for m_ver in ["M10", "M9", "M8", "M7", "M6", "M5", "M4", "M3", "M2", "M1"]:
-                    nombre_buscar = f"*_UTN_DIE4_{disp}_{corr}uA_{temp}_{m_ver}.csv"
-                    lista_datos = matchear_archivos(nombre_buscar, tipo_medicion="temperatura")
-                    if not lista_datos:
-                        nombre_buscar = f"*_UTN_DIE4_{disp}_{corr}u_{temp}_{m_ver}.csv"
-                        lista_datos = matchear_archivos(nombre_buscar, tipo_medicion="temperatura")
+                if archivo_reciente is not None:
+                    datos = np.genfromtxt(archivo_reciente, delimiter=',', skip_header=1, usecols=(3, 4))
+                    v_drain = datos[:, 0]
+                    i_drain = datos[:, 1]
                     
-                    if lista_datos:
-                        archivo_encontrado = lista_datos[0]
-                        break
-                
-                if archivo_encontrado is not None:
-                    v_drain = archivo_encontrado[:, 0]
-                    i_drain = archivo_encontrado[:, 1]
                     idx_vd = np.argmin(np.abs(v_drain - (-4.5)))
                     i_en_v5 = np.abs(i_drain[idx_vd]) * 1e6
                     
