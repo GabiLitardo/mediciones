@@ -41,7 +41,10 @@ def calcular_sensibilidad_ventana(tiempos, corrientes_proc, corrientes_norm, n_v
     return np.array(eje_x), np.array(eje_y)
 
 def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ventana=6):
-    datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda)
+    if normalizado:
+        datos_crudos = obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda)
+    else:
+        datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda)
     resultado_fit = {}
     resultado_discreto = {}
     
@@ -49,15 +52,11 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ve
     for disp, datos in datos_crudos.items():
         tiempos = datos["tiempos"]
         corrientes = datos["valores"]
-        factor = factores_normalizacion.get(disp, 1.0)
         
-        corrientes_norm = corrientes / factor
-        corrientes_proc = corrientes_norm if normalizado else corrientes
-        
-        coefs_y = calcular_fit_polinomico(tiempos.tolist(), corrientes_proc.tolist())
+        coefs_y = calcular_fit_polinomico(tiempos.tolist(), corrientes.tolist())
         a_y, b_y, c_y, d_y, e_y = coefs_y
         
-        coefs_x = calcular_fit_polinomico(tiempos.tolist(), corrientes_norm.tolist())
+        coefs_x = calcular_fit_polinomico(tiempos.tolist(), corrientes.tolist())
         a_x, b_x, c_x, d_x, e_x = coefs_x
         
         t_cont = np.linspace(tiempos.min(), tiempos.max(), 200)
@@ -70,15 +69,11 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ve
     for disp, datos in datos_crudos.items():   
         tiempos = datos["tiempos"]
         corrientes = datos["valores"]
-        factor = factores_normalizacion.get(disp, 1.0)
-        
-        corrientes_norm = corrientes / factor
-        corrientes_proc = corrientes_norm if normalizado else corrientes
         
         eje_x, eje_y = calcular_sensibilidad_ventana(
             tiempos=tiempos, 
-            corrientes_proc=corrientes_proc, 
-            corrientes_norm=corrientes_norm, 
+            corrientes_proc=corrientes, 
+            corrientes_norm=corrientes, 
             n_ventana=n_ventana
         )
             
