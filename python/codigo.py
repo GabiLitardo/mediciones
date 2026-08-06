@@ -102,12 +102,12 @@ if opcion == "Ruido":
     evos1_sin_deriva = proc_ruido.obtener_evolucion_ruido(["PFGIW1", "PFGIW2", "PFGIP2"], [100, 150, 200, 250, 350], False, True)
 
 
-    log1 = st.checkbox("Graficar Semilog?", value=False)
+    log = st.checkbox("Graficar Semilog?", value=False)
 
     graficos.graficar_evolucion_ruido(
         titulo="Corriente vs tiempo a corto plazo",
         todas_las_evos=evos1,
-        es_log = log1
+        es_log = log
     )
 
     graficos.graficar_histograma_ruido(
@@ -118,12 +118,10 @@ if opcion == "Ruido":
     evos2 = proc_ruido.obtener_evolucion_ruido(["PFGIW1"], [100, 150, 200, 250, 350], True, restar_deriva)
     evos2_sin_deriva = proc_ruido.obtener_evolucion_ruido(["PFGIW1"], [100, 150, 200, 250, 350], True, True)
 
-    log2 = st.checkbox("Graficar Semilog?", value=False)
-
     graficos.graficar_evolucion_ruido(
         titulo="Corriente vs tiempo a largo plazo",
         todas_las_evos=evos2,
-        es_log = log2
+        es_log = log
     )
 
     graficos.graficar_histograma_ruido(
