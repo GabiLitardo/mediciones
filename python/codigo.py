@@ -98,19 +98,37 @@ if opcion == "Ruido":
     resultados_ruido = proc_ruido.procesar_ruido(lista_dispositivos, corrientes_nominales, False, restar_deriva)
     graficos.graficar_ruido(titulo="Desvío estándar del ruido neto vs Corriente nominal", datos_ruido=resultados_ruido)
 
-    evos = proc_ruido.obtener_evolucion_ruido(["PFGIW1", "PFGIW2", "PFGIP2"], [100, 150, 200, 250, 350], False, restar_deriva)
+    evos1 = proc_ruido.obtener_evolucion_ruido(["PFGIW1", "PFGIW2", "PFGIP2"], [100, 150, 200, 250, 350], False, restar_deriva)
+    evos1_sin_deriva = proc_ruido.obtener_evolucion_ruido(["PFGIW1", "PFGIW2", "PFGIP2"], [100, 150, 200, 250, 350], False, True)
 
-    log = st.checkbox("Graficar Semilog?", value=False)
+
+    log1 = st.checkbox("Graficar Semilog?", value=False)
 
     graficos.graficar_evolucion_ruido(
-        titulo="Corriente vs tiempo",
-        todas_las_evos=evos,
-        es_log = log
+        titulo="Corriente vs tiempo a corto plazo",
+        todas_las_evos=evos1,
+        es_log = log1
     )
 
     graficos.graficar_histograma_ruido(
-        titulo="Distribución del Ruido Neto",
-        todas_las_evos=evos
+        titulo="Distribución del Ruido Neto a corto plazo",
+        todas_las_evos=evos1_sin_deriva
+    )
+
+    evos2 = proc_ruido.obtener_evolucion_ruido(["PFGIW1"], [100, 150, 200, 250, 350], True, restar_deriva)
+    evos2_sin_deriva = proc_ruido.obtener_evolucion_ruido(["PFGIW1"], [100, 150, 200, 250, 350], True, True)
+
+    log2 = st.checkbox("Graficar Semilog?", value=False)
+
+    graficos.graficar_evolucion_ruido(
+        titulo="Corriente vs tiempo a largo plazo",
+        todas_las_evos=evos2,
+        es_log = log2
+    )
+
+    graficos.graficar_histograma_ruido(
+        titulo="Distribución del Ruido Neto a largo plazo",
+        todas_las_evos=evos2_sin_deriva
     )
 
     evos_temp = proc_ruido.obtener_evolucion_temperatura_ruido(lista_dispositivos, corrientes_nominales, False)
