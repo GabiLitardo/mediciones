@@ -53,11 +53,13 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ve
     for disp, datos in datos_crudos.items():
         tiempos = datos["tiempos"]
         corrientes = datos["valores"]
+        factor = factores_normalizacion.get(disp, 1.0)
+        corrientes_norm = corrientes if normalizado else corrientes / factor        
         
         coefs_y = calcular_fit_polinomico(tiempos.tolist(), corrientes.tolist())
         a_y, b_y, c_y, d_y, e_y = coefs_y
         
-        coefs_x = calcular_fit_polinomico(tiempos.tolist(), corrientes.tolist())
+        coefs_x = calcular_fit_polinomico(tiempos.tolist(), corrientes_norm.tolist())
         a_x, b_x, c_x, d_x, e_x = coefs_x
         
         t_cont = np.linspace(tiempos.min(), tiempos.max(), 200)
@@ -70,11 +72,13 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ve
     for disp, datos in datos_crudos.items():   
         tiempos = datos["tiempos"]
         corrientes = datos["valores"]
+        factor = factores_normalizacion.get(disp, 1.0)
+        corrientes_norm = corrientes if normalizado else corrientes / factor
         
         eje_x, eje_y = calcular_sensibilidad_ventana(
             tiempos=tiempos, 
             corrientes_proc=corrientes, 
-            corrientes_norm=corrientes, 
+            corrientes_norm=corrientes_norm, 
             n_ventana=n_ventana
         )
             
