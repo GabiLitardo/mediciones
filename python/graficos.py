@@ -396,13 +396,13 @@ def graficar_I_vs_T(titulo, datos_temperatura):
     fig_ply = go.Figure()
     for disp, corrientes_dict in datos_temperatura.items():
         for corr, curvas in corrientes_dict.items():
+            print(curvas["alpha"], flush = True)
             fig_ply.add_trace(go.Scatter(
                 x=curvas["y"], 
                 y=curvas["alpha"],
                 mode='markers+lines', 
                 name=f"{disp} ({corr} uA)"
             ))
-            print(curvas["y"][0], flush = True)
             
     fig_ply.update_layout(
         title={
