@@ -110,7 +110,7 @@ if mostrar_ruido:
     )
 
     graficos.graficar_histograma_ruido(
-        titulo="Distribución del Ruido Neto (Verificación Gaussiana)",
+        titulo="Distribución del Ruido Neto",
         todas_las_evos=evos
     )
 

@@ -646,19 +646,18 @@ def graficar_histograma_ruido(titulo, todas_las_evos):
 
     for disp, evos_disp in todas_las_evos.items():
         for corr, datos in evos_disp.items():
-            # Convertimos uA a nA para que la escala sea más legible
             ruido_nA = datos["y"] * 1000.0
 
             fig_ply.add_trace(go.Histogram(
                 x=ruido_nA,
                 name=f"{disp} @ {corr} uA",
                 opacity=0.5,
-                histnorm='probability density'  # Normaliza la campana
+                histnorm='probability density'
             ))
 
     fig_ply.update_layout(
         title=titulo,
-        barmode='overlay',  # Superpone los histogramas con transparencia
+        barmode='overlay',
         xaxis=dict(
             title="Ruido Neto [nA]",
             showgrid=False,
