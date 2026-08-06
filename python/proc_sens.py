@@ -5,6 +5,7 @@ from proc_evo import obtener_datos_crudos_tanda
 from proc_evo import obtener_datos_evolucion_vg
 
 factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2": 1.0}
+tasa_dosis = 0.18 #Gy/min
 
 def calcular_fit_polinomico(tiempos_list, corrientes_list):
     coeficientes = np.polyfit(tiempos_list, corrientes_list, deg=4)
@@ -38,7 +39,7 @@ def calcular_sensibilidad_ventana(tiempos, corrientes_proc, corrientes_norm, n_v
             eje_y.append(tasa_promedio_ventana)
             eje_x.append(corriente_promedio_ventana)
             
-    return np.array(eje_x), np.array(eje_y)
+    return np.array(eje_x), np.array(eje_y) / tasa_dosis
 
 def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ventana=6):
     if normalizado:
@@ -60,7 +61,7 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ve
         a_x, b_x, c_x, d_x, e_x = coefs_x
         
         t_cont = np.linspace(tiempos.min(), tiempos.max(), 200)
-        eje_y = np.abs(4*a_y*(t_cont**3) + 3*b_y*(t_cont**2) + 2*c_y*t_cont + d_y)
+        eje_y = np.abs(4*a_y*(t_cont**3) + 3*b_y*(t_cont**2) + 2*c_y*t_cont + d_y) / tasa_dosis
         eje_x = a_x*(t_cont**4) + b_x*(t_cont**3) + c_x*(t_cont**2) + d_x*t_cont + e_x
         
         resultado_fit[disp] = {"x": eje_x, "y": eje_y}
