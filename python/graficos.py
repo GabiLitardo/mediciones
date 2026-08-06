@@ -682,3 +682,74 @@ def graficar_histograma_ruido(titulo, todas_las_evos):
     )
 
     st.iframe(html, height="content")
+
+def graficar_error_termico_equivalente(titulo, datos_sensibilidad, datos_temp):
+    """
+    Dibuja en Plotly el error térmico equivalente (|alpha| / Sensibilidad) en función de la
+    corriente normalizada, expresado en min/°C.
+
+    Args:
+        titulo (str): Título a mostrar en el gráfico
+        datos_sensibilidad (dict): dict con {disp: {"x": array_I_norm, "y": array_sens_abs}}
+        datos_temp (dict): dict con {disp: {corr: {"alpha": float_coef}}}
+    """
+    fig_ply = go.Figure()
+    colores = {"PFGIW1": "#1f77b4", "PFGIW2": "#ff7f0e", "PFGIP2": "#2ca02c"}
+
+    for disp in datos_sensibilidad.keys():
+        if datos_temp and disp in datos_temp:
+            x_tc = []
+            alpha_vals = []
+            
+            for corr_nominal, curvas in datos_temp[disp].items():
+                if "alpha" in curvas:
+                    x_tc.append(float(corr_nominal))
+                    alpha_vals.append(np.abs(curvas["alpha"]))
+            
+            if x_tc:
+                indices_orden = np.argsort(x_tc)
+                x_tc_arr = np.array(x_tc)[indices_orden]
+                alpha_arr = np.array(alpha_vals)[indices_orden]
+
+                sens_interpolada = np.interp(
+                    x_tc_arr, 
+                    datos_sensibilidad[disp]["x"], 
+                    datos_sensibilidad[disp]["y"]
+                )
+
+                error_termico = alpha_arr / sens_interpolada
+
+                color = colores.get(disp, None)
+                fig_ply.add_trace(go.Scatter(
+                    x=x_tc_arr,
+                    y=error_termico,
+                    mode='markers+lines',
+                    name=disp,
+                    line=dict(color=color)
+                ))
+
+    fig_ply.update_layout(
+        title=dict(text=titulo, x=0.5, xanchor="center"),
+        xaxis=dict(
+            title=r"$\text{Corriente Normalizada }I_{D_{norm}} \text{ [}\mu \text{A]}$",
+            showgrid=False,
+            showline=False,
+            zeroline=False,
+        ),
+        yaxis=dict(
+            title=r"$\text{Error Térmico Equivalente [min/°C]}$",
+            showgrid=True,
+            gridcolor="rgba(255, 255, 255, 0.2)",
+            showline=False,
+            zeroline=False,
+        ),
+        template="plotly_white",
+        paper_bgcolor="#0e1117",
+        plot_bgcolor="#0e1117",
+        font=dict(color="white"),
+    )
+
+    html = pio.to_html(
+        fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False
+    )
+    st.iframe(html, height="content")

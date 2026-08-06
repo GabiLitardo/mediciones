@@ -177,9 +177,16 @@ if mostrar_resumen:
         datos_temp=datos_temp_resumen
     )
     
-    st.subheader("Resolución frente a ruido ($\\sigma/S$)")
+    st.subheader("Error equivalente por ruido ($\\sigma/S$)")
     graficos.graficar_snr(
-        titulo=r"$\text{Resolución frente a ruido (}\sigma\text{/S) vs Corriente Normalizada}$",
+        titulo=r"$\text{Error equivalente por ruido (}\sigma\text{/S) vs Corriente Normalizada}$",
         datos_sensibilidad=sens_resumen,
         datos_ruido=ruido_resumen
+    )
+
+    st.subheader("Error Equivalente por Temperatura ($|\\alpha| / S$)")
+    graficos.graficar_error_termico_equivalente(
+        titulo=r"$\text{Error Térmico Equivalente vs Corriente Normalizada}$",
+        datos_sensibilidad=sens_resumen,
+        datos_temp=datos_temp_resumen
     )
