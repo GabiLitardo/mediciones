@@ -26,7 +26,8 @@ def _renderizar_grafico(fig_ply, titulo, xaxis_kwargs=None, yaxis_kwargs=None, *
     html = pio.to_html(fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False)
     st.iframe(html, height="content")
 
-def _graficar_curvas_simples(titulo, dict_datos, xlabel, ylabel, modo='markers+lines', es_anidado=False, es_log=False):
+def graficar_curvas(titulo, dict_datos, xlabel, ylabel, modo='markers+lines', es_anidado=False, es_log=False):
+    """Función genérica pública para graficar series simples o anidadas."""
     fig = go.Figure()
     if es_anidado:
         for disp, corr_dict in dict_datos.items():
@@ -62,15 +63,9 @@ def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
         fig.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines+markers', name=disp))
     _renderizar_grafico(fig, titulo, xaxis_kwargs=dict(title=xlabel), yaxis_kwargs=dict(title=ylabel))
 
-def graficar_ruido(titulo, datos_ruido):
-    _graficar_curvas_simples(titulo, datos_ruido, r"$\text{Corriente Nominal }I_D\text{ [}\mu \text{A]}$", "Desvío de Ruido [nA]", modo='markers')
-
-def graficar_evolucion_ruido(titulo, todas_las_evos, es_log):
-    _graficar_curvas_simples(titulo, todas_las_evos, "Tiempo [s]", r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$", modo='lines', es_anidado=True, es_log=es_log)
-
 def graficar_I_vs_T(titulo, datos_temperatura):
     colores = {"PFGIW1": "#1f77b4", "PFGIW2": "#ff7f0e", "PFGIP2": "#2ca02c"}
-    _graficar_curvas_simples(titulo, datos_temperatura, "Temperatura [°C]", r"$\text{Corriente }I_D \text{ @ }V_D \text{ = -4.5V [}\mu \text{A]}$", modo='markers+lines', es_anidado=True)
+    graficar_curvas(titulo, datos_temperatura, "Temperatura [°C]", r"$\text{Corriente }I_D \text{ @ }V_D \text{ = -4.5V [}\mu \text{A]}$", modo='markers+lines', es_anidado=True)
 
     fig_alpha = go.Figure()
     for disp, corrientes_dict in datos_temperatura.items():

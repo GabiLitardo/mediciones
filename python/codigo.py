@@ -122,21 +122,20 @@ elif opcion == "Ruido":
     restar_deriva = st.checkbox("Restar deriva térmica para visualizar el ruido?", value=True)
     log = st.checkbox("Graficar Semilog?", value=False)
 
-    # Una sola llamada para corto plazo
     ruido_corto = proc_ruido.obtener_analisis_ruido_completo(lista_dispositivos, corrientes_nominales, es_larga=False, restar_deriva=restar_deriva)
 
-    graficos.graficar_ruido(titulo="Desvío estándar del ruido neto vs Corriente nominal", datos_ruido=ruido_corto["std_ruido"])
-    graficos.graficar_evolucion_ruido(titulo="Corriente vs tiempo a corto plazo", todas_las_evos=ruido_corto["evos"], es_log=log)
-    graficos.graficar_histograma_ruido(titulo="Distribución del Ruido Neto a corto plazo", todas_las_evos=ruido_corto["evos"])
+    # Llamadas directas a graficar_curvas
+    graficos.graficar_curvas("Desvío estándar del ruido neto vs Corriente nominal", ruido_corto["std_ruido"], r"$\text{Corriente Nominal }I_D\text{ [}\mu \text{A]}$", "Desvío de Ruido [nA]", modo='markers')
+    graficos.graficar_curvas("Corriente vs tiempo a corto plazo", ruido_corto["evos"], "Tiempo [s]", r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$", modo='lines', es_anidado=True, es_log=log)
+    graficos.graficar_histograma_ruido("Distribución del Ruido Neto a corto plazo", todas_las_evos=ruido_corto["evos"])
 
-    # Una sola llamada para largo plazo
     ruido_largo = proc_ruido.obtener_analisis_ruido_completo(["PFGIW1"], corrientes_nominales, es_larga=True, restar_deriva=restar_deriva)
 
-    graficos.graficar_evolucion_ruido(titulo="Corriente vs tiempo a largo plazo", todas_las_evos=ruido_largo["evos"], es_log=log)
-    graficos.graficar_histograma_ruido(titulo="Distribución del Ruido Neto a largo plazo", todas_las_evos=ruido_largo["evos"])
+    graficos.graficar_curvas("Corriente vs tiempo a largo plazo", ruido_largo["evos"], "Tiempo [s]", r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$", modo='lines', es_anidado=True, es_log=log)
+    graficos.graficar_histograma_ruido("Distribución del Ruido Neto a largo plazo", todas_las_evos=ruido_largo["evos"])
 
-    graficos.graficar_evolucion_temperatura(titulo="Evolución de Temperatura vs Tiempo durante medición de ruido", datos_temp=ruido_corto["evos_temp"])
-    graficos.graficar_corriente_vs_temperatura_ruido(titulo="Corriente vs Temperatura durante medición de ruido", todas_las_evos_i_vs_t=ruido_corto["i_vs_t"])
+    graficos.graficar_evolucion_temperatura("Evolución de Temperatura vs Tiempo durante medición de ruido", datos_temp=ruido_corto["evos_temp"])
+    graficos.graficar_corriente_vs_temperatura_ruido("Corriente vs Temperatura durante medición de ruido", todas_las_evos_i_vs_t=ruido_corto["i_vs_t"])
 
 # =====================================================================
 # SECCIÓN 4: TEMPERATURA
