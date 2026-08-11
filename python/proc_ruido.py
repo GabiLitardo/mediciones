@@ -1,5 +1,6 @@
 # proc_ruido.py
 import numpy as np
+import streamlit as st
 from lector_archivos import cargar_medicion_ruido
 
 A_SH = 1.12924e-3
@@ -33,65 +34,63 @@ def procesar_matriz_ruido(datos):
         "i_ruido_neto_uA": i_ruido_neto_uA
     }
 
-def obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales, es_larga=False, restar_deriva=True):
-    resultado = {}
+@st.cache_data
+def obtener_analisis_ruido_completo(lista_dispositivos, corrientes_nominales, es_larga=False):
+    """
+    Procesa las mediciones en una sola pasada y retorna todas las estructuras 
+    necesarias para los gráficos de ruido, evoluciones y temperatura.
+    """
+    datos_procesados = {}
+    
     for disp in lista_dispositivos:
-        resultado[disp] = {}
+        datos_procesados[disp] = {}
         for corr in corrientes_nominales:
             datos_matriz = cargar_medicion_ruido(disp, corr, es_larga)
             if datos_matriz is not None:
-                datos = procesar_matriz_ruido(datos_matriz)
-                y_val = datos["i_ruido_neto_uA"] if restar_deriva else datos["corriente_uA"]
-                resultado[disp][corr] = {"x": datos["tiempo_s"], "y": y_val}
+                datos_procesados[disp][corr] = procesar_matriz_ruido(datos_matriz)
+                
+    return datos_procesados
 
-    return resultado
+def extraer_estructuras_ruido(datos_procesados, restar_deriva=True):
+    """
+    Sustrae las series específicas para cada gráfico sin recomputar ajustes.
+    """
+    evos = {}
+    evos_temp = {}
+    i_vs_t = {}
+    std_ruido = {}
 
-def obtener_evolucion_temperatura_ruido(lista_dispositivos, corrientes_nominales, es_larga=False):
-    resultado = {}
-    for disp in lista_dispositivos:
-        resultado[disp] = {}
-        for corr in corrientes_nominales:
-            datos_matriz = cargar_medicion_ruido(disp, corr, es_larga)
-            if datos_matriz is not None:
-                datos = procesar_matriz_ruido(datos_matriz)
-                resultado[disp][corr] = {
-                    "x": datos["tiempo_s"], 
-                    "y": datos["temperatura_C"],
-                    "y_fit": datos["temperatura_fit_C"]
-                }
-
-    return resultado
-
-def obtener_corriente_vs_temperatura_ruido(lista_dispositivos, corrientes_nominales, es_larga=False):
-    resultado = {}
-    for disp in lista_dispositivos:
-        resultado[disp] = {}
-        for corr in corrientes_nominales:
-            datos_matriz = cargar_medicion_ruido(disp, corr, es_larga)
-            if datos_matriz is not None:
-                datos = procesar_matriz_ruido(datos_matriz)
-                resultado[disp][corr] = {
-                    "x": datos["temperatura_C"],
-                    "y": datos["corriente_uA"],
-                    "y_fit": datos["corriente_fit_uA"]
-                }
-
-    return resultado
-
-def procesar_ruido(lista_dispositivos, corrientes_nominales, es_larga=False, restar_deriva=True):
-    resultado = {}
-    todas_las_evos = obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales, es_larga, restar_deriva)
-
-    for disp in lista_dispositivos:
+    for disp, corrientes_dict in datos_procesados.items():
+        evos[disp] = {}
+        evos_temp[disp] = {}
+        i_vs_t[disp] = {}
         std_list = []
-        for corr in corrientes_nominales:
-            if corr in todas_las_evos[disp]:
-                std_val = np.std(todas_las_evos[disp][corr]["y"] * 1000.0, ddof=1)
-                std_list.append(std_val)
+        corrientes_validas = []
 
-        resultado[disp] = {
-            "x": np.array([float(corr) for corr in corrientes_nominales]),
+        for corr, datos in corrientes_dict.items():
+            y_val = datos["i_ruido_neto_uA"] if restar_deriva else datos["corriente_uA"]
+            evos[disp][corr] = {"x": datos["tiempo_s"], "y": y_val}
+            
+            evos_temp[disp][corr] = {
+                "x": datos["tiempo_s"],
+                "y": datos["temperatura_C"],
+                "y_fit": datos["temperatura_fit_C"]
+            }
+            
+            i_vs_t[disp][corr] = {
+                "x": datos["temperatura_C"],
+                "y": datos["corriente_uA"],
+                "y_fit": datos["corriente_fit_uA"]
+            }
+            
+            # Cálculo de desviación estándar del ruido en nA
+            std_val = np.std(datos["i_ruido_neto_uA"] * 1000.0, ddof=1) if restar_deriva else np.std(datos["corriente_uA"] * 1000.0, ddof=1)
+            std_list.append(std_val)
+            corrientes_validas.append(float(corr))
+
+        std_ruido[disp] = {
+            "x": np.array(corrientes_validas),
             "y": np.array(std_list)
         }
 
-    return resultado
+    return evos, evos_temp, i_vs_t, std_ruido
