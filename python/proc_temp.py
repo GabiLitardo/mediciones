@@ -1,34 +1,10 @@
 # proc_temp.py
-import re
 import numpy as np
 import streamlit as st
-from pathlib import Path
-
-def _obtener_archivo_mas_reciente(disp, corr, temp):
-    """
-    Busca en el sistema de archivos todas las mediciones para un dispositivo, 
-    corriente y temperatura, devolviendo únicamente la de mayor versión M.
-    """
-    directorio_base = Path(".")
-    patron_uA = f"*_UTN_DIE4_{disp}_{corr}uA_{temp}_M*.csv"
-    patron_u = f"*_UTN_DIE4_{disp}_{corr}u_{temp}_M*.csv"
-    
-    archivos = list(directorio_base.glob(f"**/{patron_uA}")) + list(directorio_base.glob(f"**/{patron_u}"))
-    
-    if not archivos:
-        return None
-
-    def extraer_m(path):
-        match = re.search(r"_M(\d+)\.csv$", path.name)
-        return int(match.group(1)) if match else -1
-
-    return max(archivos, key=extraer_m)
+import lector_archivos
 
 @st.cache_data
 def obtener_datos_I_vs_T(lista_dispositivos, corrientes_nominales, lista_temperaturas):
-    """
-    Obtiene los datos de corriente en función de la temperatura y calcula el coeficiente térmico.
-    """
     resultado = {}
     
     for disp in lista_dispositivos:
@@ -38,10 +14,9 @@ def obtener_datos_I_vs_T(lista_dispositivos, corrientes_nominales, lista_tempera
             corrientes_aux = []
             
             for temp in lista_temperaturas:
-                archivo_reciente = _obtener_archivo_mas_reciente(disp, corr, temp)
+                datos = lector_archivos.cargar_medicion_temperatura(disp, corr, temp)
                 
-                if archivo_reciente is not None:
-                    datos = np.genfromtxt(archivo_reciente, delimiter=',', skip_header=1, usecols=(3, 4))
+                if datos is not None:
                     v_drain = datos[:, 0]
                     i_drain = datos[:, 1]
                     

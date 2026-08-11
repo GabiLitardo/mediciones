@@ -1,13 +1,9 @@
 # proc_evo.py
 import numpy as np
-from pathlib import Path
-from lector_archivos import matchear_archivos
 import streamlit as st
+import lector_archivos
 
 def calcular_tiempo_acumulado(nro, tipo_tanda):
-    """
-    Calcula el tiempo acumulado según el historial de intervalos de irradiación.
-    """
     t = 0
     for i in range(1, nro + 1):
         if tipo_tanda == "FOXFET":
@@ -30,22 +26,7 @@ def calcular_tiempo_acumulado(nro, tipo_tanda):
 
 @st.cache_data
 def obtener_vg_por_corriente(dispositivo, corriente_buscada):
-    """
-    Obtiene la tensión de Floating Gate equivalente a partir de las curvas de transferencia.
-    """
-    if dispositivo in ["PFGIW2", "PFGIP2", "PFGIW3"]:
-        nombre_archivo = "MOSISV72M_DIE4_PMOS_STD1_IV_VD=-4.5V_M1.ri"
-    elif dispositivo == "PFGIW1":
-        nombre_archivo = "MOSISV72M_DIE4_PMOS_STD2_IV_VD=-4.5V_M1.ri"
-    else:
-        raise ValueError("Dispositivo no válido. Elegir entre PFGIW1, PFGIW2 o PFGIP2.")
-    raiz = Path(__file__).resolve().parent.parent
-    lista_rutas = list(raiz.glob(f"*/{nombre_archivo}"))
-    if not lista_rutas:
-        raise FileNotFoundError(f"No se encontró el archivo {nombre_archivo} en mediciones.")
-    
-    ruta_archivo = lista_rutas[0]
-    datos = np.genfromtxt(ruta_archivo, skip_header=2, usecols=(0, 1), encoding="cp1252")
+    datos = lector_archivos.cargar_curva_iv_referencia(dispositivo)
     tensiones_g = datos[:, 0]
     corrientes_d = np.abs(datos[:, 1])
 
@@ -56,27 +37,11 @@ def obtener_vg_por_corriente(dispositivo, corriente_buscada):
 
 @st.cache_data
 def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, rng=60):
-    """
-    Barre los archivos del postrad0 al postrad<rng> y extrae los arrays de tiempos y valores.
-    """
     resultado = {}
     for disp in lista_dispositivos:
         tiempos, valores = [], []
         for nro in range(0, rng):
-            if tipo_tanda == "FG_tanda1":
-                sufijo = ".ri"; prefijo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_"
-            elif tipo_tanda == "FG_tanda2":
-                sufijo = "_2.ri"; prefijo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_"
-            elif tipo_tanda == "FOXFET":
-                sufijo = ".ri"; prefijo = f"MOSISV72M_DIE4_{disp}_IV_VD=5V_postrad{nro}_"
-                
-            archivo_encontrado = None    
-            for m_ver in ["M2", "M1"]:
-                nombre_buscar = f"{prefijo}{m_ver}{sufijo}"
-                datos = matchear_archivos(nombre_buscar)
-                if datos:
-                    archivo_encontrado = datos[0]
-                    break
+            archivo_encontrado = lector_archivos.cargar_medicion_tanda(disp, tipo_tanda, nro)
             
             if archivo_encontrado is not None:
                 t = calcular_tiempo_acumulado(nro, tipo_tanda)
@@ -88,8 +53,7 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, rng=60):
                     indices_orden = np.argsort(corrientes_abs)
                     x_sort = corrientes_abs[indices_orden]
                     y_sort = tensiones[indices_orden]
-                    v_interp = np.interp(1e-7, x_sort, y_sort)
-                    valores.append(v_interp)
+                    valores.append(np.interp(1e-7, x_sort, y_sort))
                     tiempos.append(t)
                 else:
                     idx = np.where(np.round(tensiones, 1) == -4.5)[0]
@@ -107,9 +71,6 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, rng=60):
 
 @st.cache_data
 def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda):
-    """
-    Genera la evolución temporal mapeada a la tensión equivalente V_FG.
-    """
     datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda)
     resultado = {}
     for disp, datos in datos_crudos.items():
@@ -119,7 +80,7 @@ def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda):
                 vg_val = obtener_vg_por_corriente(disp, corriente_ua * 1e-6)
                 tensiones_vg.append(vg_val)
                 tiempos_vg.append(t)
-            except:
+            except (ValueError, IndexError):
                 continue
         if tiempos_vg:
             resultado[disp] = {"tiempos": np.array(tiempos_vg), "valores": np.array(tensiones_vg)}
