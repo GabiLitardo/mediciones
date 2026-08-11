@@ -122,25 +122,21 @@ elif opcion == "Ruido":
     restar_deriva = st.checkbox("Restar deriva térmica para visualizar el ruido?", value=True)
     log = st.checkbox("Graficar Semilog?", value=False)
 
-    # Procesamiento en una sola pasada para corto plazo
-    datos_corto = proc_ruido.obtener_analisis_ruido_completo(lista_dispositivos, corrientes_nominales, es_larga=False)
-    evos1, evos_temp, evos_i_vs_t, resultados_ruido = proc_ruido.extraer_estructuras_ruido(datos_corto, restar_deriva)
-    _, _, _, ruido_neto_corto = proc_ruido.extraer_estructuras_ruido(datos_corto, restar_deriva=True)
+    # Una sola llamada para corto plazo
+    ruido_corto = proc_ruido.obtener_analisis_ruido_completo(lista_dispositivos, corrientes_nominales, es_larga=False, restar_deriva=restar_deriva)
 
-    graficos.graficar_ruido(titulo="Desvío estándar del ruido neto vs Corriente nominal", datos_ruido=resultados_ruido)
+    graficos.graficar_ruido(titulo="Desvío estándar del ruido neto vs Corriente nominal", datos_ruido=ruido_corto["std_ruido"])
+    graficos.graficar_evolucion_ruido(titulo="Corriente vs tiempo a corto plazo", todas_las_evos=ruido_corto["evos"], es_log=log)
+    graficos.graficar_histograma_ruido(titulo="Distribución del Ruido Neto a corto plazo", todas_las_evos=ruido_corto["evos"])
 
-    graficos.graficar_evolucion_ruido(titulo="Corriente vs tiempo a corto plazo", todas_las_evos=evos1, es_log=log)
-    graficos.graficar_histograma_ruido(titulo="Distribución del Ruido Neto a corto plazo", todas_las_evos=evos1)
+    # Una sola llamada para largo plazo
+    ruido_largo = proc_ruido.obtener_analisis_ruido_completo(["PFGIW1"], corrientes_nominales, es_larga=True, restar_deriva=restar_deriva)
 
-    # Procesamiento en una sola pasada para largo plazo
-    datos_largo = proc_ruido.obtener_analisis_ruido_completo(["PFGIW1"], corrientes_nominales, es_larga=True)
-    evos2, _, _, _ = proc_ruido.extraer_estructuras_ruido(datos_largo, restar_deriva)
+    graficos.graficar_evolucion_ruido(titulo="Corriente vs tiempo a largo plazo", todas_las_evos=ruido_largo["evos"], es_log=log)
+    graficos.graficar_histograma_ruido(titulo="Distribución del Ruido Neto a largo plazo", todas_las_evos=ruido_largo["evos"])
 
-    graficos.graficar_evolucion_ruido(titulo="Corriente vs tiempo a largo plazo", todas_las_evos=evos2, es_log=log)
-    graficos.graficar_histograma_ruido(titulo="Distribución del Ruido Neto a largo plazo", todas_las_evos=evos2)
-
-    graficos.graficar_evolucion_temperatura(titulo="Evolución de Temperatura vs Tiempo durante medición de ruido", datos_temp=evos_temp)
-    graficos.graficar_corriente_vs_temperatura_ruido(titulo="Corriente vs Temperatura durante medición de ruido", todas_las_evos_i_vs_t=evos_i_vs_t)
+    graficos.graficar_evolucion_temperatura(titulo="Evolución de Temperatura vs Tiempo durante medición de ruido", datos_temp=ruido_corto["evos_temp"])
+    graficos.graficar_corriente_vs_temperatura_ruido(titulo="Corriente vs Temperatura durante medición de ruido", todas_las_evos_i_vs_t=ruido_corto["i_vs_t"])
 
 # =====================================================================
 # SECCIÓN 4: TEMPERATURA
@@ -176,14 +172,13 @@ elif opcion == "Resumen":
     
     sens_abs_t2 = proc_sens.procesar_sensibilidad(["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"], "FG_tanda2", normalizado=False)
     
-    # Reutilizamos el análisis de ruido en una sola pasada
-    datos_ruido_resumen = proc_ruido.obtener_analisis_ruido_completo(dispositivos_cruce, corrientes_ruido, es_larga=False)
-    _, _, _, resultados_ruido = proc_ruido.extraer_estructuras_ruido(datos_ruido_resumen, restar_deriva=True)
+    # Procesamiento unificado de ruido
+    ruido_resumen_data = proc_ruido.obtener_analisis_ruido_completo(dispositivos_cruce, corrientes_ruido, es_larga=False, restar_deriva=True)
+    ruido_resumen = ruido_resumen_data["std_ruido"]
     
     datos_temp_resumen = proc_temp.obtener_datos_I_vs_T(dispositivos_cruce, corrientes_ruido, lista_temps_resumen)
     
     sens_resumen = {disp: sens_abs_t2[0][disp] for disp in dispositivos_cruce}
-    ruido_resumen = {disp: resultados_ruido[disp] for disp in dispositivos_cruce}
     
     graficos.graficar_superposicion_sens_ruido(
         titulo=r"$\text{Sensibilidad absoluta, ruido y coef. térmico vs }I_D \text{ normalizada}$",
