@@ -7,7 +7,7 @@ import plotly.io as pio
 
 def _renderizar_grafico(fig_ply, titulo, xaxis_kwargs=None, yaxis_kwargs=None, **layout_kwargs):
     """
-    Función auxiliar para centralizar la configuración de estilo y el renderizado en Streamlit.
+    Centraliza la configuración de estilo y el renderizado mediante iframe.
     """
     xaxis = dict(showgrid=False, showline=False, zeroline=False)
     if xaxis_kwargs:
@@ -30,6 +30,26 @@ def _renderizar_grafico(fig_ply, titulo, xaxis_kwargs=None, yaxis_kwargs=None, *
     
     html = pio.to_html(fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False)
     st.iframe(html, height="content")
+
+def _agregar_trazas_anidadas(fig, datos_dict, modo='lines', incluir_fit=False, estilo_fit='dash', fmt_nombre="{disp} @ {corr} uA", **kwargs):
+    """
+    Recorre diccionarios anidados por dispositivo y corriente para agregar trazados Scatter de forma unificada.
+    """
+    for disp, corrientes_dict in datos_dict.items():
+        for corr, datos in corrientes_dict.items():
+            grupo_id = f"{disp}_{corr}uA"
+            nombre = fmt_nombre.format(disp=disp, corr=corr)
+            
+            fig.add_trace(go.Scatter(
+                x=datos["x"], y=datos["y"], mode=modo, name=nombre, legendgroup=grupo_id, **kwargs
+            ))
+            
+            if incluir_fit and "y_fit" in datos and datos["y_fit"] is not None:
+                fig.add_trace(go.Scatter(
+                    x=datos["x"], y=datos["y_fit"], mode='lines',
+                    name=f"{nombre} (Fit)", legendgroup=grupo_id, showlegend=False,
+                    line=dict(width=2, dash=estilo_fit)
+                ))
 
 def graficar_dispositivos(titulo, ylabel, datos_procesados, tanda, es_fg):
     fig_ply = go.Figure()    
@@ -133,9 +153,7 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
 
 def graficar_evolucion_ruido(titulo, todas_las_evos, es_log):
     fig_ply = go.Figure()
-    for disp, evos_disp in todas_las_evos.items():
-        for corr, datos in evos_disp.items():
-            fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines', name=f"{disp} @ {corr} uA", opacity=0.8))
+    _agregar_trazas_anidadas(fig_ply, todas_las_evos, modo='lines', opacity=0.8)
                 
     _renderizar_grafico(
         fig_ply, 
@@ -146,9 +164,7 @@ def graficar_evolucion_ruido(titulo, todas_las_evos, es_log):
 
 def graficar_I_vs_T(titulo, datos_temperatura):
     fig_ply = go.Figure()
-    for disp, corrientes_dict in datos_temperatura.items():
-        for corr, curvas in corrientes_dict.items():
-            fig_ply.add_trace(go.Scatter(x=curvas["x"], y=curvas["y"], mode='markers+lines', name=f"{disp} ({corr} uA)"))
+    _agregar_trazas_anidadas(fig_ply, datos_temperatura, modo='markers+lines', fmt_nombre="{disp} ({corr} uA)")
             
     _renderizar_grafico(
         fig_ply, 
@@ -182,12 +198,7 @@ def graficar_I_vs_T(titulo, datos_temperatura):
 
 def graficar_evolucion_temperatura(titulo, datos_temp):
     fig_ply = go.Figure()
-    for disp, evos_disp in datos_temp.items():
-        for corr, datos in evos_disp.items():
-            grupo_id = f"temp_{disp}_{corr}uA"
-            fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines', name=f"{disp} @ {corr} uA", legendgroup=grupo_id, opacity=0.5))
-            if datos.get("y_fit") is not None:
-                fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y_fit"], mode='lines', name=f"{disp} @ {corr} uA (Fit)", legendgroup=grupo_id, showlegend=False, line=dict(width=2, dash='dash')))
+    _agregar_trazas_anidadas(fig_ply, datos_temp, modo='lines', incluir_fit=True, estilo_fit='dash', opacity=0.5)
             
     _renderizar_grafico(
         fig_ply, 
@@ -198,11 +209,9 @@ def graficar_evolucion_temperatura(titulo, datos_temp):
 
 def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t):
     fig_ply = go.Figure()
-    for disp, evos_disp in todas_las_evos_i_vs_t.items():
-        for corr, datos in evos_disp.items():
-            grupo_id = f"{disp}_{corr}uA"
-            fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='markers', name=f"{disp} @ {corr} uA", legendgroup=grupo_id, marker=dict(size=4), opacity=0.6))
-            fig_ply.add_trace(go.Scatter(x=datos["x"], y=datos["y_fit"], mode='lines', name=f"{disp} @ {corr} uA (Fit)", legendgroup=grupo_id, showlegend=False, line=dict(width=2)))
+    _agregar_trazas_anidadas(
+        fig_ply, todas_las_evos_i_vs_t, modo='markers', incluir_fit=True, estilo_fit='solid', marker=dict(size=4), opacity=0.6
+    )
                 
     _renderizar_grafico(
         fig_ply, 
