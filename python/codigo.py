@@ -175,7 +175,11 @@ elif opcion == "Resumen":
     lista_temps_resumen = [30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130]
     
     sens_abs_t2 = proc_sens.procesar_sensibilidad(["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"], "FG_tanda2", normalizado=False)
-    resultados_ruido = proc_ruido.procesar_ruido(dispositivos_cruce, corrientes_ruido)
+    
+    # Reutilizamos el análisis de ruido en una sola pasada
+    datos_ruido_resumen = proc_ruido.obtener_analisis_ruido_completo(dispositivos_cruce, corrientes_ruido, es_larga=False)
+    _, _, _, resultados_ruido = proc_ruido.extraer_estructuras_ruido(datos_ruido_resumen, restar_deriva=True)
+    
     datos_temp_resumen = proc_temp.obtener_datos_I_vs_T(dispositivos_cruce, corrientes_ruido, lista_temps_resumen)
     
     sens_resumen = {disp: sens_abs_t2[0][disp] for disp in dispositivos_cruce}
