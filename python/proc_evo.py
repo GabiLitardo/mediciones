@@ -2,6 +2,7 @@
 import numpy as np
 import streamlit as st
 from lector_archivos import cargar_curva_iv_referencia
+from lector_archivos import cargar_medicion_tanda
 
 def calcular_tiempo_acumulado(nro, tipo_tanda):
     t = 0
@@ -41,7 +42,7 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, rng=60):
     for disp in lista_dispositivos:
         tiempos, valores = [], []
         for nro in range(0, rng):
-            archivo_encontrado = lector_archivos.cargar_medicion_tanda(disp, tipo_tanda, nro)
+            archivo_encontrado = cargar_medicion_tanda(disp, tipo_tanda, nro)
             
             if archivo_encontrado is not None:
                 t = calcular_tiempo_acumulado(nro, tipo_tanda)
