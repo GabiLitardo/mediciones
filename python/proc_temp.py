@@ -1,7 +1,7 @@
 # proc_temp.py
 import numpy as np
 import streamlit as st
-import lector_archivos
+from lector_archivos import cargar_medicion_temperatura
 
 @st.cache_data
 def obtener_datos_I_vs_T(lista_dispositivos, corrientes_nominales, lista_temperaturas):
@@ -14,7 +14,7 @@ def obtener_datos_I_vs_T(lista_dispositivos, corrientes_nominales, lista_tempera
             corrientes_aux = []
             
             for temp in lista_temperaturas:
-                datos = lector_archivos.cargar_medicion_temperatura(disp, corr, temp)
+                datos = cargar_medicion_temperatura(disp, corr, temp)
                 
                 if datos is not None:
                     v_drain = datos[:, 0]

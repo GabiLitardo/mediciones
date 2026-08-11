@@ -1,7 +1,7 @@
 # proc_evo.py
 import numpy as np
 import streamlit as st
-import lector_archivos
+from lector_archivos import cargar_curva_iv_referencia
 
 def calcular_tiempo_acumulado(nro, tipo_tanda):
     t = 0
@@ -26,7 +26,7 @@ def calcular_tiempo_acumulado(nro, tipo_tanda):
 
 @st.cache_data
 def obtener_vg_por_corriente(dispositivo, corriente_buscada):
-    datos = lector_archivos.cargar_curva_iv_referencia(dispositivo)
+    datos = cargar_curva_iv_referencia(dispositivo)
     tensiones_g = datos[:, 0]
     corrientes_d = np.abs(datos[:, 1])
 

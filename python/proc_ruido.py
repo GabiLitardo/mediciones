@@ -1,6 +1,6 @@
 # proc_ruido.py
 import numpy as np
-import lector_archivos
+from lector_archivos import cargar_medicion_ruido
 
 A_SH = 1.12924e-3
 B_SH = 2.34108e-4
@@ -38,7 +38,7 @@ def obtener_evolucion_ruido(lista_dispositivos, corrientes_nominales, es_larga=F
     for disp in lista_dispositivos:
         resultado[disp] = {}
         for corr in corrientes_nominales:
-            datos_matriz = lector_archivos.cargar_medicion_ruido(disp, corr, es_larga)
+            datos_matriz = cargar_medicion_ruido(disp, corr, es_larga)
             if datos_matriz is not None:
                 datos = procesar_matriz_ruido(datos_matriz)
                 y_val = datos["i_ruido_neto_uA"] if restar_deriva else datos["corriente_uA"]
@@ -51,7 +51,7 @@ def obtener_evolucion_temperatura_ruido(lista_dispositivos, corrientes_nominales
     for disp in lista_dispositivos:
         resultado[disp] = {}
         for corr in corrientes_nominales:
-            datos_matriz = lector_archivos.cargar_medicion_ruido(disp, corr, es_larga)
+            datos_matriz = cargar_medicion_ruido(disp, corr, es_larga)
             if datos_matriz is not None:
                 datos = procesar_matriz_ruido(datos_matriz)
                 resultado[disp][corr] = {
@@ -67,7 +67,7 @@ def obtener_corriente_vs_temperatura_ruido(lista_dispositivos, corrientes_nomina
     for disp in lista_dispositivos:
         resultado[disp] = {}
         for corr in corrientes_nominales:
-            datos_matriz = lector_archivos.cargar_medicion_ruido(disp, corr, es_larga)
+            datos_matriz = cargar_medicion_ruido(disp, corr, es_larga)
             if datos_matriz is not None:
                 datos = procesar_matriz_ruido(datos_matriz)
                 resultado[disp][corr] = {

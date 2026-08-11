@@ -28,12 +28,10 @@ def cargar_curva_iv_referencia(dispositivo):
     else:
         raise ValueError("Dispositivo no válido.")
     
-    raiz = Path(".").resolve()
-    lista_rutas = list(raiz.glob(f"**/{nombre_archivo}"))
-    if not lista_rutas:
+    datos = matchear_archivos(nombre_archivo, tipo_medicion="iv")
+    if not datos:
         raise FileNotFoundError(f"No se encontró {nombre_archivo}")
-    
-    return np.genfromtxt(lista_rutas[0], skip_header=2, usecols=(0, 1), encoding="cp1252")
+    return datos[0]
 
 @st.cache_data
 def cargar_medicion_tanda(disp, tipo_tanda, nro):
