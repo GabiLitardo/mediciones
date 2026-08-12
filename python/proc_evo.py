@@ -33,10 +33,6 @@ def calcular_fit_polinomico(tiempos_list, corrientes_list):
 
 @st.cache_data
 def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, incluir_fit=True):
-    """
-    Retorna la estructura aplanada unificada para mediciones crudas:
-    {"Etiqueta": {"x": array_tiempos, "y": array_valores}}
-    """
     resultado = {}
     limite = 55 if tipo_tanda == "FOXFET" else 31
 
@@ -62,10 +58,8 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, incluir_fit=True)
             t_arr = np.array(tiempos)
             v_arr = np.array(valores)
             
-            # Puntos medidos
             resultado[f"{disp} (Medido)"] = {"x": t_arr, "y": v_arr}
 
-            # Fit polinómico de grado 4 si corresponde
             if incluir_fit and disp in ["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"]:
                 coefs = calcular_fit_polinomico(t_arr.tolist(), v_arr.tolist())
                 t_cont = np.linspace(t_arr.min(), t_arr.max(), 200)
@@ -76,10 +70,6 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, incluir_fit=True)
 
 @st.cache_data
 def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda, incluir_fit=True):
-    """
-    Calcula la evolución de V_FG equivalente y retorna la estructura aplanada unificada:
-    {"Etiqueta": {"x": array_tiempos, "y": array_vg}}
-    """
     datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, incluir_fit=False)
     resultado = {}
 
