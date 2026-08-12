@@ -28,18 +28,56 @@ def _renderizar_grafico(fig_ply, titulo, xaxis_kwargs=None, yaxis_kwargs=None, *
     html = pio.to_html(fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False)
     st.iframe(html, height="content")
 
+def graficar_curvas(titulo, dict_datos, xlabel, ylabel, clave_y=None, modo='markers+lines', es_log=False):
+    """
+    Función genérica pública para graficar series simples, anidadas o métricas escalares.
+    
+    - Si clave_y está definido (ej: "std_nA"): Extrae esa métrica escalar y la grafica vs las subclaves (corrientes).
+    - Si es serie simple (tiene "x" y "y" en la raíz del subdict): Grafica y vs x.
+    - Si es serie anidada: Grafica una curva por cada subclave (ej: corriente nominal).
+    """
+    fig = go.Figure()
+    
+    for disp, subdict in dict_datos.items():
+        if clave_y is not None:
+            # Caso 1: Extracción de métrica escalar por corriente nominal
+            x_vals = [float(c) for c, d in subdict.items() if clave_y in d]
+            y_vals = [d[clave_y] for c, d in subdict.items() if clave_y in d]
+            if x_vals:
+                idx = np.argsort(x_vals)
+                color = COLORES_DISPOSITIVOS.get(disp)
+                fig.add_trace(go.Scatter(
+                    x=np.array(x_vals)[idx], 
+                    y=np.array(y_vals)[idx], 
+                    mode=modo, 
+                    name=str(disp),
+                    line=dict(color=color) if color else None
+                ))
+        elif "x" in subdict and "y" in subdict:
+            # Caso 2: Serie simple (1 nivel)
+            fig.add_trace(go.Scatter(x=subdict["x"], y=subdict["y"], mode=modo, name=str(disp)))
+        else:
+            # Caso 3: Serie anidada de curvas (2 niveles)
+            for corr, datos in subdict.items():
+                x_data = datos.get("tiempo_s", datos.get("temp_C", datos.get("x")))
+                y_data = datos.get("i_ruido_uA", datos.get("y"))
+                fig.add_trace(go.Scatter(x=x_data, y=y_data, mode=modo, name=f"{disp} @ {corr} uA"))
+
+    _renderizar_grafico(
+        fig, titulo,
+        xaxis_kwargs=dict(title=xlabel, type="log" if es_log else "-"),
+        yaxis_kwargs=dict(title=ylabel)
+    )
+
 def _graficar_relacion_normalizada(titulo, datos_numerador, datos_sensibilidad, ylabel, factor_escala=1.0):
-    """
-    Función auxiliar genérica para graficar (Métrica / Sensibilidad) vs Corriente Normalizada.
-    Sirve tanto para Error por Ruido (sigma/S) como para Error Térmico (|alpha|/S).
-    """
     fig = go.Figure()
     for disp, d_sens in datos_sensibilidad.items():
         if datos_numerador and disp in datos_numerador:
-            es_diccionario_temp = isinstance(datos_numerador[disp].get(next(iter(datos_numerador[disp]), {})), dict)
+            d_corr = datos_numerador[disp]
+            es_temp = "alpha" in next(iter(d_corr.values()))
             
-            x_vals = [float(c) for c, d in datos_numerador[disp].items() if "alpha" in d] if es_diccionario_temp else datos_numerador[disp]["x"]
-            y_vals = [np.abs(d["alpha"]) for c, d in datos_numerador[disp].items() if "alpha" in d] if es_diccionario_temp else datos_numerador[disp]["y"] * factor_escala
+            x_vals = [float(c) for c in d_corr.keys()]
+            y_vals = [np.abs(d["alpha"]) if es_temp else d["std_nA"] * factor_escala for d in d_corr.values()]
             
             if len(x_vals) > 0:
                 idx = np.argsort(x_vals)
@@ -54,21 +92,6 @@ def _graficar_relacion_normalizada(titulo, datos_numerador, datos_sensibilidad, 
         fig, 
         dict(text=titulo, x=0.5, xanchor="center"), 
         xaxis_kwargs=dict(title=r"$\text{Corriente Normalizada }I_{D_{norm}} \text{ [}\mu \text{A]}$"), 
-        yaxis_kwargs=dict(title=ylabel)
-    )
-
-def graficar_curvas(titulo, dict_datos, xlabel, ylabel, modo='markers+lines', es_log=False):
-    fig = go.Figure()
-    for disp, subdict in dict_datos.items():
-        if "x" in subdict and "y" in subdict:
-            fig.add_trace(go.Scatter(x=subdict["x"], y=subdict["y"], mode=modo, name=str(disp)))
-        else:
-            for corr, datos in subdict.items():
-                fig.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode=modo, name=f"{disp} @ {corr} uA"))
-            
-    _renderizar_grafico(
-        fig, titulo,
-        xaxis_kwargs=dict(title=xlabel, type="log" if es_log else "-"),
         yaxis_kwargs=dict(title=ylabel)
     )
 
@@ -106,23 +129,22 @@ def graficar_I_vs_T(titulo, datos_temperatura):
     if fig_alpha.data:
         _renderizar_grafico(fig_alpha, dict(text=r"$\text{Coeficiente Térmico (}\alpha\text{) vs Corriente Nominal}$", y=0.95, x=0.5, xanchor='center', yanchor='top'), xaxis_kwargs=dict(title=r"$\text{Corriente Nominal }I_D\text{ [}\mu \text{A]}$"), yaxis_kwargs=dict(title=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu \text{A/°C]}$"))
 
-def graficar_evolucion_temperatura(titulo, datos_temp):
+def graficar_evolucion_temperatura(titulo, datos_ruido):
     fig = go.Figure()
-    for disp, corrientes_dict in datos_temp.items():
-        for corr, datos in corrientes_dict.items():
+    for disp, d_corr in datos_ruido.items():
+        for corr, datos in d_corr.items():
             gid = f"temp_{disp}_{corr}uA"
-            fig.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines', name=f"{disp} @ {corr} uA", legendgroup=gid, opacity=0.5))
-            if datos.get("y_fit") is not None:
-                fig.add_trace(go.Scatter(x=datos["x"], y=datos["y_fit"], mode='lines', name=f"{disp} @ {corr} uA (Fit)", legendgroup=gid, showlegend=False, line=dict(width=2, dash='dash')))
+            fig.add_trace(go.Scatter(x=datos["tiempo_s"], y=datos["temp_C"], mode='lines', name=f"{disp} @ {corr} uA", legendgroup=gid, opacity=0.5))
+            fig.add_trace(go.Scatter(x=datos["tiempo_s"], y=datos["temp_fit_C"], mode='lines', name=f"{disp} @ {corr} uA (Fit)", legendgroup=gid, showlegend=False, line=dict(width=2, dash='dash')))
     _renderizar_grafico(fig, titulo, xaxis_kwargs=dict(title="Tiempo [s]"), yaxis_kwargs=dict(title="Temperatura [°C]"))
 
-def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t):
+def graficar_corriente_vs_temperatura_ruido(titulo, datos_ruido):
     fig = go.Figure()
-    for disp, corrientes_dict in todas_las_evos_i_vs_t.items():
-        for corr, datos in corrientes_dict.items():
+    for disp, d_corr in datos_ruido.items():
+        for corr, datos in d_corr.items():
             gid = f"{disp}_{corr}uA"
-            fig.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='markers', name=f"{disp} @ {corr} uA", legendgroup=gid, marker=dict(size=4), opacity=0.6))
-            fig.add_trace(go.Scatter(x=datos["x"], y=datos["y_fit"], mode='lines', name=f"{disp} @ {corr} uA (Fit)", legendgroup=gid, showlegend=False, line=dict(width=2)))
+            fig.add_trace(go.Scatter(x=datos["temp_C"], y=datos["i_ruido_uA"], mode='markers', name=f"{disp} @ {corr} uA", legendgroup=gid, marker=dict(size=4), opacity=0.6))
+            fig.add_trace(go.Scatter(x=datos["temp_C"], y=datos["i_fit_uA"], mode='lines', name=f"{disp} @ {corr} uA (Fit)", legendgroup=gid, showlegend=False, line=dict(width=2)))
     _renderizar_grafico(fig, titulo, xaxis_kwargs=dict(title="Temperatura [°C]"), yaxis_kwargs=dict(title=r"$\text{Corriente }I_D \text{ [}\mu \text{A]}$"))
 
 def graficar_error_ruido_equivalente(titulo, datos_sensibilidad, datos_ruido):
@@ -131,17 +153,20 @@ def graficar_error_ruido_equivalente(titulo, datos_sensibilidad, datos_ruido):
 def graficar_error_termico_equivalente(titulo, datos_sensibilidad, datos_temp):
     _graficar_relacion_normalizada(titulo, datos_temp, datos_sensibilidad, r"$\text{Error Térmico Equivalente [Gy/°C]}$")
 
-def graficar_histograma_ruido(titulo, todas_las_evos):
+def graficar_histograma_ruido(titulo, datos_ruido):
     fig = go.Figure()
-    for disp, corrientes_dict in todas_las_evos.items():
-        for corr, datos in corrientes_dict.items():
-            fig.add_trace(go.Histogram(x=datos["y"] * 1000.0, name=f"{disp} @ {corr} uA", opacity=0.5, histnorm='probability density'))
+    for disp, d_corr in datos_ruido.items():
+        for corr, datos in d_corr.items():
+            fig.add_trace(go.Histogram(x=datos["i_ruido_uA"] * 1000.0, name=f"{disp} @ {corr} uA", opacity=0.5, histnorm='probability density'))
     _renderizar_grafico(fig, titulo, xaxis_kwargs=dict(title="Ruido Neto [nA]"), yaxis_kwargs=dict(title="Densidad de Probabilidad"), barmode='overlay')
 
 def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, datos_temp):
     fig = go.Figure()
     s_max = max(np.max(d["y"]) for d in datos_sensibilidad.values())
-    r_max = max(np.max(d["y"]) for d in datos_ruido.values())
+    
+    # Extraer desvío máximo de ruido leyendo el diccionario de 2 niveles
+    r_vals = [d["std_nA"] for d_corr in datos_ruido.values() for d in d_corr.values() if "std_nA" in d]
+    r_max = max(r_vals) if r_vals else 1.0
 
     datos_tc = {}
     for disp in datos_sensibilidad.keys():
@@ -157,11 +182,18 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
     vals_tc = [val for d in datos_tc.values() if len(d["y"]) > 0 for val in d["y"]]
     tc_min, tc_max = (min(min(vals_tc) * 1.1, -0.05), max(max(vals_tc) * 1.1, 0.05)) if vals_tc else (-0.05, 0.05)
 
-    for disp in datos_ruido.keys():
+    for disp in datos_sensibilidad.keys():
         color = COLORES_DISPOSITIVOS.get(disp)
         fig.add_trace(go.Scatter(x=datos_sensibilidad[disp]["x"], y=datos_sensibilidad[disp]["y"], mode='lines', name=f"{disp} (Sens)", line=dict(dash='solid', color=color)))
-        fig.add_trace(go.Scatter(x=datos_ruido[disp]["x"], y=datos_ruido[disp]["y"], mode='markers+lines', name=f"{disp} (Ruido)", line=dict(dash='longdash', color=color), yaxis='y2'))
-        if len(datos_tc[disp]["x"]) > 0:
+        
+        # Extraer puntos de ruido para el gráfico compuesto
+        if disp in datos_ruido:
+            x_r = [float(c) for c in datos_ruido[disp].keys()]
+            y_r = [d["std_nA"] for d in datos_ruido[disp].values()]
+            idx_r = np.argsort(x_r)
+            fig.add_trace(go.Scatter(x=np.array(x_r)[idx_r], y=np.array(y_r)[idx_r], mode='markers+lines', name=f"{disp} (Ruido)", line=dict(dash='longdash', color=color), yaxis='y2'))
+            
+        if disp in datos_tc and len(datos_tc[disp]["x"]) > 0:
             fig.add_trace(go.Scatter(x=datos_tc[disp]["x"], y=datos_tc[disp]["y"], mode='markers+lines', name=f"{disp} (TC)", line=dict(dash='dot', color=color), marker=dict(symbol='triangle-up-open'), yaxis='y3'))
 
     _renderizar_grafico(
