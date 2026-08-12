@@ -1,8 +1,20 @@
 # proc_evo.py
 import numpy as np
 import streamlit as st
-from lector_archivos import cargar_curva_iv_referencia
-from lector_archivos import cargar_medicion_tanda
+from lector_archivos import cargar_medicion_tanda, cargar_curva_iv_referencia
+
+COLUMNAS_DISPOSITIVOS = {
+    "PFGIW1": 0, "PFGIW2": 1, "PFGIW3": 2, "PFGIP2": 3,
+    "FFC1": 0, "FFC2": 1, "FFC3": 2, "FFL": 3, "FFS": 4
+}
+
+FACTOR_TENSION = 0.05
+VALOR_CERO_VOLT_TANDA2 = 57.0
+
+TRAMOS_TIEMPO = {
+    "FOXFET": [(32, 10), (44, 15), (47, 20), (50, 25), (52, 30), (53, 35)],
+    "DEFAULT": [(9, 10), (21, 15), (24, 20), (27, 25), (29, 30), (30, 35)]
+}
 
 def calcular_tiempo_acumulado(nro, tipo_tanda):
     t = 0
@@ -25,65 +37,103 @@ def calcular_tiempo_acumulado(nro, tipo_tanda):
             else: t += 10
     return t
 
-@st.cache_data
-def obtener_vg_por_corriente(dispositivo, corriente_buscada):
-    datos = cargar_curva_iv_referencia(dispositivo)
-    tensiones_g = datos[:, 0]
-    corrientes_d = np.abs(datos[:, 1])
-
-    indices_ordenados = np.argsort(corrientes_d)
-    if dispositivo == "PFGIW3":
-        corriente_buscada = corriente_buscada / 56.0
-    return np.interp(corriente_buscada, corrientes_d[indices_ordenados], tensiones_g[indices_ordenados])
+def calcular_fit_polinomico(tiempos_list, corrientes_list):
+    coeficientes = np.polyfit(tiempos_list, corrientes_list, deg=4)
+    return coeficientes.tolist()
 
 @st.cache_data
-def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, rng=60):
+def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, incluir_fit=True):
+    """
+    Retorna la estructura aplanada unificada para mediciones crudas:
+    {"Etiqueta": {"x": array_tiempos, "y": array_valores}}
+    """
     resultado = {}
+    limite = 55 if tipo_tanda == "FOXFET" else 31
+
     for disp in lista_dispositivos:
-        tiempos, valores = [], []
-        for nro in range(0, rng):
-            archivo_encontrado = cargar_medicion_tanda(disp, tipo_tanda, nro)
+        if disp not in COLUMNAS_DISPOSITIVOS:
+            continue
             
-            if archivo_encontrado is not None:
-                t = calcular_tiempo_acumulado(nro, tipo_tanda)
-                tensiones = archivo_encontrado[:, 0]
-                corrientes = archivo_encontrado[:, 1]
-                
-                if tipo_tanda == "FOXFET":
-                    corrientes_abs = np.abs(corrientes)
-                    indices_orden = np.argsort(corrientes_abs)
-                    x_sort = corrientes_abs[indices_orden]
-                    y_sort = tensiones[indices_orden]
-                    valores.append(np.interp(1e-7, x_sort, y_sort))
-                    tiempos.append(t)
-                else:
-                    idx = np.where(np.round(tensiones, 1) == -4.5)[0]
-                    if len(idx) > 0:
-                        valores.append(np.abs(corrientes[idx[0]] * 1e6))
-                        tiempos.append(t)
-            else:
-                break               
+        col_idx = COLUMNAS_DISPOSITIVOS[disp]
+        tiempos, valores = [], []
+
+        for i in range(0, limite + 1):
+            mediciones = cargar_medicion_tanda(i, tipo_tanda)
+            if mediciones and len(mediciones) > col_idx:
+                matriz = mediciones[col_idx]
+                if matriz is not None and matriz.size > 0:
+                    t_acum = calcular_tiempo_acumulado(i, tipo_tanda)
+                    
+                    if tipo_tanda == "FOXFET":
+                        col_i, col_v = matriz[:, 0], matriz[:, 1]
+                        v_interp = np.interp(0.1, col_i, col_v)
+                        tiempos.append(t_acum)
+                        valores.append(v_interp)
+                    else:
+                        val_uA = np.abs(matriz[0, 1]) * 1e6
+                        tiempos.append(t_acum)
+                        valores.append(val_uA)
+
         if tiempos:
-            indices = np.argsort(tiempos)
-            resultado[disp] = {
-                "tiempos": np.array(tiempos)[indices],
-                "valores": np.array(valores)[indices]
-            }
+            t_arr = np.array(tiempos)
+            v_arr = np.array(valores)
+            
+            # Puntos medidos
+            resultado[f"{disp} (Medido)"] = {"x": t_arr, "y": v_arr}
+
+            # Fit polinómico de grado 4 si corresponde
+            if incluir_fit and disp in ["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"]:
+                coefs = calcular_fit_polinomico(t_arr.tolist(), v_arr.tolist())
+                t_cont = np.linspace(t_arr.min(), t_arr.max(), 200)
+                v_fit = np.polyval(coefs, t_cont)
+                resultado[f"{disp} (Fit Poly g4)"] = {"x": t_cont, "y": v_fit}
+
     return resultado
 
 @st.cache_data
-def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda):
-    datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda)
+def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda, incluir_fit=True):
+    """
+    Calcula la evolución de V_FG equivalente y retorna la estructura aplanada unificada:
+    {"Etiqueta": {"x": array_tiempos, "y": array_vg}}
+    """
+    datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, incluir_fit=False)
     resultado = {}
-    for disp, datos in datos_crudos.items():
-        tiempos_vg, tensiones_vg = [], []
-        for t, corriente_ua in zip(datos["tiempos"], datos["valores"]):
-            try:
-                vg_val = obtener_vg_por_corriente(disp, corriente_ua * 1e-6)
-                tensiones_vg.append(vg_val)
-                tiempos_vg.append(t)
-            except (ValueError, IndexError):
-                continue
-        if tiempos_vg:
-            resultado[disp] = {"tiempos": np.array(tiempos_vg), "valores": np.array(tensiones_vg)}
+
+    for disp in lista_dispositivos:
+        tag_medido = f"{disp} (Medido)"
+        if tag_medido not in datos_crudos:
+            continue
+
+        datos_disp = datos_crudos[tag_medido]
+        tiempos = datos_disp["x"]
+        corrientes_uA = datos_disp["y"]
+
+        med_ref = cargar_curva_iv_referencia(disp)
+        if med_ref is None:
+            continue
+
+        v_ref = med_ref[:, 0]
+        i_ref = np.abs(med_ref[:, 1]) * 1e6
+
+        vg_equiv = []
+        for i_val in corrientes_uA:
+            v_int = np.interp(i_val, i_ref, v_ref)
+            vg_equiv.append(v_int)
+
+        t_arr = np.array(tiempos)
+        vg_arr = np.array(vg_equiv)
+
+        if tipo_tanda == "FG_tanda1":
+            vg_arr = (vg_arr - vg_arr[0]) * FACTOR_TENSION
+        elif tipo_tanda == "FG_tanda2":
+            vg_arr = (vg_arr - vg_arr[0]) * FACTOR_TENSION + VALOR_CERO_VOLT_TANDA2
+
+        resultado[f"{disp} (Medido)"] = {"x": t_arr, "y": vg_arr}
+
+        if incluir_fit and disp in ["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"]:
+            coefs = calcular_fit_polinomico(t_arr.tolist(), vg_arr.tolist())
+            t_cont = np.linspace(t_arr.min(), t_arr.max(), 200)
+            vg_fit = np.polyval(coefs, t_cont)
+            resultado[f"{disp} (Fit Poly g4)"] = {"x": t_cont, "y": vg_fit}
+
     return resultado

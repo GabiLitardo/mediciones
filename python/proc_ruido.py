@@ -12,26 +12,19 @@ def convertir_r_a_temp_steinhart(resistencia):
     return (1.0 / (A_SH + B_SH * ln_R + C_SH * (ln_R ** 3))) - 273.15
 
 @st.cache_data
-def obtener_analisis_ruido(lista_dispositivos, corrientes_nominales, es_larga=False, restar_deriva=True):
+def obtener_analisis_ruido_completo(lista_dispositivos, corrientes_nominales, es_larga=False, restar_deriva=True):
     """
-    Retorna la estructura unificada de 2 niveles:
-    {
-        disp: {
-            corr: {
-                "tiempo_s": array,
-                "i_ruido_uA": array,
-                "temp_C": array,
-                "temp_fit_C": array,
-                "i_fit_uA": array,
-                "std_nA": float
-            }
-        }
-    }
+    Procesa las mediciones de ruido y devuelve estructuras aplanadas unificadas
+    con formato {"Etiqueta": {"x": array, "y": array}} listas para graficar_curvas.
     """
-    resultado = {}
+    std_ruido = {}
+    evos_ruido = {}
+    evos_temp = {}
+    i_vs_t = {}
 
     for disp in lista_dispositivos:
-        d_corr = {}
+        x_corr = []
+        y_std = []
 
         for corr in corrientes_nominales:
             datos_matriz = cargar_medicion_ruido(disp, corr, es_larga)
@@ -53,16 +46,32 @@ def obtener_analisis_ruido(lista_dispositivos, corrientes_nominales, es_larga=Fa
             y_val = i_ruido_neto_uA if restar_deriva else corriente_uA
             std_val = np.std(y_val * 1000.0, ddof=1)
 
-            d_corr[corr] = {
-                "tiempo_s": tiempo_s,
-                "i_ruido_uA": y_val,
-                "temp_C": temperatura_C,
-                "temp_fit_C": temperatura_fit_C,
-                "i_fit_uA": corriente_fit_uA,
-                "std_nA": std_val
+            tag = f"{disp} @ {corr} uA"
+            
+            # Evolución del ruido
+            evos_ruido[tag] = {"x": tiempo_s, "y": y_val}
+            
+            # Evolución de temperatura (medida y fit)
+            evos_temp[tag] = {"x": tiempo_s, "y": temperatura_C}
+            evos_temp[f"{tag} (Fit)"] = {"x": tiempo_s, "y": temperatura_fit_C}
+
+            # Corriente vs Temperatura (medida y fit)
+            i_vs_t[tag] = {"x": temperatura_C, "y": corriente_uA}
+            i_vs_t[f"{tag} (Fit)"] = {"x": temperatura_C, "y": corriente_fit_uA}
+
+            x_corr.append(float(corr))
+            y_std.append(std_val)
+
+        if x_corr:
+            idx = np.argsort(x_corr)
+            std_ruido[disp] = {
+                "x": np.array(x_corr)[idx],
+                "y": np.array(y_std)[idx]
             }
 
-        if d_corr:
-            resultado[disp] = d_corr
-
-    return resultado
+    return {
+        "std_ruido": std_ruido,
+        "evos_ruido": evos_ruido,
+        "evos_temp": evos_temp,
+        "i_vs_t": i_vs_t
+    }
