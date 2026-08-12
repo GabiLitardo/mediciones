@@ -30,7 +30,7 @@ def cargar_curva_iv_referencia(dispositivo):
     return datos[0]
 
 @st.cache_data
-def cargar_medicion_tanda(disp, tipo_tanda, nro = 60):
+def cargar_medicion_tanda(disp, tipo_tanda, nro):
     if tipo_tanda in ["FG_tanda1", "FOXFET"]:
         sufijo = ".ri"; prefijo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_" if tipo_tanda != "FOXFET" else f"MOSISV72M_DIE4_{disp}_IV_VD=5V_postrad{nro}_"
     elif tipo_tanda == "FG_tanda2":
