@@ -14,7 +14,7 @@ def matchear_archivos(nombre_archivo_generico, tipo_medicion="iv"):
             medicion = np.genfromtxt(ruta_archivo, delimiter='\t', skip_header=5, usecols=(0, 1, 2), encoding="cp1252")
         elif tipo_medicion == "temperatura":
             medicion = np.genfromtxt(ruta_archivo, delimiter=',', skip_header=1, usecols=(3, 4))
-        else:
+        elif tipo_medicion == "iv":
             medicion = np.genfromtxt(ruta_archivo, skip_header=2, usecols=(0, 1), encoding="cp1252")
         mediciones.append(medicion)  
     return mediciones
@@ -25,12 +25,8 @@ def cargar_curva_iv_referencia(dispositivo):
         nombre_archivo = "MOSISV72M_DIE4_PMOS_STD1_IV_VD=-4.5V_M1.ri"
     elif dispositivo == "PFGIW1":
         nombre_archivo = "MOSISV72M_DIE4_PMOS_STD2_IV_VD=-4.5V_M1.ri"
-    else:
-        raise ValueError("Dispositivo no válido.")
     
     datos = matchear_archivos(nombre_archivo, tipo_medicion="iv")
-    if not datos:
-        raise FileNotFoundError(f"No se encontró {nombre_archivo}")
     return datos[0]
 
 @st.cache_data
@@ -53,20 +49,21 @@ def cargar_medicion_ruido(disp, corr, es_larga):
     mediciones = matchear_archivos(nombre, tipo_medicion="ruido")
     return mediciones[0] if mediciones else None
 
+def _obtener_version_m(path):
+    if "_M" in path.stem:
+        texto_version = path.stem.rsplit("_M", 1)[1]
+        if texto_version.isdigit():
+            return int(texto_version)
+    return -1
+
 @st.cache_data
 def cargar_medicion_temperatura(disp, corr, temp):
-    directorio_base = Path(".")
-    patrones = [f"*_UTN_DIE4_{disp}_{corr}uA_{temp}_M*.csv", f"*_UTN_DIE4_{disp}_{corr}u_{temp}_M*.csv"]
-    archivos = []
-    for pat in patrones:
-        archivos.extend(list(directorio_base.glob(f"**/{pat}")))
-    
-    if not archivos:
-        return None
-
-    def extraer_m(path):
-        match = re.search(r"_M(\d+)\.csv$", path.name)
-        return int(match.group(1)) if match else -1
-
-    archivo_reciente = max(archivos, key=extraer_m)
-    return np.genfromtxt(archivo_reciente, delimiter=',', skip_header=1, usecols=(3, 4))
+    # Probamos primero la variante con 'uA' y luego con 'u'
+    for variante in [f"{corr}uA", f"{corr}u"]:
+        archivos = list(Path(".").glob(f"**/*_UTN_DIE4_{disp}_{variante}_{temp}_M*.csv"))
+        if archivos:
+            archivo_reciente = max(archivos, key=_obtener_version_m)
+            mediciones = matchear_archivos(archivo_reciente.name, tipo_medicion="temperatura")
+            return mediciones[0] if mediciones else None
+            
+    return None
