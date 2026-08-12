@@ -153,7 +153,6 @@ elif opcion == "Resumen":
     st.header("Sensibilidad absoluta, ruido y coef. térmico vs $I_D$ normalizada")
         
     sens_abs_t2 = proc_sens.procesar_sensibilidad(dispos_FG, "FG_tanda2", normalizado=False)
-    print(list(sens_abs_t2[0].keys()), flush = True)
     # Procesamiento unificado de ruido
     ruido_resumen_data = proc_ruido.obtener_analisis_ruido_completo(dispos_FG, corrientes_normalizadas, es_larga=False, restar_deriva=True)
     ruido_resumen = ruido_resumen_data["std_ruido"]

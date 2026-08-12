@@ -42,7 +42,8 @@ def calcular_sensibilidad_ventana(tiempos, corrientes_proc, corrientes_norm, n_v
 def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ventana=6):
     datos_crudos = obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda) if normalizado else obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda)
     resultado_fit, resultado_discreto = {}, {}
-    
+    print(list(datos_crudos[0].keys()), flush = True)
+
     for disp, datos in datos_crudos.items():
         tiempos, corrientes = datos["tiempos"], datos["valores"]
         factor = factores_normalizacion.get(disp, 1.0)
