@@ -29,10 +29,6 @@ def _renderizar_grafico(fig_ply, titulo, xaxis_kwargs=None, yaxis_kwargs=None, *
     st.iframe(html, height="content")
 
 def _graficar_relacion_normalizada(titulo, datos_numerador, datos_sensibilidad, ylabel, factor_escala=1.0):
-    """
-    Función auxiliar genérica para graficar (Métrica / Sensibilidad) vs Corriente Normalizada.
-    Sirve tanto para Error por Ruido (sigma/S) como para Error Térmico (|alpha|/S).
-    """
     fig = go.Figure()
     for disp, d_sens in datos_sensibilidad.items():
         if datos_numerador and disp in datos_numerador:
@@ -75,7 +71,7 @@ def graficar_curvas(titulo, dict_datos, xlabel, ylabel, modo='markers+lines', es
 def graficar_dispositivos(titulo, ylabel, datos_procesados):
     fig = go.Figure()
     for disp, datos in datos_procesados.items():
-        t, v = datos["tiempos"], datos["valores"]
+        t, v = datos["x"], datos["y"]
         fig.add_trace(go.Scatter(x=t, y=v, mode='markers', name=f"{disp} (Medido)"))
         if disp in ["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"]:
             coefs = calcular_fit_polinomico(t.tolist(), v.tolist())

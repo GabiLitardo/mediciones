@@ -25,6 +25,10 @@ def calcular_tiempo_acumulado(nro, tipo_tanda):
             else: t += 10
     return t
 
+def calcular_fit_polinomico(tiempos_list, corrientes_list):
+    coeficientes = np.polyfit(tiempos_list, corrientes_list, deg=4)
+    return coeficientes.tolist()
+
 @st.cache_data
 def obtener_vg_por_corriente(dispositivo, corriente_buscada):
     datos = cargar_curva_iv_referencia(dispositivo)
@@ -65,25 +69,51 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, rng=60):
                 break               
         if tiempos:
             indices = np.argsort(tiempos)
-            resultado[disp] = {
-                "tiempos": np.array(tiempos)[indices],
-                "valores": np.array(valores)[indices]
-            }
+            x_arr = np.array(tiempos)[indices]
+            y_arr = np.array(valores)[indices]
+            
+            # Serie 1: Medido
+            resultado[f"{disp} (Medido)"] = {"x": x_arr, "y": y_arr}
+
+            # Serie 2: Fit Polinómico (solo para los dispositivos que corresponden)
+            if disp in ["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"]:
+                coefs = calcular_fit_polinomico(x_arr.tolist(), y_arr.tolist())
+                t_cont = np.linspace(x_arr.min(), x_arr.max(), 200)
+                y_fit = np.polyval(coefs, t_cont)
+                resultado[f"{disp} (Fit Poly g4)"] = {"x": t_cont, "y": y_fit}
+
     return resultado
 
 @st.cache_data
 def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda):
     datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda)
     resultado = {}
-    for disp, datos in datos_crudos.items():
+    
+    # Filtramos para hacer la conversión de V_FG solo sobre las series medidas
+    for tag, datos in datos_crudos.items():
+        if "(Fit" in tag:
+            continue
+        disp = tag.replace(" (Medido)", "")
+        
         tiempos_vg, tensiones_vg = [], []
-        for t, corriente_ua in zip(datos["tiempos"], datos["valores"]):
+        for t, corriente_ua in zip(datos["x"], datos["y"]):
             try:
                 vg_val = obtener_vg_por_corriente(disp, corriente_ua * 1e-6)
                 tensiones_vg.append(vg_val)
                 tiempos_vg.append(t)
             except (ValueError, IndexError):
                 continue
+
         if tiempos_vg:
-            resultado[disp] = {"tiempos": np.array(tiempos_vg), "valores": np.array(tensiones_vg)}
+            x_arr = np.array(tiempos_vg)
+            y_arr = np.array(tensiones_vg)
+            
+            resultado[f"{disp} (Medido)"] = {"x": x_arr, "y": y_arr}
+            
+            if disp in ["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"]:
+                coefs = calcular_fit_polinomico(x_arr.tolist(), y_arr.tolist())
+                t_cont = np.linspace(x_arr.min(), x_arr.max(), 200)
+                y_fit = np.polyval(coefs, t_cont)
+                resultado[f"{disp} (Fit Poly g4)"] = {"x": t_cont, "y": y_fit}
+
     return resultado

@@ -25,40 +25,50 @@ if opcion == "Evolución temporal":
     st.header("Evolución Temporal")
     
     datos_fg_t1 = proc_evo.obtener_datos_crudos_tanda(dispos_FG, "FG_tanda1")
-    graficos.graficar_dispositivos(
+    graficos.graficar_curvas(
         titulo="Evolución Floating Gates tanda 1 (I @ V = -4.5 V)",
-        ylabel=r"$I_D\text{ [}\mu \text{A}]$",
-        datos_procesados=datos_fg_t1
+        dict_datos=datos_fg_t1,
+        xlabel="Tiempo de irradiación [min]",
+        ylabel=r"$I_D\text{ [}\mu \text{A]}$",
+        modo='markers+lines'
     )
 
     datos_fg_t2 = proc_evo.obtener_datos_crudos_tanda(dispos_FG, "FG_tanda2")
-    graficos.graficar_dispositivos(
+    graficos.graficar_curvas(
         titulo="Evolución Floating Gates tanda 2 (I @ V = -4.5 V)",
-        ylabel=r"$I_D\text{ [}\mu \text{A}]$",
-        datos_procesados=datos_fg_t2
+        dict_datos=datos_fg_t2,
+        xlabel="Tiempo de irradiación [min]",
+        ylabel=r"$I_D\text{ [}\mu \text{A]}$",
+        modo='markers+lines'
     )
 
     datos_foxfet = proc_evo.obtener_datos_crudos_tanda(dispos_FOXFET, "FOXFET")
-    graficos.graficar_dispositivos(
+    graficos.graficar_curvas(
         titulo="Evolución FOXFETs (Tensión interpolada @ I = 0.1 uA)",
+        dict_datos=datos_foxfet,
+        xlabel="Tiempo de irradiación [min]",
         ylabel="Tensión [V]",
-        datos_procesados=datos_foxfet
+        modo='markers+lines'
     )
 
     st.subheader("Evolución de la tensión de compuerta equivalente ($V_{FG}$)")
     
     datos_vg_t1 = proc_evo.obtener_datos_evolucion_vg(dispos_FG, "FG_tanda1")
-    graficos.graficar_dispositivos(
+    graficos.graficar_curvas(
         titulo="Descarga temporal de Floating Gates tanda 1 en tensión",
+        dict_datos=datos_vg_t1,
+        xlabel="Tiempo de irradiación [min]",
         ylabel=r"$\text{Tensión }V_{FG}\text{ [V]}$",
-        datos_procesados=datos_vg_t1
+        modo='markers+lines'
     )
     
     datos_vg_t2 = proc_evo.obtener_datos_evolucion_vg(dispos_FG, "FG_tanda2")
-    graficos.graficar_dispositivos(
+    graficos.graficar_curvas(
         titulo="Descarga temporal de Floating Gates tanda 2 en tensión",
+        dict_datos=datos_vg_t2,
+        xlabel="Tiempo de irradiación [min]",
         ylabel=r"$\text{Tensión }V_{FG}\text{ [V]}$",
-        datos_procesados=datos_vg_t2
+        modo='markers+lines'
     )
 
 # =====================================================================
