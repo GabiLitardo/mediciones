@@ -69,7 +69,6 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, rng=60):
                 "tiempos": np.array(tiempos)[indices],
                 "valores": np.array(valores)[indices]
             }
-    print(list(resultado.keys()))
     return resultado
 
 @st.cache_data

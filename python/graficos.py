@@ -150,7 +150,7 @@ def graficar_superposicion_sens_ruido(titulo, datos_sensibilidad, datos_ruido, d
     vals_tc = [val for d in datos_tc.values() if len(d["y"]) > 0 for val in d["y"]]
     tc_min, tc_max = (min(min(vals_tc) * 1.1, -0.05), max(max(vals_tc) * 1.1, 0.05)) if vals_tc else (-0.05, 0.05)
 
-    for disp in datos_sensibilidad.keys():
+    for disp in datos_ruido.keys():
         color = colores.get(disp)
         fig.add_trace(go.Scatter(x=datos_sensibilidad[disp]["x"], y=datos_sensibilidad[disp]["y"], mode='lines', name=f"{disp} (Sens)", line=dict(dash='solid', color=color)))
         fig.add_trace(go.Scatter(x=datos_ruido[disp]["x"], y=datos_ruido[disp]["y"], mode='markers+lines', name=f"{disp} (Ruido)", line=dict(dash='longdash', color=color), yaxis='y2'))

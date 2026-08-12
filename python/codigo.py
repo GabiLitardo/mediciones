@@ -156,6 +156,7 @@ elif opcion == "Resumen":
     # Procesamiento unificado de ruido
     ruido_resumen_data = proc_ruido.obtener_analisis_ruido_completo(dispos_FG, corrientes_normalizadas, es_larga=False, restar_deriva=True)
     ruido_resumen = ruido_resumen_data["std_ruido"]
+    print(ruido_resumen.keys(), flush=True)
     
     datos_temp_resumen = proc_temp.obtener_datos_I_vs_T(dispos_FG, corrientes_normalizadas, temperaturas)
     
