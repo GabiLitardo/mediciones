@@ -113,20 +113,19 @@ elif opcion == "Ruido":
     restar_deriva = st.checkbox("Restar deriva térmica para visualizar el ruido?", value=True)
     log = st.checkbox("Graficar Semilog?", value=False)
 
-    ruido_corto = proc_ruido.obtener_analisis_ruido(dispos_FG, corrientes_normalizadas, es_larga=False, restar_deriva=restar_deriva)
+    ruido_corto = proc_ruido.obtener_analisis_ruido_completo(dispos_FG, corrientes_normalizadas, es_larga=False, restar_deriva=restar_deriva)
 
-    # Reusamos graficar_curvas especificando la clave a graficar
-    graficos.graficar_curvas("Desvío estándar del ruido neto vs Corriente nominal", ruido_corto, r"$\text{Corriente Nominal }I_D\text{ [}\mu \text{A]}$", "Desvío de Ruido [nA]", clave_y="std_nA", modo='markers+lines')
-    graficos.graficar_curvas("Corriente vs tiempo a corto plazo", ruido_corto, "Tiempo [s]", r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$", modo='lines', es_log=log)
-    graficos.graficar_histograma_ruido("Distribución del Ruido Neto a corto plazo", ruido_corto)
+    graficos.graficar_curvas("Desvío estándar del ruido neto vs Corriente nominal", ruido_corto["std_ruido"], r"$\text{Corriente Nominal }I_D\text{ [}\mu \text{A]}$", "Desvío de Ruido [nA]", modo='markers')
+    graficos.graficar_curvas("Corriente vs tiempo a corto plazo", ruido_corto["evos"], "Tiempo [s]", r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$", modo='lines', es_log=log)
+    graficos.graficar_histograma_ruido("Distribución del Ruido Neto a corto plazo", todas_las_evos=ruido_corto["evos"])
 
-    ruido_largo = proc_ruido.obtener_analisis_ruido(dispos_FG, corrientes_normalizadas, es_larga=True, restar_deriva=restar_deriva)
+    ruido_largo = proc_ruido.obtener_analisis_ruido_completo(dispos_FG, corrientes_normalizadas, es_larga=True, restar_deriva=restar_deriva)
 
-    graficos.graficar_curvas("Corriente vs tiempo a largo plazo", ruido_largo, "Tiempo [s]", r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$", modo='lines', es_log=log)
-    graficos.graficar_histograma_ruido("Distribución del Ruido Neto a largo plazo", ruido_largo)
+    graficos.graficar_curvas("Corriente vs tiempo a largo plazo", ruido_largo["evos"], "Tiempo [s]", r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$", modo='lines', es_log=log)
+    graficos.graficar_histograma_ruido("Distribución del Ruido Neto a largo plazo", todas_las_evos=ruido_largo["evos"])
 
-    graficos.graficar_evolucion_temperatura("Evolución de Temperatura vs Tiempo durante medición de ruido", ruido_corto)
-    graficos.graficar_corriente_vs_temperatura_ruido("Corriente vs Temperatura durante medición de ruido", ruido_corto)
+    graficos.graficar_evolucion_temperatura("Evolución de Temperatura vs Tiempo durante medición de ruido", datos_temp=ruido_corto["evos_temp"])
+    graficos.graficar_corriente_vs_temperatura_ruido("Corriente vs Temperatura durante medición de ruido", todas_las_evos_i_vs_t=ruido_corto["i_vs_t"])
 
 # =====================================================================
 # SECCIÓN 4: TEMPERATURA
@@ -153,8 +152,8 @@ elif opcion == "Resumen":
     st.header("Sensibilidad absoluta, ruido y coef. térmico vs $I_D$ normalizada")
         
     sens_abs_t2 = proc_sens.procesar_sensibilidad(dispos_FG, "FG_tanda2", normalizado=False)
-    ruido_resumen_data = proc_ruido.obtener_analisis_ruido(dispos_FG, corrientes_normalizadas, es_larga=False, restar_deriva=True)
-    ruido_resumen = ruido_resumen_data["std_nA"]
+    ruido_resumen_data = proc_ruido.obtener_analisis_ruido_completo(dispos_FG, corrientes_normalizadas, es_larga=False, restar_deriva=True)
+    ruido_resumen = ruido_resumen_data["std_ruido"]
     
     datos_temp_resumen = proc_temp.obtener_datos_I_vs_T(dispos_FG, corrientes_normalizadas, temperaturas)
     
