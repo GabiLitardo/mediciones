@@ -33,6 +33,10 @@ def calcular_fit_polinomico(tiempos_list, corrientes_list):
 
 @st.cache_data
 def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, incluir_fit=True):
+    """
+    Retorna la estructura aplanada unificada para mediciones crudas:
+    {"Etiqueta": {"x": array_tiempos, "y": array_valores}}
+    """
     resultado = {}
     limite = 55 if tipo_tanda == "FOXFET" else 31
 
@@ -70,6 +74,10 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, incluir_fit=True)
 
 @st.cache_data
 def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda, incluir_fit=True):
+    """
+    Calcula la evolución de V_FG equivalente y retorna la estructura aplanada unificada:
+    {"Etiqueta": {"x": array_tiempos, "y": array_vg}}
+    """
     datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, incluir_fit=False)
     resultado = {}
 
