@@ -11,11 +11,6 @@ COLUMNAS_DISPOSITIVOS = {
 FACTOR_TENSION = 0.05
 VALOR_CERO_VOLT_TANDA2 = 57.0
 
-TRAMOS_TIEMPO = {
-    "FOXFET": [(32, 10), (44, 15), (47, 20), (50, 25), (52, 30), (53, 35)],
-    "DEFAULT": [(9, 10), (21, 15), (24, 20), (27, 25), (29, 30), (30, 35)]
-}
-
 def calcular_tiempo_acumulado(nro, tipo_tanda):
     t = 0
     for i in range(1, nro + 1):
@@ -42,11 +37,7 @@ def calcular_fit_polinomico(tiempos_list, corrientes_list):
     return coeficientes.tolist()
 
 @st.cache_data
-def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, incluir_fit=True, nro = 60):
-    """
-    Retorna la estructura aplanada unificada para mediciones crudas:
-    {"Etiqueta": {"x": array_tiempos, "y": array_valores}}
-    """
+def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, incluir_fit=True):
     resultado = {}
     limite = 55 if tipo_tanda == "FOXFET" else 31
 
@@ -58,7 +49,7 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, incluir_fit=True,
         tiempos, valores = [], []
 
         for i in range(0, limite + 1):
-            mediciones = cargar_medicion_tanda(i, tipo_tanda, nro)
+            mediciones = cargar_medicion_tanda(disp, tipo_tanda, i)
             if mediciones and len(mediciones) > col_idx:
                 matriz = mediciones[col_idx]
                 if matriz is not None and matriz.size > 0:
@@ -78,10 +69,8 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, incluir_fit=True,
             t_arr = np.array(tiempos)
             v_arr = np.array(valores)
             
-            # Puntos medidos
             resultado[f"{disp} (Medido)"] = {"x": t_arr, "y": v_arr}
 
-            # Fit polinómico de grado 4 si corresponde
             if incluir_fit and disp in ["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"]:
                 coefs = calcular_fit_polinomico(t_arr.tolist(), v_arr.tolist())
                 t_cont = np.linspace(t_arr.min(), t_arr.max(), 200)
@@ -92,10 +81,6 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, incluir_fit=True,
 
 @st.cache_data
 def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda, incluir_fit=True):
-    """
-    Calcula la evolución de V_FG equivalente y retorna la estructura aplanada unificada:
-    {"Etiqueta": {"x": array_tiempos, "y": array_vg}}
-    """
     datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, incluir_fit=False)
     resultado = {}
 

@@ -229,7 +229,13 @@ elif opcion == "Resumen":
     
     sens_resumen = {disp: datos for disp, datos in sens_abs_t2.items() if "(Poly)" not in disp}
     
-    # Para los errores equivalentes, calculamos la relación en el diccionario plano
+    graficos.graficar_superposicion_sens_ruido(
+        titulo=r"$\text{Sensibilidad absoluta, ruido y coef. térmico vs }I_D \text{ normalizada}$",
+        datos_sensibilidad=sens_resumen,
+        datos_ruido=ruido_resumen_data["std_ruido"],
+        datos_temp=temp_resumen_data["alpha_vs_i"]
+    )
+    
     st.subheader("Error equivalente por ruido ($\\sigma/S$)")
     err_ruido = {}
     for disp in dispos_FG:
@@ -237,7 +243,7 @@ elif opcion == "Resumen":
             s_x = sens_resumen[disp]["x"]
             s_y = sens_resumen[disp]["y"]
             r_x = ruido_resumen_data["std_ruido"][disp]["x"]
-            r_y = ruido_resumen_data["std_ruido"][disp]["y"] / 1000.0  # a uA
+            r_y = ruido_resumen_data["std_ruido"][disp]["y"] / 1000.0
             
             s_interp = np.interp(r_x, s_x, s_y)
             err_ruido[disp] = {"x": r_x, "y": r_y / s_interp}

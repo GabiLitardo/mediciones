@@ -40,19 +40,17 @@ def calcular_sensibilidad_ventana(tiempos, corrientes_proc, corrientes_norm, n_v
 
 @st.cache_data
 def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ventana=6):
-    """
-    Procesa la sensibilidad y devuelve una única estructura aplanada unificada:
-    {"Etiqueta": {"x": array, "y": array}} lista para graficar_curvas.
-    """
     datos_crudos = obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda) if normalizado else obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda)
     resultado = {}
 
-    for disp, datos in datos_crudos.items():
-        tiempos, corrientes = datos["tiempos"], datos["valores"]
+    for tag, datos in datos_crudos.items():
+        if "(Poly)" in tag:
+            continue
+        disp = tag.replace(" (Medido)", "")
+        tiempos, corrientes = datos["x"], datos["y"]
         factor = factores_normalizacion.get(disp, 1.0)
         corrientes_norm = corrientes if normalizado else corrientes / factor
         
-        # 1. Fit polinómico y derivada analítica
         coefs_y = calcular_fit_polinomico(tiempos.tolist(), corrientes.tolist())
         coefs_x = calcular_fit_polinomico(tiempos.tolist(), corrientes_norm.tolist())
         t_cont = np.linspace(tiempos.min(), tiempos.max(), 200)
@@ -63,7 +61,6 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ve
         
         resultado[f"{disp} (Poly)"] = {"x": eje_x_fit, "y": eje_y_fit}
         
-        # 2. Discreto por ventana
         ex_disc, ey_disc = calcular_sensibilidad_ventana(tiempos, corrientes, corrientes_norm, n_ventana)
         resultado[disp] = {"x": ex_disc, "y": ey_disc}
         
