@@ -8,7 +8,8 @@ def obtener_datos_I_vs_T(lista_dispositivos, corrientes_nominales, lista_tempera
     resultado = {}
     
     for disp in lista_dispositivos:
-        resultado[disp] = {}
+        d_corr = {}
+        
         for corr in corrientes_nominales:
             temps_aux = []
             corrientes_aux = []
@@ -26,17 +27,20 @@ def obtener_datos_I_vs_T(lista_dispositivos, corrientes_nominales, lista_tempera
                     temps_aux.append(float(temp))
                     corrientes_aux.append(i_en_v5)
             
-            if temps_aux:
+            if len(temps_aux) >= 2:
                 indices_orden = np.argsort(temps_aux)
                 x_ordenado = np.array(temps_aux)[indices_orden]
                 y_ordenado = np.array(corrientes_aux)[indices_orden]
                 
                 coefs = np.polyfit(x_ordenado, y_ordenado, deg=1)
                 
-                resultado[disp][corr] = {
+                d_corr[corr] = {
                     "x": x_ordenado,
                     "y": y_ordenado,
                     "alpha": coefs[0]
                 }
+        
+        if d_corr:
+            resultado[disp] = d_corr
                 
     return resultado

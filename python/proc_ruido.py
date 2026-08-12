@@ -16,13 +16,13 @@ def obtener_analisis_ruido_completo(lista_dispositivos, corrientes_nominales, es
     evos, evos_temp, i_vs_t, std_ruido = {}, {}, {}, {}
 
     for disp in lista_dispositivos:
-        evos[disp], evos_temp[disp], i_vs_t[disp] = {}, {}, {}
         std_list, corrientes_validas = [], []
+        d_evos, d_evos_temp, d_i_vs_t = {}, {}, {}
 
         for corr in corrientes_nominales:
             datos_matriz = cargar_medicion_ruido(disp, corr, es_larga)
             if datos_matriz is None:
-                continue
+                break
 
             tiempo_s = datos_matriz[:, 0]
             corriente_uA = np.abs(datos_matriz[:, 1]) * 1e6
@@ -38,14 +38,20 @@ def obtener_analisis_ruido_completo(lista_dispositivos, corrientes_nominales, es
 
             y_val = i_ruido_neto_uA if restar_deriva else corriente_uA
 
-            evos[disp][corr] = {"x": tiempo_s, "y": y_val}
-            evos_temp[disp][corr] = {"x": tiempo_s, "y": temperatura_C, "y_fit": temperatura_fit_C}
-            i_vs_t[disp][corr] = {"x": temperatura_C, "y": corriente_uA, "y_fit": corriente_fit_uA}
+            d_evos[corr] = {"x": tiempo_s, "y": y_val}
+            d_evos_temp[corr] = {"x": tiempo_s, "y": temperatura_C, "y_fit": temperatura_fit_C}
+            d_i_vs_t[corr] = {"x": temperatura_C, "y": corriente_uA, "y_fit": corriente_fit_uA}
 
             std_val = np.std(y_val * 1000.0, ddof=1)
             std_list.append(std_val)
             corrientes_validas.append(float(corr))
 
+        if not corrientes_validas:
+            continue
+
+        evos[disp] = d_evos
+        evos_temp[disp] = d_evos_temp
+        i_vs_t[disp] = d_i_vs_t
         std_ruido[disp] = {"x": np.array(corrientes_validas), "y": np.array(std_list)}
 
     return {
