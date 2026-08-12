@@ -78,9 +78,9 @@ def graficar_dispositivos(titulo, ylabel, datos_procesados):
         t, v = datos["tiempos"], datos["valores"]
         fig.add_trace(go.Scatter(x=t, y=v, mode='markers', name=f"{disp} (Medido)"))
         if disp in ["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"]:
-            a, b, c, d, e = calcular_fit_polinomico(t.tolist(), v.tolist())
+            coefs = calcular_fit_polinomico(t.tolist(), v.tolist())
             t_cont = np.linspace(t.min(), t.max(), 200)
-            i_fit = a*(t_cont**4) + b*(t_cont**3) + c*(t_cont**2) + d*t_cont + e
+            i_fit = np.polyval(coefs, t_cont)
             fig.add_trace(go.Scatter(x=t_cont, y=i_fit, mode='lines', name=f"{disp} (Fit Poly g4)"))
     _renderizar_grafico(fig, titulo, xaxis_kwargs=dict(title="Tiempo de irradiación [min]"), yaxis_kwargs=dict(title=ylabel))
 
