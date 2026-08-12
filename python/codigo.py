@@ -154,7 +154,7 @@ elif opcion == "Resumen":
         
     sens_abs_t2 = proc_sens.procesar_sensibilidad(dispos_FG, "FG_tanda2", normalizado=False)
     ruido_resumen_data = proc_ruido.obtener_analisis_ruido(dispos_FG, corrientes_normalizadas, es_larga=False, restar_deriva=True)
-    ruido_resumen = ruido_resumen_data["std_ruido"]
+    ruido_resumen = ruido_resumen_data["std_nA"]
     
     datos_temp_resumen = proc_temp.obtener_datos_I_vs_T(dispos_FG, corrientes_normalizadas, temperaturas)
     
