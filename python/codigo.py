@@ -189,17 +189,28 @@ elif opcion == "Ruido":
 elif opcion == "Temperatura":
     st.markdown("---")
     st.header("Análisis de Coeficiente Térmico")
-    
-    datos_temp = proc_temp.obtener_datos_I_vs_T(dispos_FG, corrientes_normalizadas, temperaturas)
-    
-    if datos_temp and any(datos_temp[d] for d in datos_temp):
-        graficos.graficar_I_vs_T(
+
+    datos_temp = proc_temp.obtener_analisis_temperatura(
+        dispos_FG, corrientes_normalizadas, temperaturas
+    )
+
+    if datos_temp["i_vs_t"]:
+        graficos.graficar_curvas(
             titulo="Evolución de Corriente de Drain vs Temperatura (@ VD = -4.5V)",
-            datos_temperatura=datos_temp
+            dict_datos=datos_temp["i_vs_t"],
+            xlabel="Temperatura [°C]",
+            ylabel=r"$\text{Corriente }I_D \text{ @ }V_D \text{ = -4.5V [}\mu \text{A]}$",
+            modo='markers+lines'
+        )
+        graficos.graficar_curvas(
+            titulo=r"$\text{Coeficiente Térmico (}\alpha\text{) vs Corriente Nominal}$",
+            dict_datos=datos_temp["alpha_vs_i"],
+            xlabel=r"$\text{Corriente Nominal }I_D\text{ [}\mu \text{A]}$",
+            ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu \text{A/°C]}$",
+            modo='markers+lines'
         )
     else:
         st.warning("No se encontraron archivos de medición de temperatura para los parámetros seleccionados.")
-
 # =====================================================================
 # SECCIÓN 5: RESUMEN
 # =====================================================================

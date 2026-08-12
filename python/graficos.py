@@ -71,26 +71,6 @@ def graficar_curvas(titulo, dict_datos, xlabel, ylabel, modo='markers+lines', es
         yaxis_kwargs=dict(title=ylabel)
     )
 
-def graficar_dispositivos(titulo, ylabel, datos_procesados):
-    fig = go.Figure()
-    for disp, datos in datos_procesados.items():
-        t, v = datos["x"], datos["y"]
-        fig.add_trace(go.Scatter(x=t, y=v, mode='markers', name=f"{disp} (Medido)"))
-        if disp in ["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"]:
-            coefs = calcular_fit_polinomico(t.tolist(), v.tolist())
-            t_cont = np.linspace(t.min(), t.max(), 200)
-            i_fit = np.polyval(coefs, t_cont)
-            fig.add_trace(go.Scatter(x=t_cont, y=i_fit, mode='lines', name=f"{disp} (Fit Poly g4)"))
-    _renderizar_grafico(fig, titulo, xaxis_kwargs=dict(title="Tiempo de irradiación [min]"), yaxis_kwargs=dict(title=ylabel))
-
-def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
-    fig = go.Figure()
-    for disp, datos in datos_sensibilidad[0].items():
-        fig.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines', name=f"{disp} (Poly)"))
-    for disp, datos in datos_sensibilidad[1].items():
-        fig.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines+markers', name=disp))
-    _renderizar_grafico(fig, titulo, xaxis_kwargs=dict(title=xlabel), yaxis_kwargs=dict(title=ylabel))
-
 def graficar_I_vs_T(titulo, datos_temperatura):
     graficar_curvas(titulo, datos_temperatura, "Temperatura [°C]", r"$\text{Corriente }I_D \text{ @ }V_D \text{ = -4.5V [}\mu \text{A]}$", modo='markers+lines')
 
@@ -104,25 +84,6 @@ def graficar_I_vs_T(titulo, datos_temperatura):
     
     if fig_alpha.data:
         _renderizar_grafico(fig_alpha, dict(text=r"$\text{Coeficiente Térmico (}\alpha\text{) vs Corriente Nominal}$", y=0.95, x=0.5, xanchor='center', yanchor='top'), xaxis_kwargs=dict(title=r"$\text{Corriente Nominal }I_D\text{ [}\mu \text{A]}$"), yaxis_kwargs=dict(title=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu \text{A/°C]}$"))
-
-def graficar_evolucion_temperatura(titulo, datos_temp):
-    fig = go.Figure()
-    for disp, corrientes_dict in datos_temp.items():
-        for corr, datos in corrientes_dict.items():
-            gid = f"temp_{disp}_{corr}uA"
-            fig.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='lines', name=f"{disp} @ {corr} uA", legendgroup=gid, opacity=0.5))
-            if datos.get("y_fit") is not None:
-                fig.add_trace(go.Scatter(x=datos["x"], y=datos["y_fit"], mode='lines', name=f"{disp} @ {corr} uA (Fit)", legendgroup=gid, showlegend=False, line=dict(width=2, dash='dash')))
-    _renderizar_grafico(fig, titulo, xaxis_kwargs=dict(title="Tiempo [s]"), yaxis_kwargs=dict(title="Temperatura [°C]"))
-
-def graficar_corriente_vs_temperatura_ruido(titulo, todas_las_evos_i_vs_t):
-    fig = go.Figure()
-    for disp, corrientes_dict in todas_las_evos_i_vs_t.items():
-        for corr, datos in corrientes_dict.items():
-            gid = f"{disp}_{corr}uA"
-            fig.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode='markers', name=f"{disp} @ {corr} uA", legendgroup=gid, marker=dict(size=4), opacity=0.6))
-            fig.add_trace(go.Scatter(x=datos["x"], y=datos["y_fit"], mode='lines', name=f"{disp} @ {corr} uA (Fit)", legendgroup=gid, showlegend=False, line=dict(width=2)))
-    _renderizar_grafico(fig, titulo, xaxis_kwargs=dict(title="Temperatura [°C]"), yaxis_kwargs=dict(title=r"$\text{Corriente }I_D \text{ [}\mu \text{A]}$"))
 
 def graficar_error_ruido_equivalente(titulo, datos_sensibilidad, datos_ruido):
     _graficar_relacion_normalizada(titulo, datos_ruido, datos_sensibilidad, "Error Equivalente por Ruido [Gy]", factor_escala=1/1000.0)
