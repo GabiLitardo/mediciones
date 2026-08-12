@@ -41,27 +41,26 @@ def calcular_sensibilidad_ventana(tiempos, corrientes_proc, corrientes_norm, n_v
 @st.cache_data
 def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ventana=6):
     datos_crudos = obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda) if normalizado else obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda)
-    resultado = {}
+    resultado_fit, resultado_discreto = {}, {}
 
-    for tag, datos in datos_crudos.items():
-        if "(Poly)" in tag:
-            continue
-        disp = tag.replace(" (Medido)", "")
-        tiempos, corrientes = datos["x"], datos["y"]
+    for disp, datos in datos_crudos.items():
+        tiempos, corrientes = datos["tiempos"], datos["valores"]
         factor = factores_normalizacion.get(disp, 1.0)
         corrientes_norm = corrientes if normalizado else corrientes / factor
         
+        # Fit polinómico
         coefs_y = calcular_fit_polinomico(tiempos.tolist(), corrientes.tolist())
         coefs_x = calcular_fit_polinomico(tiempos.tolist(), corrientes_norm.tolist())
         t_cont = np.linspace(tiempos.min(), tiempos.max(), 200)
         
         coefs_dy = np.polyder(coefs_y)
-        eje_y_fit = np.abs(np.polyval(coefs_dy, t_cont)) / tasa_dosis
-        eje_x_fit = np.polyval(coefs_x, t_cont)
         
-        resultado[f"{disp} (Poly)"] = {"x": eje_x_fit, "y": eje_y_fit}
+        eje_y = np.abs(np.polyval(coefs_dy, t_cont)) / tasa_dosis
+        eje_x = np.polyval(coefs_x, t_cont)
+        resultado_fit[disp] = {"x": eje_x, "y": eje_y}
         
+        # Discreto por ventana
         ex_disc, ey_disc = calcular_sensibilidad_ventana(tiempos, corrientes, corrientes_norm, n_ventana)
-        resultado[disp] = {"x": ex_disc, "y": ey_disc}
+        resultado_discreto[disp] = {"x": ex_disc, "y": ey_disc}
         
-    return resultado
+    return [resultado_fit, resultado_discreto]
