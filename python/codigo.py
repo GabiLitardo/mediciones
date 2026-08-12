@@ -136,7 +136,7 @@ elif opcion == "Ruido":
         dict_datos=ruido_corto["std_ruido"],
         xlabel=r"$\text{Corriente Nominal }I_D\text{ [}\mu \text{A]}$",
         ylabel="Desvío de Ruido [nA]",
-        modo='markers+lines'
+        modo='markers'
     )
     graficos.graficar_curvas(
         "Corriente vs tiempo a corto plazo",
@@ -182,7 +182,7 @@ elif opcion == "Ruido":
         ylabel=r"$\text{Corriente }I_D \text{ [}\mu \text{A]}$",
         modo='markers+lines'
     )
-    
+
 # =====================================================================
 # SECCIÓN 4: TEMPERATURA
 # =====================================================================
