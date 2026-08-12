@@ -227,15 +227,19 @@ elif opcion == "Resumen":
     sens_resumen = {disp: sens_abs_t2[0][disp] for disp in dispos_FG}
     
     st.subheader("Error equivalente por ruido ($\\sigma/S$)")
-    graficos.graficar_error_ruido_equivalente(
+    graficos.graficar_relacion_normalizada(
         titulo=r"$\text{Error equivalente por ruido (}\sigma\text{/S) vs Corriente Normalizada}$",
-        datos_sensibilidad=sens_resumen,
-        datos_ruido=ruido_resumen
+        datos_denominador=ruido_resumen,         
+        datos_sensibilidad=sens_resumen, 
+        ylabel="Error Equivalente por Ruido [Gy]", 
+        factor_escala=1/1000.0
     )
 
     st.subheader("Error Equivalente por Temperatura ($|\\alpha| / S$)")
-    graficos.graficar_error_termico_equivalente(
+    graficos.graficar_relacion_normalizada(
         titulo=r"$\text{Error Térmico Equivalente vs Corriente Normalizada}$",
-        datos_sensibilidad=sens_resumen,
-        datos_temp=datos_temp_resumen
+        datos_denominador=datos_temp_resumen,         
+        datos_sensibilidad=sens_resumen, 
+        ylabel=r"$\text{Error Térmico Equivalente [Gy/°C]}$",
+        factor_escala=1.0
     )

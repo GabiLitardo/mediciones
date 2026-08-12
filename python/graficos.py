@@ -28,14 +28,14 @@ def _renderizar_grafico(fig_ply, titulo, xaxis_kwargs=None, yaxis_kwargs=None, *
     html = pio.to_html(fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False)
     st.iframe(html, height="content")
 
-def _graficar_relacion_normalizada(titulo, datos_numerador, datos_sensibilidad, ylabel, factor_escala=1.0):
+def graficar_relacion_normalizada(titulo, datos_denominador, datos_sensibilidad, ylabel, factor_escala):
     fig = go.Figure()
     for disp, d_sens in datos_sensibilidad.items():
-        if datos_numerador and disp in datos_numerador:
-            es_diccionario_temp = isinstance(datos_numerador[disp].get(next(iter(datos_numerador[disp]), {})), dict)
+        if datos_denominador and disp in datos_denominador:
+            es_diccionario_temp = isinstance(datos_denominador[disp].get(next(iter(datos_denominador[disp]), {})), dict)
             
-            x_vals = [float(c) for c, d in datos_numerador[disp].items() if "alpha" in d] if es_diccionario_temp else datos_numerador[disp]["x"]
-            y_vals = [np.abs(d["alpha"]) for c, d in datos_numerador[disp].items() if "alpha" in d] if es_diccionario_temp else datos_numerador[disp]["y"] * factor_escala
+            x_vals = [float(c) for c, d in datos_denominador[disp].items() if "alpha" in d] if es_diccionario_temp else datos_denominador[disp]["x"]
+            y_vals = [np.abs(d["alpha"]) for c, d in datos_denominador[disp].items() if "alpha" in d] if es_diccionario_temp else datos_denominador[disp]["y"] * factor_escala
             
             if len(x_vals) > 0:
                 idx = np.argsort(x_vals)
@@ -70,26 +70,6 @@ def graficar_curvas(titulo, dict_datos, xlabel, ylabel, modo='markers+lines', es
         xaxis_kwargs=dict(title=xlabel, type="log" if es_log else "-"),
         yaxis_kwargs=dict(title=ylabel)
     )
-
-def graficar_I_vs_T(titulo, datos_temperatura):
-    graficar_curvas(titulo, datos_temperatura, "Temperatura [°C]", r"$\text{Corriente }I_D \text{ @ }V_D \text{ = -4.5V [}\mu \text{A]}$", modo='markers+lines')
-
-    fig_alpha = go.Figure()
-    for disp, corrientes_dict in datos_temperatura.items():
-        x_corr = [float(c) for c, d in corrientes_dict.items() if "alpha" in d]
-        y_alpha = [d["alpha"] for c, d in corrientes_dict.items() if "alpha" in d]
-        if x_corr:
-            idx = np.argsort(x_corr)
-            fig_alpha.add_trace(go.Scatter(x=np.array(x_corr)[idx], y=np.array(y_alpha)[idx], mode='markers+lines', name=disp, line=dict(color=COLORES_DISPOSITIVOS.get(disp))))
-    
-    if fig_alpha.data:
-        _renderizar_grafico(fig_alpha, dict(text=r"$\text{Coeficiente Térmico (}\alpha\text{) vs Corriente Nominal}$", y=0.95, x=0.5, xanchor='center', yanchor='top'), xaxis_kwargs=dict(title=r"$\text{Corriente Nominal }I_D\text{ [}\mu \text{A]}$"), yaxis_kwargs=dict(title=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu \text{A/°C]}$"))
-
-def graficar_error_ruido_equivalente(titulo, datos_sensibilidad, datos_ruido):
-    _graficar_relacion_normalizada(titulo, datos_ruido, datos_sensibilidad, "Error Equivalente por Ruido [Gy]", factor_escala=1/1000.0)
-
-def graficar_error_termico_equivalente(titulo, datos_sensibilidad, datos_temp):
-    _graficar_relacion_normalizada(titulo, datos_temp, datos_sensibilidad, r"$\text{Error Térmico Equivalente [Gy/°C]}$")
 
 def graficar_histograma_ruido(titulo, dict_datos):
     """
