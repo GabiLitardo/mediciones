@@ -55,12 +55,15 @@ def _graficar_relacion_normalizada(titulo, datos_numerador, datos_sensibilidad, 
 
 def graficar_curvas(titulo, dict_datos, xlabel, ylabel, modo='markers+lines', es_log=False):
     fig = go.Figure()
-    for disp, subdict in dict_datos.items():
-        if "x" in subdict and "y" in subdict:
-            fig.add_trace(go.Scatter(x=subdict["x"], y=subdict["y"], mode=modo, name=str(disp)))
-        else:
-            for corr, datos in subdict.items():
-                fig.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode=modo, name=f"{disp} @ {corr} uA"))
+    for etiqueta, serie in dict_datos.items():
+        modo_real = 'lines' if ("(Fit" in etiqueta or "(Poly)" in etiqueta) else modo
+
+        fig.add_trace(go.Scatter(
+            x=serie["x"], 
+            y=serie["y"], 
+            mode=modo_real, 
+            name=str(etiqueta)
+        ))
             
     _renderizar_grafico(
         fig, titulo,
