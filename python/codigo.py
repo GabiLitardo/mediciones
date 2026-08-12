@@ -227,15 +227,7 @@ elif opcion == "Resumen":
         dispos_FG, corrientes_normalizadas, temperaturas
     )
     
-    # Filtramos la sensibilidad discreta para la superposición
     sens_resumen = {disp: datos for disp, datos in sens_abs_t2.items() if "(Poly)" not in disp}
-    
-    graficos.graficar_superposicion_sens_ruido(
-        titulo=r"$\text{Sensibilidad absoluta, ruido y coef. térmico vs }I_D \text{ normalizada}$",
-        datos_sensibilidad=sens_resumen,
-        datos_ruido=ruido_resumen_data["std_ruido"],
-        datos_temp=temp_resumen_data["alpha_vs_i"]
-    )
     
     # Para los errores equivalentes, calculamos la relación en el diccionario plano
     st.subheader("Error equivalente por ruido ($\\sigma/S$)")
