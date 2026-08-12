@@ -115,7 +115,6 @@ elif opcion == "Ruido":
 
     ruido_corto = proc_ruido.obtener_analisis_ruido_completo(dispos_FG, corrientes_normalizadas, es_larga=False, restar_deriva=restar_deriva)
 
-    # Llamadas directas a graficar_curvas
     graficos.graficar_curvas("Desvío estándar del ruido neto vs Corriente nominal", ruido_corto["std_ruido"], r"$\text{Corriente Nominal }I_D\text{ [}\mu \text{A]}$", "Desvío de Ruido [nA]", modo='markers')
     graficos.graficar_curvas("Corriente vs tiempo a corto plazo", ruido_corto["evos"], "Tiempo [s]", r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$", modo='lines', es_log=log)
     graficos.graficar_histograma_ruido("Distribución del Ruido Neto a corto plazo", todas_las_evos=ruido_corto["evos"])
@@ -153,7 +152,6 @@ elif opcion == "Resumen":
     st.header("Sensibilidad absoluta, ruido y coef. térmico vs $I_D$ normalizada")
         
     sens_abs_t2 = proc_sens.procesar_sensibilidad(dispos_FG, "FG_tanda2", normalizado=False)
-    # Procesamiento unificado de ruido
     ruido_resumen_data = proc_ruido.obtener_analisis_ruido_completo(dispos_FG, corrientes_normalizadas, es_larga=False, restar_deriva=True)
     ruido_resumen = ruido_resumen_data["std_ruido"]
     
@@ -169,7 +167,7 @@ elif opcion == "Resumen":
     )
     
     st.subheader("Error equivalente por ruido ($\\sigma/S$)")
-    graficos.graficar_snr(
+    graficos.graficar_error_ruido_equivalente(
         titulo=r"$\text{Error equivalente por ruido (}\sigma\text{/S) vs Corriente Normalizada}$",
         datos_sensibilidad=sens_resumen,
         datos_ruido=ruido_resumen

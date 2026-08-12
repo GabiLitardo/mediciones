@@ -53,8 +53,10 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, n_ve
         coefs_x = calcular_fit_polinomico(tiempos.tolist(), corrientes_norm.tolist())
         t_cont = np.linspace(tiempos.min(), tiempos.max(), 200)
         
-        eje_y = np.abs(4*coefs_y[0]*(t_cont**3) + 3*coefs_y[1]*(t_cont**2) + 2*coefs_y[2]*t_cont + coefs_y[3]) / tasa_dosis
-        eje_x = coefs_x[0]*(t_cont**4) + coefs_x[1]*(t_cont**3) + coefs_x[2]*(t_cont**2) + coefs_x[3]*t_cont + coefs_x[4]
+        coefs_dy = np.polyder(coefs_y)
+        
+        eje_y = np.abs(np.polyval(coefs_dy, t_cont)) / tasa_dosis
+        eje_x = np.polyval(coefs_x, t_cont)
         resultado_fit[disp] = {"x": eje_x, "y": eje_y}
         
         # Discreto por ventana
