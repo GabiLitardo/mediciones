@@ -116,8 +116,8 @@ elif opcion == "Ruido":
     ruido_corto = proc_ruido.obtener_analisis_ruido_completo(dispos_FG, corrientes_normalizadas, es_larga=False, restar_deriva=restar_deriva)
 
     # Llamadas directas a graficar_curvas
-    graficos.graficar_curvas("Desvío estándar del ruido neto vs Corriente nominal", ruido_corto["std_ruido"], r"$\text{Corriente Nominal }I_D\text{ [}\mu \text{A]}$", "Desvío de Ruido [nA]", modo='markers')
-    graficos.graficar_curvas("Corriente vs tiempo a corto plazo", ruido_corto["evos"], "Tiempo [s]", r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$", modo='lines', es_log=log)
+    graficos.graficar_curvas("Desvío estándar del ruido neto vs Corriente nominal", ruido_corto["std_ruido"], r"$\text{Corriente Nominal }I_D\text{ [}\mu \text{A]}$", "Desvío de Ruido [nA]", es_anidado = True, modo='markers')
+    graficos.graficar_curvas("Corriente vs tiempo a corto plazo", ruido_corto["evos"], "Tiempo [s]", r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$", modo='lines', es_anidado = True, es_log=log)
     graficos.graficar_histograma_ruido("Distribución del Ruido Neto a corto plazo", todas_las_evos=ruido_corto["evos"])
 
     ruido_largo = proc_ruido.obtener_analisis_ruido_completo(dispos_FG, corrientes_normalizadas, es_larga=True, restar_deriva=restar_deriva)

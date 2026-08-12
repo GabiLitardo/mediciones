@@ -26,12 +26,16 @@ def _renderizar_grafico(fig_ply, titulo, xaxis_kwargs=None, yaxis_kwargs=None, *
     html = pio.to_html(fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False)
     st.iframe(html, height="content")
 
-def graficar_curvas(titulo, dict_datos, xlabel, ylabel, modo='markers+lines', es_log=False):
+def graficar_curvas(titulo, dict_datos, xlabel, ylabel, modo='markers+lines', es_anidado=False, es_log=False):
     """Función genérica pública para graficar series simples o anidadas."""
     fig = go.Figure()
-    for disp, corr_dict in dict_datos.items():
-        for corr, datos in corr_dict.items():
-            fig.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode=modo, name=f"{disp} @ {corr} uA"))
+    if es_anidado:
+        for disp, corr_dict in dict_datos.items():
+            for corr, datos in corr_dict.items():
+                fig.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode=modo, name=f"{disp} @ {corr} uA"))
+    else:
+        for disp, datos in dict_datos.items():
+            fig.add_trace(go.Scatter(x=datos["x"], y=datos["y"], mode=modo, name=disp))
             
     _renderizar_grafico(
         fig, titulo,
@@ -61,7 +65,7 @@ def graficar_sensibilidad_fg(titulo, datos_sensibilidad, xlabel, ylabel):
 
 def graficar_I_vs_T(titulo, datos_temperatura):
     colores = {"PFGIW1": "#1f77b4", "PFGIW2": "#ff7f0e", "PFGIP2": "#2ca02c"}
-    graficar_curvas(titulo, datos_temperatura, "Temperatura [°C]", r"$\text{Corriente }I_D \text{ @ }V_D \text{ = -4.5V [}\mu \text{A]}$", modo='markers+lines')
+    graficar_curvas(titulo, datos_temperatura, "Temperatura [°C]", r"$\text{Corriente }I_D \text{ @ }V_D \text{ = -4.5V [}\mu \text{A]}$", modo='markers+lines', es_anidado=True)
 
     fig_alpha = go.Figure()
     for disp, corrientes_dict in datos_temperatura.items():
