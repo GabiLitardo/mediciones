@@ -218,27 +218,35 @@ elif opcion == "Resumen":
     st.markdown("---")
     st.header("Sensibilidad absoluta, ruido y coef. térmico vs $I_D$ normalizada")
         
+    # 1. Obtención de datos con la estructura plana unificada
     sens_abs_t2 = proc_sens.procesar_sensibilidad(dispos_FG, "FG_tanda2", normalizado=False)
     ruido_resumen_data = proc_ruido.obtener_analisis_ruido_completo(dispos_FG, corrientes_normalizadas, es_larga=False, restar_deriva=True)
-    ruido_resumen = ruido_resumen_data["std_ruido"]
+    temp_resumen_data = proc_temp.obtener_analisis_temperatura(dispos_FG, corrientes_normalizadas, temperaturas)
     
-    datos_temp_resumen = proc_temp.obtener_datos_I_vs_T(dispos_FG, corrientes_normalizadas, temperaturas)
+    # 2. Filtrado de la sensibilidad discreta (sin los ajustes 'Poly')
+    sens_resumen = {disp: datos for disp, datos in sens_abs_t2.items() if "(Poly)" not in disp}
     
-    sens_resumen = {disp: sens_abs_t2[0][disp] for disp in dispos_FG}
-    
+    # 3. Gráfico: Error equivalente por ruido (\sigma / S)
     st.subheader("Error equivalente por ruido ($\\sigma/S$)")
     graficos.graficar_relacion_normalizada(
         titulo=r"$\text{Error equivalente por ruido (}\sigma\text{/S) vs Corriente Normalizada}$",
-        datos_denominador=ruido_resumen,         
+        datos_denominador=ruido_resumen_data["std_ruido"],         
         datos_sensibilidad=sens_resumen, 
         ylabel="Error Equivalente por Ruido [Gy]", 
         factor_escala=1/1000.0
     )
 
+    # 4. Modulo de alpha para el error térmico (|alpha| / S)
+    temp_resumen_abs = {
+        disp: {"x": datos["x"], "y": np.abs(datos["y"])} 
+        for disp, datos in temp_resumen_data["alpha_vs_i"].items()
+    }
+
+    # 5. Gráfico: Error térmico equivalente (|alpha| / S)
     st.subheader("Error Equivalente por Temperatura ($|\\alpha| / S$)")
     graficos.graficar_relacion_normalizada(
         titulo=r"$\text{Error Térmico Equivalente vs Corriente Normalizada}$",
-        datos_denominador=datos_temp_resumen,         
+        datos_denominador=temp_resumen_abs,         
         datos_sensibilidad=sens_resumen, 
         ylabel=r"$\text{Error Térmico Equivalente [Gy/°C]}$",
         factor_escala=1.0
