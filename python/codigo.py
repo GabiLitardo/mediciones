@@ -160,13 +160,6 @@ elif opcion == "Resumen":
     
     sens_resumen = {disp: sens_abs_t2[0][disp] for disp in dispos_FG}
     
-    graficos.graficar_superposicion_sens_ruido(
-        titulo=r"$\text{Sensibilidad absoluta, ruido y coef. térmico vs }I_D \text{ normalizada}$",
-        datos_sensibilidad=sens_resumen,
-        datos_ruido=ruido_resumen,
-        datos_temp=datos_temp_resumen
-    )
-    
     st.subheader("Error equivalente por ruido ($\\sigma/S$)")
     graficos.graficar_error_ruido_equivalente(
         titulo=r"$\text{Error equivalente por ruido (}\sigma\text{/S) vs Corriente Normalizada}$",
