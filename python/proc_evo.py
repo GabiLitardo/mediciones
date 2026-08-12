@@ -42,7 +42,7 @@ def calcular_fit_polinomico(tiempos_list, corrientes_list):
     return coeficientes.tolist()
 
 @st.cache_data
-def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, incluir_fit=True):
+def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, incluir_fit=True, nro = 60):
     """
     Retorna la estructura aplanada unificada para mediciones crudas:
     {"Etiqueta": {"x": array_tiempos, "y": array_valores}}
@@ -58,7 +58,7 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, incluir_fit=True)
         tiempos, valores = [], []
 
         for i in range(0, limite + 1):
-            mediciones = cargar_medicion_tanda(i, tipo_tanda)
+            mediciones = cargar_medicion_tanda(i, tipo_tanda, nro)
             if mediciones and len(mediciones) > col_idx:
                 matriz = mediciones[col_idx]
                 if matriz is not None and matriz.size > 0:
