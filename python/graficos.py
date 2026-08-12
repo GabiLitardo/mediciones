@@ -130,9 +130,21 @@ def graficar_error_ruido_equivalente(titulo, datos_sensibilidad, datos_ruido):
 def graficar_error_termico_equivalente(titulo, datos_sensibilidad, datos_temp):
     _graficar_relacion_normalizada(titulo, datos_temp, datos_sensibilidad, r"$\text{Error Térmico Equivalente [Gy/°C]}$")
 
-def graficar_histograma_ruido(titulo, todas_las_evos):
+def graficar_histograma_ruido(titulo, dict_datos):
+    """
+    Dibuja histogramas consumiendo la estructura plana unificada {"Etiqueta": {"x": ..., "y": ...}}.
+    """
     fig = go.Figure()
-    for disp, corrientes_dict in todas_las_evos.items():
-        for corr, datos in corrientes_dict.items():
-            fig.add_trace(go.Histogram(x=datos["y"] * 1000.0, name=f"{disp} @ {corr} uA", opacity=0.5, histnorm='probability density'))
-    _renderizar_grafico(fig, titulo, xaxis_kwargs=dict(title="Ruido Neto [nA]"), yaxis_kwargs=dict(title="Densidad de Probabilidad"), barmode='overlay')
+    for etiqueta, datos in dict_datos.items():
+        fig.add_trace(go.Histogram(
+            x=datos["y"] * 1000.0, 
+            name=etiqueta, 
+            opacity=0.5, 
+            histnorm='probability density'
+        ))
+    _renderizar_grafico(
+        fig, titulo, 
+        xaxis_kwargs=dict(title="Ruido Neto [nA]"), 
+        yaxis_kwargs=dict(title="Densidad de Probabilidad"), 
+        barmode='overlay'
+    )

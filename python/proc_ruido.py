@@ -13,16 +13,23 @@ def convertir_r_a_temp_steinhart(resistencia):
 
 @st.cache_data
 def obtener_analisis_ruido_completo(lista_dispositivos, corrientes_nominales, es_larga=False, restar_deriva=True):
-    evos, evos_temp, i_vs_t, std_ruido = {}, {}, {}, {}
+    """
+    Retorna cuatro diccionarios planos unificados con formato:
+    {"Etiqueta Leyenda": {"x": array, "y": array}}
+    """
+    evos = {}
+    evos_temp = {}
+    i_vs_t = {}
+    std_ruido = {}
 
     for disp in lista_dispositivos:
-        std_list, corrientes_validas = [], []
-        d_evos, d_evos_temp, d_i_vs_t = {}, {}, {}
+        std_list = []
+        corrientes_validas = []
 
         for corr in corrientes_nominales:
             datos_matriz = cargar_medicion_ruido(disp, corr, es_larga)
             if datos_matriz is None:
-                break
+                continue
 
             tiempo_s = datos_matriz[:, 0]
             corriente_uA = np.abs(datos_matriz[:, 1]) * 1e6
@@ -38,21 +45,29 @@ def obtener_analisis_ruido_completo(lista_dispositivos, corrientes_nominales, es
 
             y_val = i_ruido_neto_uA if restar_deriva else corriente_uA
 
-            d_evos[corr] = {"x": tiempo_s, "y": y_val}
-            d_evos_temp[corr] = {"x": tiempo_s, "y": temperatura_C, "y_fit": temperatura_fit_C}
-            d_i_vs_t[corr] = {"x": temperatura_C, "y": corriente_uA, "y_fit": corriente_fit_uA}
+            tag = f"{disp} @ {corr} uA"
+            tag_fit = f"{disp} @ {corr} uA (Fit)"
+
+            # 1. Evolución del ruido
+            evos[tag] = {"x": tiempo_s, "y": y_val}
+
+            # 2. Evolución de temperatura (medida y fit)
+            evos_temp[tag] = {"x": tiempo_s, "y": temperatura_C}
+            evos_temp[tag_fit] = {"x": tiempo_s, "y": temperatura_fit_C}
+
+            # 3. Corriente vs Temperatura (medida y fit)
+            i_vs_t[tag] = {"x": temperatura_C, "y": corriente_uA}
+            i_vs_t[tag_fit] = {"x": temperatura_C, "y": corriente_fit_uA}
 
             std_val = np.std(y_val * 1000.0, ddof=1)
             std_list.append(std_val)
             corrientes_validas.append(float(corr))
 
-        if not corrientes_validas:
-            continue
-
-        evos[disp] = d_evos
-        evos_temp[disp] = d_evos_temp
-        i_vs_t[disp] = d_i_vs_t
-        std_ruido[disp] = {"x": np.array(corrientes_validas), "y": np.array(std_list)}
+        if corrientes_validas:
+            std_ruido[disp] = {
+                "x": np.array(corrientes_validas),
+                "y": np.array(std_list)
+            }
 
     return {
         "evos": evos,
