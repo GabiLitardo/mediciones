@@ -231,7 +231,7 @@ elif opcion == "Resumen":
     st.subheader("Error equivalente por ruido ($\\sigma/S$)")
     graficos.graficar_relacion_normalizada(
         titulo=r"$\text{Error equivalente por ruido (}\sigma\text{/S) vs Corriente Normalizada}$",
-        datos_denominador=ruido_resumen_data["std_ruido"],         
+        datos_numerador=ruido_resumen_data["std_ruido"],         
         datos_sensibilidad=sens_resumen, 
         ylabel="Error Equivalente por Ruido [Gy]", 
         factor_escala=1/1000.0
@@ -247,7 +247,7 @@ elif opcion == "Resumen":
     st.subheader("Error Equivalente por Temperatura ($|\\alpha| / S$)")
     graficos.graficar_relacion_normalizada(
         titulo=r"$\text{Error Térmico Equivalente vs Corriente Normalizada}$",
-        datos_denominador=temp_resumen_abs,         
+        datos_numerador=temp_resumen_abs,         
         datos_sensibilidad=sens_resumen, 
         ylabel=r"$\text{Error Térmico Equivalente [Gy/°C]}$",
         factor_escala=1.0
