@@ -31,14 +31,13 @@ def graficar_relacion_normalizada(titulo, datos_numerador, datos_sensibilidad, y
     fig = go.Figure()
     for disp, d_sens in datos_sensibilidad.items():
         if datos_numerador and disp in datos_numerador:
-            es_diccionario_temp = isinstance(datos_numerador[disp].get(next(iter(datos_numerador[disp]), {})), dict)
+            d_num = datos_numerador[disp]
+            x_arr = np.array(d_num["x"])
+            y_arr = np.array(d_num["y"]) * factor_escala
             
-            x_vals = [float(c) for c, d in datos_numerador[disp].items() if "alpha" in d] if es_diccionario_temp else datos_numerador[disp]["x"]
-            y_vals = [np.abs(d["alpha"]) for c, d in datos_numerador[disp].items() if "alpha" in d] if es_diccionario_temp else datos_numerador[disp]["y"] * factor_escala
-            
-            if len(x_vals) > 0:
-                idx = np.argsort(x_vals)
-                x_arr, y_arr = np.array(x_vals)[idx], np.array(y_vals)[idx]
+            if len(x_arr) > 0:
+                idx = np.argsort(x_arr)
+                x_arr, y_arr = x_arr[idx], y_arr[idx]
                 sens_interp = np.interp(x_arr, d_sens["x"], d_sens["y"])
                 
                 relacion = y_arr / sens_interp
