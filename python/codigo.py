@@ -43,9 +43,11 @@ if opcion == "Evolución temporal":
         modo='markers+lines'
     )
 
-    datos_foxfet = proc_evo.obtener_datos_crudos_tanda(dispos_FOXFET, "FOXFET")
+    I_interp=st.selectbox("Corriente de interpolación:", [0.1e-6, 1e-6, 10e-6, 100e-6])
+
+    datos_foxfet = proc_evo.obtener_datos_crudos_tanda(lista_dispositivos=dispos_FOXFET, tipo_tanda="FOXFET", I_interp=I_interp)
     graficos.graficar_curvas(
-        titulo="Evolución FOXFETs (Tensión interpolada @ I = 0.1 uA)",
+        titulo=f"Evolución FOXFETs (Tensión interpolada @ I = {I_interp * 1e6} uA)",
         dict_datos=datos_foxfet,
         xlabel="Tiempo de irradiación [min]",
         ylabel="Tensión [V]",
