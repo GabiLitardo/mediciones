@@ -28,14 +28,14 @@ def _renderizar_grafico(fig_ply, titulo, xaxis_kwargs=None, yaxis_kwargs=None, *
     html = pio.to_html(fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False)
     st.iframe(html, height="content")
 
-def graficar_relacion_normalizada(titulo, datos_denominador, datos_sensibilidad, ylabel, factor_escala):
+def graficar_relacion_normalizada(titulo, datos_numerador, datos_sensibilidad, ylabel, factor_escala):
     fig = go.Figure()
     for disp, d_sens in datos_sensibilidad.items():
-        if datos_denominador and disp in datos_denominador:
-            es_diccionario_temp = isinstance(datos_denominador[disp].get(next(iter(datos_denominador[disp]), {})), dict)
+        if datos_numerador and disp in datos_numerador:
+            es_diccionario_temp = isinstance(datos_numerador[disp].get(next(iter(datos_numerador[disp]), {})), dict)
             
-            x_vals = [float(c) for c, d in datos_denominador[disp].items() if "alpha" in d] if es_diccionario_temp else datos_denominador[disp]["x"]
-            y_vals = [np.abs(d["alpha"]) for c, d in datos_denominador[disp].items() if "alpha" in d] if es_diccionario_temp else datos_denominador[disp]["y"] * factor_escala
+            x_vals = [float(c) for c, d in datos_numerador[disp].items() if "alpha" in d] if es_diccionario_temp else datos_numerador[disp]["x"]
+            y_vals = [np.abs(d["alpha"]) for c, d in datos_numerador[disp].items() if "alpha" in d] if es_diccionario_temp else datos_numerador[disp]["y"] * factor_escala
             
             if len(x_vals) > 0:
                 idx = np.argsort(x_vals)
