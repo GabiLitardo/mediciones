@@ -3,7 +3,6 @@ import numpy as np
 import streamlit as st
 import plotly.graph_objects as go
 import plotly.io as pio
-from proc_sens import calcular_fit_polinomico
 
 COLORES_DISPOSITIVOS = {"PFGIW1": "#1f77b4", "PFGIW2": "#ff7f0e", "PFGIP2": "#2ca02c"}
 
