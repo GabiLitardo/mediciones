@@ -1,7 +1,7 @@
 # proc_sens.py
 import numpy as np
 import streamlit as st
-from proc_evo import obtener_datos_crudos_tanda, obtener_datos_evolucion_vg
+from proc_evo import obtener_datos_crudos_tanda, obtener_datos_evolucion_vg, calcular_fit_polinomico
 
 factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2": 1.0}
 tasa_dosis = 0.18
