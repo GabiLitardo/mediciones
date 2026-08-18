@@ -271,7 +271,7 @@ elif opcion == "Resumen":
 
     st.subheader("Curvas de Transferencia I-V de Referencia")
     
-    datos_iv_ref = proc_evo.obtener_curvas_iv_referencia(dispos_FG)
+    datos_iv_ref = proc_evo.obtener_curvas_iv_referencia(["PFGIW1", "PFGIW2"])
     graficos.graficar_curvas(
         titulo="Curvas de Transferencia I-V de Referencia (@ VD = -4.5 V)",
         dict_datos=datos_iv_ref,
