@@ -129,7 +129,7 @@ def obtener_curvas_iv_referencia(lista_dispositivos):
         datos = cargar_curva_iv_referencia(disp)
         if datos is not None and len(datos) > 0:
             vg = datos[:, 0]
-            id_ua = np.abs(datos[:, 1]) * 1e6
+            id_ua = datos[:, 1] * 1e6
             
             # Si es PFGIW3, normalizamos por su factor de escala (56x)
             if disp == "PFGIW3":
