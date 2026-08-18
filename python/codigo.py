@@ -279,3 +279,9 @@ elif opcion == "Resumen":
         ylabel=r"$I_D\text{ [}\mu \text{A]}$",
         modo='markers'
     )
+
+    st.text("Se estima que las corrientes de ZTC son: PFGIW1->31.2uA ; PFGIW2->17.4uA ; PFGIP2->20.6uA")
+    st.text("Para saber si en esa corriente los dispositivos estarían en saturación, me fijo su tensión de Floating Gate equivalente")
+    st.text("Las tensiones equivalentes para ZTC son: PFGIW1->1.69V ; PFGIW2->2.10V ; PFGIP2->2.20V")
+    st.text("Ahora quiero ver si esas tensiones cumplen Vg>Vds-Vt, con Vds=-4.5V y Vt a estimar")
+    st.text(f"Se estiman los Vt: PFGIW1->{datos_iv_ref["PFGIW1"]["vt"]} ; (PFGIW2, PFGIP2)->{datos_iv_ref["PFGIW2"]["vt"]}")
