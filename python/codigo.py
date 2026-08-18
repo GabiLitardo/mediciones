@@ -250,7 +250,7 @@ elif opcion == "Resumen":
         datos_numerador=ruido_resumen_data["std_ruido"],         
         datos_sensibilidad=sens_resumen, 
         ylabel="Error Equivalente por Ruido [cGy]", 
-        factor_escala=1/1000.0
+        factor_escala=100.0/1000.0
     )
 
     # 4. Modulo de alpha para el error térmico (|alpha| / S)
@@ -266,7 +266,7 @@ elif opcion == "Resumen":
         datos_numerador=temp_resumen_abs,         
         datos_sensibilidad=sens_resumen, 
         ylabel="Error Térmico Equivalente [cGy/°C]",
-        factor_escala=1.0
+        factor_escala=100.0
     )
 
     st.subheader("Curvas de Transferencia I-V de Referencia")

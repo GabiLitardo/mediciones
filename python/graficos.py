@@ -40,7 +40,7 @@ def graficar_relacion_normalizada(titulo, datos_numerador, datos_sensibilidad, y
                 x_arr, y_arr = x_arr[idx], y_arr[idx]
                 sens_interp = np.interp(x_arr, d_sens["x"], d_sens["y"])
                 
-                relacion = y_arr / sens_interp * 1e2
+                relacion = y_arr / sens_interp
                 color = COLORES_DISPOSITIVOS.get(disp)
                 fig.add_trace(go.Scatter(x=x_arr, y=relacion, mode='markers+lines', name=disp, line=dict(color=color)))
 
