@@ -137,7 +137,10 @@ def obtener_curvas_iv_referencia(lista_dispositivos):
 
         # --- Cálculo de Vt por máxima pendiente (gm) ---
         gm = np.gradient(id_ua, vg)
-        idx_max_gm = np.argmax(np.abs(gm))
+        
+        # Reemplazamos cualquier inf/nan por 0 para buscar el índice real
+        gm_limpio = np.nan_to_num(np.abs(gm), nan=0.0, posinf=0.0, neginf=0.0)
+        idx_max_gm = int(np.nanargmax(gm_limpio))
 
         gm_max = gm[idx_max_gm]
         vg_gm_max = vg[idx_max_gm]
