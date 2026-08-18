@@ -129,8 +129,11 @@ def obtener_curvas_iv_referencia(lista_dispositivos):
     for disp in lista_dispositivos:
         datos = cargar_curva_iv_referencia(disp)
 
-        vg = datos[:, 0]
-        id_ua = datos[:, 1] * 1e6
+        # Filtramos filas con NaN que puedan venir del archivo
+        datos_validos = datos[~np.isnan(datos).any(axis=1)]
+
+        vg = datos_validos[:, 0]
+        id_ua = datos_validos[:, 1] * 1e6
 
         # --- Cálculo de Vt por máxima pendiente (gm) ---
         gm = np.gradient(id_ua, vg)
