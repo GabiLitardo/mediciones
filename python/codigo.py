@@ -43,12 +43,26 @@ if opcion == "Evolución temporal":
         modo='markers+lines'
     )
 
-    I_interp=st.selectbox("Corriente de interpolación:", [0.1e-6, 1e-6, 10e-6, 100e-6])
+    I_interps = st.multiselect(
+        "Corrientes de interpolación:",
+        options=[0.1e-6, 1e-6, 10e-6, 100e-6],
+        default=[0.1e-6]
+    )
 
-    datos_foxfet = proc_evo.obtener_datos_crudos_tanda(lista_dispositivos=dispos_FOXFET, tipo_tanda="FOXFET", I_interp=I_interp)
+    datos_totales = {}
+    for I_interp in I_interps:
+        datos_foxfet = proc_evo.obtener_datos_crudos_tanda(
+            lista_dispositivos=dispos_FOXFET,
+            tipo_tanda="FOXFET",
+            I_interp=I_interp
+        )
+        # Prefijar la clave para distinguir dispositivo y corriente en el mismo grafico
+        for key, val in datos_foxfet.items():
+            datos_totales[f"{key} @ {I_interp * 1e6:.1f} uA"] = val
+
     graficos.graficar_curvas(
-        titulo=f"Evolución FOXFETs (Tensión interpolada @ I = {I_interp * 1e6} uA)",
-        dict_datos=datos_foxfet,
+        titulo="Evolución FOXFETs - Comparativa de Corrientes",
+        dict_datos=datos_totales,
         xlabel="Tiempo de irradiación [min]",
         ylabel="Tensión [V]",
         modo='markers+lines'
