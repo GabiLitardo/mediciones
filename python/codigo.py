@@ -249,7 +249,7 @@ elif opcion == "Resumen":
         titulo=r"$\text{Error equivalente por ruido (}\sigma\text{/S) vs Corriente Normalizada}$",
         datos_numerador=ruido_resumen_data["std_ruido"],         
         datos_sensibilidad=sens_resumen, 
-        ylabel="Error Equivalente por Ruido [Gy]", 
+        ylabel="Error Equivalente por Ruido [cGy]", 
         factor_escala=1/1000.0
     )
 
@@ -265,7 +265,7 @@ elif opcion == "Resumen":
         titulo=r"$\text{Error Térmico Equivalente vs Corriente Normalizada}$",
         datos_numerador=temp_resumen_abs,         
         datos_sensibilidad=sens_resumen, 
-        ylabel=r"$\text{Error Térmico Equivalente [Gy/°C]}$",
+        ylabel="Error Térmico Equivalente [cGy/°C]",
         factor_escala=1.0
     )
 
