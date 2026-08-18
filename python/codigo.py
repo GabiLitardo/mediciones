@@ -268,3 +268,14 @@ elif opcion == "Resumen":
         ylabel=r"$\text{Error Térmico Equivalente [Gy/°C]}$",
         factor_escala=1.0
     )
+
+    st.subheader("Curvas de Transferencia I-V de Referencia")
+    
+    datos_iv_ref = proc_evo.obtener_curvas_iv_referencia(dispos_FG)
+    graficos.graficar_curvas(
+        titulo="Curvas de Transferencia I-V de Referencia (@ VD = -4.5 V)",
+        dict_datos=datos_iv_ref,
+        xlabel=r"$\text{Tensión de Compuerta }V_G\text{ [V]}$",
+        ylabel=r"$I_D\text{ [}\mu \text{A]}$",
+        modo='lines'
+    )

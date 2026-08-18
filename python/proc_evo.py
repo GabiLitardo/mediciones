@@ -117,3 +117,27 @@ def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda):
                 resultado[f"{disp} (Fit Poly g4)"] = {"x": t_cont, "y": y_fit}
 
     return resultado
+
+@st.cache_data
+def obtener_curvas_iv_referencia(lista_dispositivos):
+    """
+    Retorna las curvas de transferencia I-V de referencia en formato plano unificado:
+    {"Etiqueta": {"x": array_vg, "y": array_id_uA}}
+    """
+    resultado = {}
+    for disp in lista_dispositivos:
+        datos = cargar_curva_iv_referencia(disp)
+        if datos is not None and len(datos) > 0:
+            vg = datos[:, 0]
+            id_ua = np.abs(datos[:, 1]) * 1e6
+            
+            # Si es PFGIW3, normalizamos por su factor de escala (56x)
+            if disp == "PFGIW3":
+                id_ua = id_ua / 56.0
+                
+            idx = np.argsort(vg)
+            resultado[disp] = {
+                "x": vg[idx],
+                "y": id_ua[idx]
+            }
+    return resultado
