@@ -277,5 +277,5 @@ elif opcion == "Resumen":
         dict_datos=datos_iv_ref,
         xlabel=r"$\text{Tensión de Compuerta }V_G\text{ [V]}$",
         ylabel=r"$I_D\text{ [}\mu \text{A]}$",
-        modo='lines'
+        modo='markers+lines'
     )
