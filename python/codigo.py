@@ -11,7 +11,7 @@ st.title("Resumen mediciones Chaves-Litardo")
 
 opcion = st.sidebar.radio(
     "Seleccionar Análisis",
-    ["Evolución temporal", "Sensibilidad", "Ruido", "Temperatura", "Resumen"]
+    ["Evolución temporal", "Sensibilidad", "Ruido", "Temperatura", "Resumen", "Pruebas"]
 )
 dispos_FG = ["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"]
 dispos_FOXFET = ["FFC1", "FFC2", "FFC3", "FFL", "FFS"]
@@ -269,6 +269,10 @@ elif opcion == "Resumen":
         factor_escala=100.0
     )
 
+# =====================================================================
+# SECCIÓN 6: PRUEBAS
+# =====================================================================
+elif opcion == "Pruebas":
     st.subheader("Curvas de Transferencia I-V de Referencia")
     
     datos_iv_ref = proc_evo.obtener_curvas_iv_referencia(["PFGIW1", "PFGIW2"])
