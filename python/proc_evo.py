@@ -122,31 +122,33 @@ def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda):
 def obtener_curvas_iv_referencia(lista_dispositivos):
     """
     Retorna las curvas de transferencia I-V de referencia en formato plano unificado
-    con corriente negativa y el cálculo de Vt en cada subdiccionario:
+    con corriente negativa y el cálculo de Vt por extrapolación de sqrt(|Id|) en saturación:
     {"Etiqueta": {"x": array_vg, "y": array_id_uA, "vt": float}}
     """
     resultado = {}
     for disp in lista_dispositivos:
         datos = cargar_curva_iv_referencia(disp)
 
-        # Filtramos filas con NaN que puedan venir del archivo
         datos_validos = datos[~np.isnan(datos).any(axis=1)]
 
         vg = datos_validos[:, 0]
         id_ua = datos_validos[:, 1] * 1e6
 
-        # --- Cálculo de Vt por máxima pendiente (gm) ---
-        gm = np.gradient(id_ua, vg)
+        # --- Cálculo de Vt en saturación: recta sobre sqrt(|Id|) ---
+        sqrt_id = np.sqrt(np.abs(id_ua))
         
-        # Reemplazamos cualquier inf/nan por 0 para buscar el índice real
-        gm_limpio = np.nan_to_num(np.abs(gm), nan=0.0, posinf=0.0, neginf=0.0)
-        idx_max_gm = int(np.nanargmax(gm_limpio))
+        # Derivada de sqrt(|Id|) respecto a Vg
+        d_sqrt_id = np.gradient(sqrt_id, vg)
+        
+        # Buscamos la zona de mayor linealidad/pendiente
+        d_limpia = np.nan_to_num(np.abs(d_sqrt_id), nan=0.0, posinf=0.0, neginf=0.0)
+        idx_max = int(np.nanargmax(d_limpia))
 
-        gm_max = gm[idx_max_gm]
-        vg_gm_max = vg[idx_max_gm]
-        id_gm_max = id_ua[idx_max_gm]
+        m_max = d_sqrt_id[idx_max]
+        vg_max = vg[idx_max]
+        sqrt_id_max = sqrt_id[idx_max]
 
-        vt = vg_gm_max - (id_gm_max / gm_max)
+        vt = vg_max - (sqrt_id_max / m_max)
 
         resultado[disp] = {
             "x": vg,
