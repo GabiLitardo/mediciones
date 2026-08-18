@@ -128,31 +128,26 @@ def obtener_curvas_iv_referencia(lista_dispositivos):
     resultado = {}
     for disp in lista_dispositivos:
         datos = cargar_curva_iv_referencia(disp)
-        if datos is not None and len(datos) > 0:
-            vg = datos[:, 0]
-            id_ua = np.abs(datos[:, 1]) * 1e6
+        vg = datos[:, 0]
+        id_ua = datos[:, 1] * 1e6
             
-            # Normalización de PFGIW3 por su factor de escala (56x)
-            if disp == "PFGIW3":
-                id_ua = id_ua / 56.0
-                
-            idx = np.argsort(vg)
-            vg_ord = vg[idx]
-            id_ord = id_ua[idx]
+        idx = np.argsort(vg)
+        vg_ord = vg[idx]
+        id_ord = id_ua[idx]
 
-            # --- Cálculo de Vt por máxima pendiente (gm) ---
-            gm = np.gradient(id_ord, vg_ord)
-            idx_max_gm = np.argmax(np.abs(gm))
-            gm_max = gm[idx_max_gm]
-            vg_gm_max = vg_ord[idx_max_gm]
-            id_gm_max = id_ord[idx_max_gm]
+        # --- Cálculo de Vt por máxima pendiente (gm) ---
+        gm = np.gradient(id_ord, vg_ord)
+        idx_max_gm = np.argmax(np.abs(gm))
+        gm_max = gm[idx_max_gm]
+        vg_gm_max = vg_ord[idx_max_gm]
+        id_gm_max = id_ord[idx_max_gm]
 
-            vt = vg_gm_max - (id_gm_max / gm_max) if gm_max != 0 else np.nan
+        vt = vg_gm_max - (id_gm_max / gm_max) if gm_max != 0 else np.nan
 
-            resultado[disp] = {
-                "x": vg_ord,
-                "y": id_ord,
-                "vt": float(vt)
-            }
+        resultado[disp] = {
+            "x": vg_ord,
+            "y": id_ord,
+            "vt": float(vt)
+        }
             
     return resultado
