@@ -56,10 +56,23 @@ def render_FOXFET ():
         st.markdown("---")
         st.header("Análisis de sensibilidad")
 
-        sens = proc_sens.procesar_sensibilidad(dispos, "FOXFET", normalizado=False)
+        I_interps = st.multiselect(
+            "Corrientes de interpolación:",
+            options=[0.1e-6, 1e-6, 10e-6, 100e-6],
+            default=[0.1e-6]
+        )
+
+        sens_totales = {}
+        for I_interp in I_interps:
+            sens = proc_sens.procesar_sensibilidad(dispos, "FOXFET", normalizado=False, I_interp=I_interp)
+            # Prefijar la clave para distinguir dispositivo y corriente en el mismo grafico
+            for key, val in sens.items():
+                sens_totales[f"{key} @ {I_interp * 1e6:.1f} uA"] = val
+
+        
         graficos.graficar_curvas(
-            titulo=r"$\text{Sensibilidad FOXFET (Sensibilidad vs }V_{FG}\text{)}$",
-            dict_datos=sens,
+            titulo=r"$\text{Sensibilidad FOXFET (Sensibilidad vs }V_{GS}\text{)}$",
+            dict_datos=sens_totales,
             xlabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
             ylabel=r"$\text{Sensibilidad [V/Gy]}$",
             modo='markers+lines'
