@@ -4,7 +4,7 @@ import streamlit as st
 from lector_archivos import cargar_medicion_temperatura
 
 @st.cache_data
-def obtener_analisis_temperatura(lista_dispositivos, corrientes_nominales, lista_temperaturas):
+def obtener_analisis_temperatura(lista_dispositivos, corrientes_normalizadas, lista_temperaturas):
     """
     Procesa las mediciones de temperatura y retorna dos diccionarios planos unificados:
     - 'i_vs_t': {"disp @ corr uA": {"x": array_temp, "y": array_corriente}}
@@ -17,7 +17,7 @@ def obtener_analisis_temperatura(lista_dispositivos, corrientes_nominales, lista
         x_alpha = []
         y_alpha = []
 
-        for corr in corrientes_nominales:
+        for corr in corrientes_normalizadas:
             temps_aux = []
             corrientes_aux = []
 

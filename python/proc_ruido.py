@@ -12,7 +12,7 @@ def convertir_r_a_temp_steinhart(resistencia):
     return (1.0 / (A_SH + B_SH * ln_R + C_SH * (ln_R ** 3))) - 273.15
 
 @st.cache_data
-def obtener_analisis_ruido_completo(lista_dispositivos, corrientes_nominales, es_larga=False, restar_deriva=True):
+def obtener_analisis_ruido_completo(lista_dispositivos, corrientes_normalizadas, es_larga=False, restar_deriva=True):
     """
     Retorna cuatro diccionarios planos unificados con formato:
     {"Etiqueta Leyenda": {"x": array, "y": array}}
@@ -26,7 +26,7 @@ def obtener_analisis_ruido_completo(lista_dispositivos, corrientes_nominales, es
         std_list = []
         corrientes_validas = []
 
-        for corr in corrientes_nominales:
+        for corr in corrientes_normalizadas:
             datos_matriz = cargar_medicion_ruido(disp, corr, es_larga)
             if datos_matriz is None:
                 continue

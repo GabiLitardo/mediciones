@@ -124,9 +124,9 @@ def render_FG ():
         )
 
         graficos.graficar_curvas(
-            "Desvío estándar del ruido neto vs Corriente nominal",
+            "Desvío estándar del ruido neto vs Corrientes Normalizadas",
             dict_datos=ruido_corto["std_ruido"],
-            xlabel=r"$\text{Corriente Nominal }I_D\text{ [}\mu \text{A]}$",
+            xlabel=r"$\text{Corrientes normalizadas }I_D\text{ [}\mu \text{A]}$",
             ylabel="Desvío de Ruido [nA]",
             modo='markers'
         )
@@ -195,9 +195,9 @@ def render_FG ():
                 modo='markers+lines'
             )
             graficos.graficar_curvas(
-                titulo=r"$\text{Coeficiente Térmico (}\alpha\text{) vs Corriente Nominal}$",
+                titulo=r"$\text{Coeficiente Térmico (}\alpha\text{) vs Corrientes Normalizadas}$",
                 dict_datos=datos_temp["alpha_vs_i"],
-                xlabel=r"$\text{Corriente Nominal }I_D\text{ [}\mu \text{A]}$",
+                xlabel=r"$\text{Corrientes Normalizadas }I_D\text{ [}\mu \text{A]}$",
                 ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu \text{A/°C]}$",
                 modo='markers+lines'
             )
