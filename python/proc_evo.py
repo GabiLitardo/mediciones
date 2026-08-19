@@ -41,7 +41,7 @@ def obtener_vg_por_corriente(dispositivo, corriente_buscada):
     return np.interp(corriente_buscada, corrientes_d[indices_ordenados], tensiones_g[indices_ordenados])
 
 @st.cache_data
-def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, I_interp = 1e-7, rng=60):
+def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, I_interp = 1e-5, rng=60):
     resultado = {}
     for disp in lista_dispositivos:
         tiempos, valores = [], []
