@@ -27,7 +27,7 @@ def render_FOXFET ():
         I_interps = st.multiselect(
             "Corrientes de interpolación:",
             options=[0.1e-6, 1e-6, 10e-6, 100e-6],
-            default=[0.1e-6]
+            default=[10e-6]
         )
 
         datos_totales = {}
@@ -59,7 +59,7 @@ def render_FOXFET ():
         I_interps = st.multiselect(
             "Corrientes de interpolación:",
             options=[0.1e-6, 1e-6, 10e-6, 100e-6],
-            default=[0.1e-6]
+            default=[10e-6]
         )
 
         sens_totales = {}
