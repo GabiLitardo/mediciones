@@ -15,7 +15,6 @@ def render_FG ():
         ["Evolución temporal", "Sensibilidad", "Ruido", "Temperatura", "Resumen", "Pruebas"]
     )
     dispos_FG = ["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"]
-    dispos_FOXFET = ["FFC1", "FFC2", "FFC3", "FFL", "FFS"]
     corrientes_normalizadas = [100, 150, 200, 250, 350]
     temperaturas = [30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130]
 
@@ -41,31 +40,6 @@ def render_FG ():
             dict_datos=datos_fg_t2,
             xlabel="Tiempo de irradiación [min]",
             ylabel=r"$I_D\text{ [}\mu \text{A]}$",
-            modo='markers+lines'
-        )
-
-        I_interps = st.multiselect(
-            "Corrientes de interpolación:",
-            options=[0.1e-6, 1e-6, 10e-6, 100e-6],
-            default=[0.1e-6]
-        )
-
-        datos_totales = {}
-        for I_interp in I_interps:
-            datos_foxfet = proc_evo.obtener_datos_crudos_tanda(
-                lista_dispositivos=dispos_FOXFET,
-                tipo_tanda="FOXFET",
-                I_interp=I_interp
-            )
-            # Prefijar la clave para distinguir dispositivo y corriente en el mismo grafico
-            for key, val in datos_foxfet.items():
-                datos_totales[f"{key} @ {I_interp * 1e6:.1f} uA"] = val
-
-        graficos.graficar_curvas(
-            titulo="Evolución FOXFETs - Comparativa de Corrientes",
-            dict_datos=datos_totales,
-            xlabel="Tiempo de irradiación [min]",
-            ylabel="Tensión [V]",
             modo='markers+lines'
         )
 
