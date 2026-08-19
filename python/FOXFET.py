@@ -64,7 +64,7 @@ def render_FOXFET ():
 
         sens_totales = {}
         for I_interp in I_interps:
-            sens = proc_sens.procesar_sensibilidad(dispos, "FOXFET", normalizado=False, I_interp=I_interp)
+            sens = proc_sens.procesar_sensibilidad(dispos, "FOXFET", normalizado=False, I_interp=I_interp, n_ventana=12)
             # Prefijar la clave para distinguir dispositivo y corriente en el mismo grafico
             for key, val in sens.items():
                 sens_totales[f"{key} @ {I_interp * 1e6:.1f} uA"] = val
