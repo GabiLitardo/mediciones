@@ -14,7 +14,7 @@ def render_FG ():
         "Seleccionar Análisis",
         ["Evolución temporal", "Sensibilidad", "Ruido", "Temperatura", "Resumen", "Pruebas"]
     )
-    dispos_FG = ["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"]
+    DISPOS = ["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"]
     corrientes_normalizadas = [100, 150, 200, 250, 350]
     temperaturas = [30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130]
 
@@ -25,7 +25,7 @@ def render_FG ():
         st.markdown("---")
         st.header("Evolución Temporal")
         
-        datos_fg_t1 = proc_evo.obtener_datos_crudos_tanda(dispos_FG, "FG_tanda1")
+        datos_fg_t1 = proc_evo.obtener_datos_crudos_tanda(DISPOS, "FG_tanda1")
         graficos.graficar_curvas(
             titulo="Evolución Floating Gates tanda 1 (I @ V = -4.5 V)",
             dict_datos=datos_fg_t1,
@@ -34,7 +34,7 @@ def render_FG ():
             modo='markers+lines'
         )
 
-        datos_fg_t2 = proc_evo.obtener_datos_crudos_tanda(dispos_FG, "FG_tanda2")
+        datos_fg_t2 = proc_evo.obtener_datos_crudos_tanda(DISPOS, "FG_tanda2")
         graficos.graficar_curvas(
             titulo="Evolución Floating Gates tanda 2 (I @ V = -4.5 V)",
             dict_datos=datos_fg_t2,
@@ -45,7 +45,7 @@ def render_FG ():
 
         st.subheader("Evolución de la tensión de compuerta equivalente ($V_{FG}$)")
         
-        datos_vg_t1 = proc_evo.obtener_datos_evolucion_vg(dispos_FG, "FG_tanda1")
+        datos_vg_t1 = proc_evo.obtener_datos_evolucion_vg(DISPOS, "FG_tanda1")
         graficos.graficar_curvas(
             titulo="Descarga temporal de Floating Gates tanda 1 en tensión",
             dict_datos=datos_vg_t1,
@@ -54,7 +54,7 @@ def render_FG ():
             modo='markers+lines'
         )
         
-        datos_vg_t2 = proc_evo.obtener_datos_evolucion_vg(dispos_FG, "FG_tanda2")
+        datos_vg_t2 = proc_evo.obtener_datos_evolucion_vg(DISPOS, "FG_tanda2")
         graficos.graficar_curvas(
             titulo="Descarga temporal de Floating Gates tanda 2 en tensión",
             dict_datos=datos_vg_t2,
@@ -71,7 +71,7 @@ def render_FG ():
         st.header("Análisis de sensibilidad")
         st.subheader("Normalizada")
         
-        sens_norm_t1 = proc_sens.procesar_sensibilidad(dispos_FG, "FG_tanda1", normalizado=True)
+        sens_norm_t1 = proc_sens.procesar_sensibilidad(DISPOS, "FG_tanda1", normalizado=True)
         graficos.graficar_curvas(
             titulo=r"$\text{Sensibilidad FG tanda 1 (Sensibilidad vs }V_{FG}\text{)}$",
             dict_datos=sens_norm_t1,
@@ -80,7 +80,7 @@ def render_FG ():
             modo='markers+lines'
         )
             
-        sens_norm_t2 = proc_sens.procesar_sensibilidad(dispos_FG, "FG_tanda2", normalizado=True)
+        sens_norm_t2 = proc_sens.procesar_sensibilidad(DISPOS, "FG_tanda2", normalizado=True)
         graficos.graficar_curvas(
             titulo=r"$\text{Sensibilidad FG tanda 2 (Sensibilidad vs }V_{FG}\text{)}$",
             dict_datos=sens_norm_t2,
@@ -91,7 +91,7 @@ def render_FG ():
             
         st.subheader("Sin normalizar")
         
-        sens_abs_t1 = proc_sens.procesar_sensibilidad(dispos_FG, "FG_tanda1", normalizado=False)
+        sens_abs_t1 = proc_sens.procesar_sensibilidad(DISPOS, "FG_tanda1", normalizado=False)
         graficos.graficar_curvas(
             titulo=r"$\text{Sensibilidad absoluta FG tanda 1 (Sensibilidad vs }I_D\text{ Normalizado)}$",
             dict_datos=sens_abs_t1,
@@ -100,7 +100,7 @@ def render_FG ():
             modo='markers+lines'
         )
             
-        sens_abs_t2 = proc_sens.procesar_sensibilidad(dispos_FG, "FG_tanda2", normalizado=False)
+        sens_abs_t2 = proc_sens.procesar_sensibilidad(DISPOS, "FG_tanda2", normalizado=False)
         graficos.graficar_curvas(
             titulo=r"$\text{Sensibilidad absoluta FG tanda 2 (Sensibilidad vs }I_D\text{ Normalizado)}$",
             dict_datos=sens_abs_t2,
@@ -120,7 +120,7 @@ def render_FG ():
         log = st.checkbox("Graficar Semilog?", value=False)
 
         ruido_corto = proc_ruido.obtener_analisis_ruido_completo(
-            dispos_FG, corrientes_normalizadas, es_larga=False, restar_deriva=restar_deriva
+            DISPOS, corrientes_normalizadas, es_larga=False, restar_deriva=restar_deriva
         )
 
         graficos.graficar_curvas(
@@ -144,7 +144,7 @@ def render_FG ():
         )
 
         ruido_largo = proc_ruido.obtener_analisis_ruido_completo(
-            dispos_FG, corrientes_normalizadas, es_larga=True, restar_deriva=restar_deriva
+            DISPOS, corrientes_normalizadas, es_larga=True, restar_deriva=restar_deriva
         )
 
         graficos.graficar_curvas(
@@ -183,7 +183,7 @@ def render_FG ():
         st.header("Análisis de Coeficiente Térmico")
 
         datos_temp = proc_temp.obtener_analisis_temperatura(
-            dispos_FG, corrientes_normalizadas, temperaturas
+            DISPOS, corrientes_normalizadas, temperaturas
         )
 
         if datos_temp["i_vs_t"]:
@@ -211,9 +211,9 @@ def render_FG ():
         st.header("Sensibilidad absoluta, ruido y coef. térmico vs $I_D$ normalizada")
             
         # 1. Obtención de datos con la estructura plana unificada
-        sens_abs_t2 = proc_sens.procesar_sensibilidad(dispos_FG, "FG_tanda2", normalizado=False)
-        ruido_resumen_data = proc_ruido.obtener_analisis_ruido_completo(dispos_FG, corrientes_normalizadas, es_larga=False, restar_deriva=True)
-        temp_resumen_data = proc_temp.obtener_analisis_temperatura(dispos_FG, corrientes_normalizadas, temperaturas)
+        sens_abs_t2 = proc_sens.procesar_sensibilidad(DISPOS, "FG_tanda2", normalizado=False)
+        ruido_resumen_data = proc_ruido.obtener_analisis_ruido_completo(DISPOS, corrientes_normalizadas, es_larga=False, restar_deriva=True)
+        temp_resumen_data = proc_temp.obtener_analisis_temperatura(DISPOS, corrientes_normalizadas, temperaturas)
         
         # 2. Filtrado de la sensibilidad discreta (sin los ajustes 'Poly')
         sens_resumen = {disp: datos for disp, datos in sens_abs_t2.items() if "(Poly)" not in disp}

@@ -3,7 +3,7 @@ import numpy as np
 import streamlit as st
 from proc_evo import obtener_datos_crudos_tanda, obtener_datos_evolucion_vg, calcular_fit_polinomico
 
-factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2": 1.0}
+factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2": 1.0, "FFC1": 1.0, "FFC2": 1.0, "FFC3": 1.0, "FFL": 1.0, "FFS": 1.0}
 tasa_dosis = 0.18
 
 def calcular_fit_polinomico(tiempos_list, corrientes_list):
