@@ -215,8 +215,8 @@ def render_FG ():
         ruido_resumen_data = proc_ruido.obtener_analisis_ruido_completo(DISPOS, corrientes_normalizadas, es_larga=False, restar_deriva=True)
         temp_resumen_data = proc_temp.obtener_analisis_temperatura(DISPOS, corrientes_normalizadas, temperaturas)
         
-        # 2. Filtrado de la sensibilidad discreta (sin los ajustes 'Poly')
-        sens_resumen = {disp: datos for disp, datos in sens_abs_t2.items() if "(Poly)" not in disp}
+        # 2. Filtrado de la sensibilidad discreta (sin los ajustes 'Fit')
+        sens_resumen = {disp: datos for disp, datos in sens_abs_t2.items() if "(Fit)" not in disp}
         
         # 3. Gráfico: Error equivalente por ruido (\sigma / S)
         st.subheader("Error equivalente por ruido ($\\sigma/S$)")

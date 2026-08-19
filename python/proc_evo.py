@@ -79,7 +79,7 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, I_interp = 1e-5, 
             coefs = calcular_fit_polinomico(x_arr.tolist(), y_arr.tolist())
             t_cont = np.linspace(x_arr.min(), x_arr.max(), 200)
             y_fit = np.polyval(coefs, t_cont)
-            resultado[f"{disp} (Fit Poly g4)"] = {"x": t_cont, "y": y_fit}
+            resultado[f"{disp} (Fit)"] = {"x": t_cont, "y": y_fit}
 
     return resultado
 
@@ -113,7 +113,7 @@ def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda):
                 coefs = calcular_fit_polinomico(x_arr.tolist(), y_arr.tolist())
                 t_cont = np.linspace(x_arr.min(), x_arr.max(), 200)
                 y_fit = np.polyval(coefs, t_cont)
-                resultado[f"{disp} (Fit Poly g4)"] = {"x": t_cont, "y": y_fit}
+                resultado[f"{disp} (Fit)"] = {"x": t_cont, "y": y_fit}
 
     return resultado
 

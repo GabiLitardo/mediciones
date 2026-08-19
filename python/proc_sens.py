@@ -65,7 +65,7 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, I_in
         ex_disc, ey_disc = calcular_sensibilidad_ventana(tiempos, corrientes, corrientes_norm, n_ventana)
 
         # Diccionario plano unificado
-        resultado[f"{disp} (Poly)"] = {"x": eje_x_fit, "y": eje_y_fit}
+        resultado[f"{disp} (Fit)"] = {"x": eje_x_fit, "y": eje_y_fit}
         resultado[disp] = {"x": ex_disc, "y": ey_disc}
         
     return resultado

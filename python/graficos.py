@@ -55,16 +55,14 @@ def graficar_curvas(titulo, dict_datos, xlabel, ylabel, modo='markers+lines', es
     fig = go.Figure()
     for etiqueta, serie in dict_datos.items():
         nombre_str = str(etiqueta)
-        es_fit = "(Fit" in nombre_str or "(Poly)" in nombre_str
+        es_fit = "(Fit" in nombre_str
         modo_real = 'lines' if es_fit else modo
 
         # Limpieza estándar de strings
         grupo_base = (
             nombre_str
             .replace(" (Medido)", "")
-            .replace(" (Fit Poly g4)", "")
             .replace(" (Fit)", "")
-            .replace(" (Poly)", "")
             .strip()
         )
 
