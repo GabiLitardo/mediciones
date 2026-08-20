@@ -149,8 +149,8 @@ def render_FG ():
             xlabel="Frecuencia [Hz]",
             ylabel=r"$\text{PSD [}\mu\text{A}^2/\text{Hz]}$",
             modo='lines',
-            log_x=True,
-            log_y=True
+            logx=True,
+            logy=True
         )
 
         ruido_largo = proc_ruido.obtener_analisis_ruido_completo(
