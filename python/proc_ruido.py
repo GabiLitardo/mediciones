@@ -1,6 +1,7 @@
 # proc_ruido.py
 import numpy as np
 import streamlit as st
+from scipy.signal import welch
 from lector_archivos import cargar_medicion_ruido
 
 A_SH = 1.12924e-3
@@ -11,12 +12,21 @@ def convertir_r_a_temp_steinhart(resistencia):
     ln_R = np.log(resistencia)
     return (1.0 / (A_SH + B_SH * ln_R + C_SH * (ln_R ** 3))) - 273.15
 
-def calcular_psd_periodograma(tiempo_s, i_ruido_uA):
-    dt = np.mean(np.diff(tiempo_s))
+def calcular_psd(tiempo_s, i_ruido_uA):
+    dt = float(np.mean(np.diff(tiempo_s)))
+    fs = 1.0 / dt
     n = len(i_ruido_uA)
-    freqs = np.fft.rfftfreq(n, d=dt)
-    fft_vals = np.fft.rfft(i_ruido_uA)
-    psd = (2.0 * dt / n) * (np.abs(fft_vals) ** 2)
+    nperseg = min(n, 256)
+    noverlap = nperseg // 2
+
+    freqs, psd = welch(
+        i_ruido_uA,
+        fs=fs,
+        window='hann',
+        nperseg=nperseg,
+        noverlap=noverlap,
+        scaling='density'
+    )
     return freqs[1:], psd[1:]
 
 @st.cache_data
@@ -70,7 +80,7 @@ def obtener_analisis_ruido_completo(lista_dispositivos, corrientes_normalizadas,
 
             # 4. Densidad Espectral de Potencia (PSD)
             if len(tiempo_s) > 1:
-                f_eje, psd_eje = calcular_psd_periodograma(tiempo_s, y_val)
+                f_eje, psd_eje = calcular_psd(tiempo_s, y_val)
                 psd[tag] = {"x": f_eje, "y": psd_eje}
 
             std_val = np.std(y_val * 1000.0, ddof=1)
