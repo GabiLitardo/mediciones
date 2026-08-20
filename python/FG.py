@@ -226,7 +226,7 @@ def render_FG ():
                 )
 
         for disp in ["PFGIW1", "PFGIW2", "PFGIP2"]:
-            st.text(r"$I_{ZTC}$"+f" para {disp}: {datos_temp["alpha_vs_i"][f"{disp} (Fit)"]["ztc"]}")
+            st.text(r"$I_{ZTC}$"+f" para {disp}: {datos_temp["alpha_vs_i"][f"{disp} (Fit)"]["ztc"] :.2f}")
     # =====================================================================
     # SECCIÓN 5: RESUMEN
     # =====================================================================
