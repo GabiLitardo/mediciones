@@ -86,7 +86,7 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, I_interp = 1e-5, 
     return resultado
 
 @st.cache_data
-def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda, en_dosis):
+def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda, en_dosis=False):
     datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, en_dosis=en_dosis)
     resultado = {}
     
