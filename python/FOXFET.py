@@ -42,7 +42,7 @@ def render_FOXFET ():
                 datos_totales[f"{key} @ {I_interp * 1e6:.1f} uA"] = val
 
         graficos.graficar_curvas(
-            titulo="Evolución FOXFETs - Comparativa de Corrientes",
+            titulo="Evolución FOXFETs Tanda 1",
             dict_datos=datos_totales,
             xlabel="Tiempo de irradiación [min]",
             ylabel="Tensión [V]",
