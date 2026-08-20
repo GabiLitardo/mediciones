@@ -46,7 +46,7 @@ def render_FOXFET ():
             dict_datos=datos_totales,
             xlabel="Tiempo de irradiación [min]",
             ylabel="Tensión [V]",
-            modo='markers+lines'
+            modo='markers'
         )
 
     # =====================================================================
