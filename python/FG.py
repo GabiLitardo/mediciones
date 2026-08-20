@@ -289,7 +289,6 @@ def render_FG ():
         vg_iw2 = {proc_evo.obtener_vg_por_corriente("PFGIW2", ztc_iw2)}
         vg_ip2 = {proc_evo.obtener_vg_por_corriente("PFGIP2", ztc_ip2)}
         st.text(f"Las tensiones equivalentes para ZTC son: PFGIW1->{vg_iw1}V ; PFGIW2->{vg_iw2}V ; PFGIP2->{vg_ip2}V")
-        st.text("Ahora quiero ver si esas tensiones cumplen Vfg<Vt y Vds<Vfg-Vt, con Vds=-4.5V y Vt a estimar")
         st.text(f"Se estiman los Vt: PFGIW1->{datos_iv_ref["PFGIW1"]["vt"] :.2f} ; (PFGIW2, PFGIP2)->{datos_iv_ref["PFGIW2"]["vt"] :.2f}")
         st.text(f"Entonces para el PFGIW1: {vg_iw1}V < {datos_iv_ref["PFGIW1"]["vt"] :.2f} y -4.5V < {-1.69 - datos_iv_ref["PFGIW1"]["vt"] :.2f}")
         st.text(f"Para el PFGIW2: {vg_iw2}V < {datos_iv_ref["PFGIW2"]["vt"] :.2f} y -4.5V < {-2.10 - datos_iv_ref["PFGIW2"]["vt"] :.2f}")
