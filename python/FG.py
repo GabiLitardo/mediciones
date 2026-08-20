@@ -210,7 +210,20 @@ def render_FG ():
             ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu \text{A/°C]}$",
             modo='markers+lines'
         )
-        
+
+        fits_ztc = {
+            tag.replace(" (Fit)", ""): datos["ztc"]
+            for tag, datos in datos_temp["alpha_vs_i"].items()
+            if "(Fit)" in tag and "ztc" in datos
+        }
+
+        if fits_ztc:
+            cols = st.columns(len(fits_ztc))
+            for col, (disp_nombre, val_ztc) in zip(cols, fits_ztc.items()):
+                col.metric(
+                    label=f"$I_{{ZTC}}$ ({disp_nombre})",
+                    value=f"{val_ztc:.2f} µA"
+                )
     # =====================================================================
     # SECCIÓN 5: RESUMEN
     # =====================================================================
