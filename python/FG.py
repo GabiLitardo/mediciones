@@ -24,41 +24,43 @@ def render_FG ():
     if opcion == "Evolución temporal":
         st.markdown("---")
         st.header("Evolución Temporal")
+
+        en_dosis = st.checkbox("Graficar en función de dosis acumulada?", value=False)
         
-        datos_fg_t1 = proc_evo.obtener_datos_crudos_tanda(DISPOS, "FG_tanda1")
+        datos_fg_t1 = proc_evo.obtener_datos_crudos_tanda(DISPOS, "FG_tanda1", en_dosis=en_dosis)
         graficos.graficar_curvas(
             titulo="Evolución Floating Gates tanda 1 (I @ V = -4.5 V)",
             dict_datos=datos_fg_t1,
-            xlabel="Tiempo de irradiación [min]",
+            xlabel="Dosis Acumulada [Gy]" if en_dosis else "Tiempo de irradiación [min]",
             ylabel=r"$I_D\text{ [}\mu \text{A]}$",
             modo='markers+lines'
         )
 
-        datos_fg_t2 = proc_evo.obtener_datos_crudos_tanda(DISPOS, "FG_tanda2")
+        datos_fg_t2 = proc_evo.obtener_datos_crudos_tanda(DISPOS, "FG_tanda2", en_dosis=en_dosis)
         graficos.graficar_curvas(
             titulo="Evolución Floating Gates tanda 2 (I @ V = -4.5 V)",
             dict_datos=datos_fg_t2,
-            xlabel="Tiempo de irradiación [min]",
+            xlabel="Dosis Acumulada [Gy]" if en_dosis else "Tiempo de irradiación [min]",
             ylabel=r"$I_D\text{ [}\mu \text{A]}$",
             modo='markers+lines'
         )
 
         st.subheader("Evolución de la tensión de compuerta equivalente ($V_{FG}$)")
         
-        datos_vg_t1 = proc_evo.obtener_datos_evolucion_vg(DISPOS, "FG_tanda1")
+        datos_vg_t1 = proc_evo.obtener_datos_evolucion_vg(DISPOS, "FG_tanda1", en_dosis = en_dosis)
         graficos.graficar_curvas(
             titulo="Descarga temporal de Floating Gates tanda 1 en tensión",
             dict_datos=datos_vg_t1,
-            xlabel="Tiempo de irradiación [min]",
+            xlabel="Dosis Acumulada [Gy]" if en_dosis else "Tiempo de irradiación [min]",
             ylabel=r"$\text{Tensión }V_{FG}\text{ [V]}$",
             modo='markers+lines'
         )
         
-        datos_vg_t2 = proc_evo.obtener_datos_evolucion_vg(DISPOS, "FG_tanda2")
+        datos_vg_t2 = proc_evo.obtener_datos_evolucion_vg(DISPOS, "FG_tanda2", en_dosis = en_dosis)
         graficos.graficar_curvas(
             titulo="Descarga temporal de Floating Gates tanda 2 en tensión",
             dict_datos=datos_vg_t2,
-            xlabel="Tiempo de irradiación [min]",
+            xlabel="Dosis Acumulada [Gy]" if en_dosis else "Tiempo de irradiación [min]",
             ylabel=r"$\text{Tensión }V_{FG}\text{ [V]}$",
             modo='markers+lines'
         )

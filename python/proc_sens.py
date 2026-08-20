@@ -4,7 +4,7 @@ import streamlit as st
 from proc_evo import obtener_datos_crudos_tanda, obtener_datos_evolucion_vg, calcular_fit_polinomico
 
 factores_normalizacion = {"PFGIW1": 4.0, "PFGIW2": 1.0, "PFGIW3": 56.0, "PFGIP2": 1.0, "FFC1": 1.0, "FFC2": 1.0, "FFC3": 1.0, "FFL": 1.0, "FFS": 1.0}
-tasa_dosis = 0.18
+TASA_DOSIS = 0.18
 
 def calcular_fit_polinomico(tiempos_list, corrientes_list):
     coeficientes = np.polyfit(tiempos_list, corrientes_list, deg=4)
@@ -36,7 +36,7 @@ def calcular_sensibilidad_ventana(tiempos, corrientes_proc, corrientes_norm, n_v
             eje_y.append(tasa_promedio_ventana)
             eje_x.append(corriente_promedio_ventana)
             
-    return np.array(eje_x), np.array(eje_y) / tasa_dosis
+    return np.array(eje_x), np.array(eje_y) / TASA_DOSIS
 
 @st.cache_data
 def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, I_interp = 1e-7, n_ventana=6):
@@ -58,7 +58,7 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, I_in
         t_cont = np.linspace(tiempos.min(), tiempos.max(), 200)
         
         coefs_dy = np.polyder(coefs_y)
-        eje_y_fit = np.abs(np.polyval(coefs_dy, t_cont)) / tasa_dosis
+        eje_y_fit = np.abs(np.polyval(coefs_dy, t_cont)) / TASA_DOSIS
         eje_x_fit = np.polyval(coefs_x, t_cont)
         
         # 2. Sensibilidad discreta por ventana

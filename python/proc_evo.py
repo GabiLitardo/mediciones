@@ -3,6 +3,7 @@ import numpy as np
 import streamlit as st
 from lector_archivos import cargar_curva_iv_referencia
 from lector_archivos import cargar_medicion_tanda
+TASA_DOSIS = 0.18
 
 def calcular_tiempo_acumulado(nro, tipo_tanda):
     t = 0
@@ -41,8 +42,9 @@ def obtener_vg_por_corriente(dispositivo, corriente_buscada):
     return np.interp(corriente_buscada, corrientes_d[indices_ordenados], tensiones_g[indices_ordenados])
 
 @st.cache_data
-def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, I_interp = 1e-5, rng=60):
+def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, I_interp = 1e-5, rng = 60, en_dosis = False):
     resultado = {}
+    factor_x = TASA_DOSIS if en_dosis else 1.0
     for disp in lista_dispositivos:
         tiempos, valores = [], []
         for nro in range(0, rng):
@@ -69,7 +71,7 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, I_interp = 1e-5, 
                 break               
         if tiempos:
             indices = np.argsort(tiempos)
-            x_arr = np.array(tiempos)[indices]
+            x_arr = np.array(tiempos)[indices] * factor_x
             y_arr = np.array(valores)[indices]
             
             # Serie 1: Medido
@@ -84,8 +86,8 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, I_interp = 1e-5, 
     return resultado
 
 @st.cache_data
-def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda):
-    datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda)
+def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda, en_dosis):
+    datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, en_dosis=en_dosis)
     resultado = {}
     
     # Filtramos para hacer la conversión de V_FG solo sobre las series medidas

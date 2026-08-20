@@ -23,6 +23,7 @@ def render_FOXFET ():
     if opcion == "Evolución temporal":
         st.markdown("---")
         st.header("Evolución Temporal")
+        en_dosis = st.checkbox("Graficar en función de dosis acumulada?", value=False)
 
         I_interps = st.multiselect(
             "Corrientes de interpolación:",
@@ -35,7 +36,8 @@ def render_FOXFET ():
             datos_foxfet = proc_evo.obtener_datos_crudos_tanda(
                 lista_dispositivos=dispos,
                 tipo_tanda="FOXFET",
-                I_interp=I_interp
+                I_interp=I_interp,
+                en_dosis=en_dosis
             )
             # Prefijar la clave para distinguir dispositivo y corriente en el mismo grafico
             for key, val in datos_foxfet.items():
@@ -44,7 +46,7 @@ def render_FOXFET ():
         graficos.graficar_curvas(
             titulo="Evolución FOXFETs Tanda 1",
             dict_datos=datos_totales,
-            xlabel="Tiempo de irradiación [min]",
+            xlabel="Dosis Acumulada [Gy]" if en_dosis else "Tiempo de irradiación [min]",
             ylabel="Tensión [V]",
             modo='markers'
         )
