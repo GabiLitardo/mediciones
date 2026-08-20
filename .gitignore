@@ -3,7 +3,6 @@ __pycache__/
 *.pyc
 
 # Ignorar las imágenes y reportes interactivos generados
-*.png
 *.html
 
 # Ignorar archivos ocultos del sistema
