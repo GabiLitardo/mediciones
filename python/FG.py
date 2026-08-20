@@ -211,20 +211,6 @@ def render_FG ():
             modo='markers+lines'
         )
 
-        fits_ztc = {
-            tag.replace(" (Fit)", ""): datos["ztc"]
-            for tag, datos in datos_temp["alpha_vs_i"].items()
-            if "(Fit)" in tag and "ztc" in datos
-        }
-
-        if fits_ztc:
-            cols = st.columns(len(fits_ztc))
-            for col, (disp_nombre, val_ztc) in zip(cols, fits_ztc.items()):
-                col.metric(
-                    label=f"$I_{{ZTC}}$ ({disp_nombre})",
-                    value=f"{val_ztc:.2f} µA"
-                )
-
         for disp in ["PFGIW1", "PFGIW2", "PFGIP2"]:
             st.write(r"$I_{ZTC}$"+f"({disp}): {datos_temp["alpha_vs_i"][f"{disp} (Fit)"]["ztc"] :.2f} µA")
     # =====================================================================
@@ -283,9 +269,13 @@ def render_FG ():
             modo='markers'
         )
 
-        ztc_iw1 = 30.58e-6
-        ztc_iw2 = 13.96e-6
-        ztc_ip2 = 17.39e-6
+        datos_temp = proc_temp.obtener_analisis_temperatura(
+            DISPOS, corrientes_normalizadas, temperaturas
+        )
+
+        ztc_iw1 = datos_temp["alpha_vs_i"]["PFGIW1 (Fit)"]["ztc"]
+        ztc_iw2 = datos_temp["alpha_vs_i"]["PFGIW2 (Fit)"]["ztc"]
+        ztc_ip2 = datos_temp["alpha_vs_i"]["PFGIP2 (Fit)"]["ztc"]
         st.text(f"Se estima que las corrientes de ZTC son: PFGIW1->{ztc_iw1*1e6:.2f}uA ; PFGIW2->{ztc_iw2*1e6:.2f}uA ; PFGIP2->{ztc_ip2*1e6:.2f}uA")
         st.text("Para saber si en esa corriente los dispositivos están en saturación, me fijo su tensión de Floating Gate equivalente")
         vg_iw1 = proc_evo.obtener_vg_por_corriente("PFGIW1", ztc_iw1)

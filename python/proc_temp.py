@@ -58,17 +58,16 @@ def obtener_analisis_temperatura(lista_dispositivos, corrientes_normalizadas, li
                 "x": x_arr,
                 "y": y_arr
             }
-            if len(x_arr) >= 2:
-                coefs_alpha = np.polyfit(x_arr, y_arr, deg=1)
-                m, b = coefs_alpha[0], coefs_alpha[1]
-                x_cont = np.linspace(0.0, x_arr.max(), 100)
-                y_cont = np.polyval(coefs_alpha, x_cont)
-                ztc = float(-b / m)
-                alpha_vs_i[f"{disp} (Fit)"] = {
-                    "x": x_cont,
-                    "y": y_cont,
-                    "ztc": ztc
-                }
+            coefs_alpha = np.polyfit(x_arr, y_arr, deg=1)
+            m, b = coefs_alpha[0], coefs_alpha[1]
+            x_cont = np.linspace(0.0, x_arr.max(), 100)
+            y_cont = np.polyval(coefs_alpha, x_cont)
+            ztc = float(-b / m)
+            alpha_vs_i[f"{disp} (Fit)"] = {
+                "x": x_cont,
+                "y": y_cont,
+                "ztc": ztc
+            }
 
     return {
         "i_vs_t": i_vs_t,
