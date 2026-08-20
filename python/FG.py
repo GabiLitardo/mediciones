@@ -211,7 +211,7 @@ def render_FG ():
             modo='markers+lines'
         )
 
-        if datos_temp["alpha_vs_i"]["PFGIW1 (Fit)"] is not None:
+        if "PFGIW1 (Fit)" in datos_temp.get("alpha_vs_i", {}):
             for disp in ["PFGIW1", "PFGIW2", "PFGIP2"]:
                 st.write(r"$I_{ZTC}$"+f"({disp}): {datos_temp["alpha_vs_i"][f"{disp} (Fit)"]["ztc"] :.2f} µA")
     # =====================================================================
@@ -274,7 +274,7 @@ def render_FG ():
             DISPOS, corrientes_normalizadas, temperaturas
         )
 
-        if datos_temp["alpha_vs_i"]["PFGIW1 (Fit)"] is not None:
+        if "PFGIW1 (Fit)" in datos_temp.get("alpha_vs_i", {}):
             ztc_iw1 = datos_temp["alpha_vs_i"]["PFGIW1 (Fit)"]["ztc"] * 1e-6
             ztc_iw2 = datos_temp["alpha_vs_i"]["PFGIW2 (Fit)"]["ztc"] * 1e-6
             ztc_ip2 = datos_temp["alpha_vs_i"]["PFGIP2 (Fit)"]["ztc"] * 1e-6
