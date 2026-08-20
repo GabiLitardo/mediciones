@@ -228,7 +228,7 @@ def render_FG ():
         # 2. Filtrado de la sensibilidad discreta (sin los ajustes 'Fit')
         sens_resumen = {disp: datos for disp, datos in sens_abs_t2.items() if "(Fit)" not in disp}
         
-        # 3. Gráfico: Error equivalente por ruido (\sigma / S)
+        # 3. Gráfico: Error equivalente por ruido (sigma / S)
         st.subheader("Error equivalente por ruido ($\\sigma/S$)")
         graficos.graficar_relacion_normalizada(
             titulo=r"$\text{Error equivalente por ruido (}\sigma\text{/S) vs Corriente Normalizada}$",
