@@ -15,8 +15,8 @@ def render_FG ():
         ["Evolución temporal", "Sensibilidad", "Ruido", "Temperatura", "Resumen", "Pruebas"]
     )
     DISPOS = ["PFGIW1", "PFGIW2", "PFGIW3", "PFGIP2"]
-    corrientes_normalizadas = [100, 150, 200, 250, 350]
-    temperaturas = [30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130]
+    CORRIENTES = [100, 150, 200, 250, 350]
+    TEMPERATURAS = [30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130]
 
     # =====================================================================
     # SECCIÓN 1: EVOLUCIÓN TEMPORAL
@@ -120,7 +120,7 @@ def render_FG ():
         logx = st.checkbox("Escala logarítmica en eje x?", value=False)
 
         ruido_corto = proc_ruido.obtener_analisis_ruido_completo(
-            DISPOS, corrientes_normalizadas, es_larga=False, restar_deriva=restar_deriva
+            DISPOS, CORRIENTES, es_larga=False, restar_deriva=restar_deriva
         )
 
         graficos.graficar_curvas(
@@ -154,7 +154,7 @@ def render_FG ():
         )
 
         ruido_largo = proc_ruido.obtener_analisis_ruido_completo(
-            DISPOS, corrientes_normalizadas, es_larga=True, restar_deriva=restar_deriva
+            DISPOS, CORRIENTES, es_larga=True, restar_deriva=restar_deriva
         )
 
         graficos.graficar_curvas(
@@ -193,7 +193,7 @@ def render_FG ():
         st.header("Análisis de Coeficiente Térmico")
 
         datos_temp = proc_temp.obtener_analisis_temperatura(
-            DISPOS, corrientes_normalizadas, temperaturas
+            DISPOS, CORRIENTES, TEMPERATURAS
         )
 
         graficos.graficar_curvas(
@@ -223,8 +223,8 @@ def render_FG ():
             
         # 1. Obtención de datos con la estructura plana unificada
         sens_abs_t2 = proc_sens.procesar_sensibilidad(DISPOS, "FG_tanda2", normalizado=False)
-        ruido_resumen_data = proc_ruido.obtener_analisis_ruido_completo(DISPOS, corrientes_normalizadas, es_larga=False, restar_deriva=True)
-        temp_resumen_data = proc_temp.obtener_analisis_temperatura(DISPOS, corrientes_normalizadas, temperaturas)
+        ruido_resumen_data = proc_ruido.obtener_analisis_ruido_completo(DISPOS, CORRIENTES, es_larga=False, restar_deriva=True)
+        temp_resumen_data = proc_temp.obtener_analisis_temperatura(DISPOS, CORRIENTES, TEMPERATURAS)
         
         # 2. Filtrado de la sensibilidad discreta (sin los ajustes 'Fit')
         sens_resumen = {disp: datos for disp, datos in sens_abs_t2.items() if "(Fit)" not in disp}
@@ -271,7 +271,7 @@ def render_FG ():
         )
 
         datos_temp = proc_temp.obtener_analisis_temperatura(
-            DISPOS, corrientes_normalizadas, temperaturas
+            DISPOS, CORRIENTES, TEMPERATURAS
         )
 
         if "PFGIW1 (Fit)" in datos_temp.get("alpha_vs_i", {}):
