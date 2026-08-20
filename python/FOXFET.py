@@ -86,7 +86,7 @@ def render_FOXFET ():
 
         restar_deriva = st.checkbox("Restar deriva térmica para visualizar el ruido?", value=True)
         log = st.checkbox("Graficar Semilog?", value=False)
-        st.image("instrumentos.png", width="stretch")
+        st.image("martillo.png", width="stretch")
     # =====================================================================
     # SECCIÓN 4: TEMPERATURA
     # =====================================================================
