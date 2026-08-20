@@ -93,10 +93,11 @@ def render_FOXFET ():
     elif opcion == "Temperatura":
         st.markdown("---")
         st.header("Análisis de Coeficiente Térmico")
+        st.image("martillo.png", width="stretch")
 
     # =====================================================================
     # SECCIÓN 5: RESUMEN
     # =====================================================================
     elif opcion == "Resumen":
         st.markdown("---")
-        st.header("Sensibilidad absoluta, ruido y coef. térmico vs $I_D$ normalizada")
+        st.image("martillo.png", width="stretch")
