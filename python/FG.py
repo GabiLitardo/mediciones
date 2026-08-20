@@ -264,7 +264,7 @@ def render_FG ():
             min_value=1.0,
             max_value=100.0,
             value=10.0,
-            step=1
+            step=1.0
         )
 
         datos_error_total = {}
