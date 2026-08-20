@@ -225,8 +225,8 @@ def render_FG ():
                     value=f"{val_ztc:.2f} µA"
                 )
 
-        for disp in DISPOS:
-            st.text(f"{datos_temp["alpha_vs_i"][f"{disp} (Fit)"]["ztc"]}")
+        for disp in ["PFGIW1", "PFGIW2", "PFGIP2"]:
+            st.text(r"$I_{ZTC}$"+f" para {disp}: {datos_temp["alpha_vs_i"][f"{disp} (Fit)"]["ztc"]}")
     # =====================================================================
     # SECCIÓN 5: RESUMEN
     # =====================================================================
