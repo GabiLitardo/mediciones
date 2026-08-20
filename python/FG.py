@@ -210,11 +210,13 @@ def render_FG ():
             ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu \text{A/°C]}$",
             modo='markers+lines'
         )
-        coefs_alpha = np.polyfit(datos_temp["alpha_vs_i"]["x"], datos_temp["alpha_vs_i"]["y"], deg=1)
-        alpha_fit = np.polyval(coefs_alpha, datos_temp["alpha_vs_i"]["x"])
+        corrs = datos_temp["PFGIW1"]["alpha_vs_i"]["x"]
+        alphas = datos_temp["PFGIW1"]["alpha_vs_i"]["y"]
+        coefs_alpha = np.polyfit(corrs, alphas, deg=1)
+        alpha_fit = np.polyval(coefs_alpha, corrs)
         dict_datos = {}
         dict_datos["Fiteo alpha vs i"] = {
-            "x": datos_temp["alpha_vs_i"]["x"],
+            "x": corrs,
             "y": alpha_fit
         }
         graficos.graficar_curvas(
