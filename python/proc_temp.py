@@ -60,7 +60,7 @@ def obtener_analisis_temperatura(lista_dispositivos, corrientes_normalizadas, li
             }
             if len(x_arr) >= 2:
                 coefs_alpha = np.polyfit(x_arr, y_arr, deg=1)
-                x_cont = np.linspace(x_arr.min(), x_arr.max(), 100)
+                x_cont = np.linspace(0.0, 350.0, 100)
                 alpha_vs_i[f"{disp} (Fit)"] = {
                     "x": x_cont,
                     "y": np.polyval(coefs_alpha, x_cont)
