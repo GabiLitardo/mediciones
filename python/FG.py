@@ -210,23 +210,7 @@ def render_FG ():
             ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu \text{A/°C]}$",
             modo='markers+lines'
         )
-        corrs = datos_temp["PFGIW1"]["alpha_vs_i"]["x"]
-        alphas = datos_temp["PFGIW1"]["alpha_vs_i"]["y"]
-        coefs_alpha = np.polyfit(corrs, alphas, deg=1)
-        alpha_fit = np.polyval(coefs_alpha, corrs)
-        dict_datos = {}
-        dict_datos["Fiteo alpha vs i"] = {
-            "x": corrs,
-            "y": alpha_fit
-        }
-        graficos.graficar_curvas(
-            titulo=r"$\text{Interpolación lineal de }\alpha\text{ vs Corrientes Normalizadas}$",
-            dict_datos=dict_datos,
-            xlabel=r"$\text{Corrientes Normalizadas }I_D\text{ [}\mu \text{A]}$",
-            ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu \text{A/°C]}$",
-            modo="lines"
-        )
-
+        
     # =====================================================================
     # SECCIÓN 5: RESUMEN
     # =====================================================================
