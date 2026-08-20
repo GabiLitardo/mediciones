@@ -284,7 +284,7 @@ def render_FG ():
         ztc_iw2 = 13.96e-6
         ztc_ip2 = 17.39e-6
         st.text(f"Se estima que las corrientes de ZTC son: PFGIW1->{ztc_iw1*1e6:.2f}uA ; PFGIW2->{ztc_iw2*1e6:.2f}uA ; PFGIP2->{ztc_ip2*1e6:.2f}uA")
-        st.text("Para saber si en esa corriente los dispositivos estarían en saturación, me fijo su tensión de Floating Gate equivalente")
+        st.text("Para saber si en esa corriente los dispositivos están en saturación, me fijo su tensión de Floating Gate equivalente")
         vg_iw1 = proc_evo.obtener_vg_por_corriente("PFGIW1", ztc_iw1)
         vg_iw2 = proc_evo.obtener_vg_por_corriente("PFGIW2", ztc_iw2)
         vg_ip2 = proc_evo.obtener_vg_por_corriente("PFGIP2", ztc_ip2)
