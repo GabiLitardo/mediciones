@@ -196,23 +196,21 @@ def render_FG ():
             DISPOS, corrientes_normalizadas, temperaturas
         )
 
-        if datos_temp["i_vs_t"]:
-            graficos.graficar_curvas(
-                titulo="Evolución de Corriente de Drain vs Temperatura (@ VD = -4.5V)",
-                dict_datos=datos_temp["i_vs_t"],
-                xlabel="Temperatura [°C]",
-                ylabel=r"$\text{Corriente }I_D \text{ @ }V_D \text{ = -4.5V [}\mu \text{A]}$",
-                modo='markers+lines'
-            )
-            graficos.graficar_curvas(
-                titulo=r"$\text{Coeficiente Térmico (}\alpha\text{) vs Corrientes Normalizadas}$",
-                dict_datos=datos_temp["alpha_vs_i"],
-                xlabel=r"$\text{Corrientes Normalizadas }I_D\text{ [}\mu \text{A]}$",
-                ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu \text{A/°C]}$",
-                modo='markers+lines'
-            )
-        else:
-            st.warning("No se encontraron archivos de medición de temperatura para los parámetros seleccionados.")
+        graficos.graficar_curvas(
+            titulo="Evolución de Corriente de Drain vs Temperatura (@ VD = -4.5V)",
+            dict_datos=datos_temp["i_vs_t"],
+            xlabel="Temperatura [°C]",
+            ylabel=r"$\text{Corriente }I_D \text{ @ }V_D \text{ = -4.5V [}\mu \text{A]}$",
+            modo='markers+lines'
+        )
+        graficos.graficar_curvas(
+            titulo=r"$\text{Coeficiente Térmico (}\alpha\text{) vs Corrientes Normalizadas}$",
+            dict_datos=datos_temp["alpha_vs_i"],
+            xlabel=r"$\text{Corrientes Normalizadas }I_D\text{ [}\mu \text{A]}$",
+            ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu \text{A/°C]}$",
+            modo='markers+lines'
+        )
+        
     # =====================================================================
     # SECCIÓN 5: RESUMEN
     # =====================================================================
