@@ -257,6 +257,55 @@ def render_FG ():
             factor_escala=100.0
         )
 
+        st.subheader("Error Total Combinado")
+        
+        delta_t = st.slider(
+            r"Variación de temperatura supuesta $\Delta T$ [°C]",
+            min_value=0.1,
+            max_value=5.0,
+            value=1.0,
+            step=0.1
+        )
+
+        datos_error_total = {}
+        for disp, d_sens in sens_resumen.items():
+            if disp in ruido_resumen_data["std_ruido"] and disp in temp_resumen_abs:
+                d_ruido = ruido_resumen_data["std_ruido"][disp]
+                d_temp = temp_resumen_abs[disp]
+
+                x_corrientes = np.array(d_ruido["x"])
+                if len(x_corrientes) > 0:
+                    idx = np.argsort(x_corrientes)
+                    x_corrientes = x_corrientes[idx]
+                    
+                    # Interpolar sensibilidad en las corrientes evaluadas
+                    sens_interp = np.interp(x_corrientes, d_sens["x"], d_sens["y"])
+
+                    # 1. Error de Ruido en [cGy]
+                    std_uA = (np.array(d_ruido["y"])[idx] / 1000.0)
+                    err_ruido_cgy = (std_uA * 100.0) / sens_interp
+
+                    # 2. Error Térmico en [cGy/°C]
+                    alpha_interp = np.interp(x_corrientes, d_temp["x"], d_temp["y"])
+                    err_temp_cgy = (alpha_interp * 100.0) / sens_interp
+
+                    # Suma en cuadratura [cGy]
+                    err_total = np.sqrt(err_ruido_cgy**2 + (err_temp_cgy * delta_t)**2)
+
+                    datos_error_total[disp] = {
+                        "x": x_corrientes,
+                        "y": err_total
+                    }
+
+        if datos_error_total:
+            graficos.graficar_curvas(
+                titulo=f"Error Total Combinado vs Corriente Normalizada (ΔT = {delta_t:.1f} °C)",
+                dict_datos=datos_error_total,
+                xlabel=r"$\text{Corriente Normalizada }I_{D_{norm}} \text{ [}\mu \text{A]}$",
+                ylabel="Error Total Combinado [cGy]",
+                modo='markers+lines'
+            )
+
     # =====================================================================
     # SECCIÓN 6: PRUEBAS
     # =====================================================================
