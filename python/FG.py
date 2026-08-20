@@ -290,6 +290,6 @@ def render_FG ():
         vg_ip2 = {proc_evo.obtener_vg_por_corriente("PFGIP2", ztc_ip2)}
         st.text(f"Las tensiones equivalentes para ZTC son: PFGIW1->{vg_iw1:.2f}V ; PFGIW2->{vg_iw2:.2f}V ; PFGIP2->{vg_ip2:.2f}V")
         st.text(f"Se estiman los Vt: PFGIW1->{datos_iv_ref["PFGIW1"]["vt"] :.2f} ; (PFGIW2, PFGIP2)->{datos_iv_ref["PFGIW2"]["vt"] :.2f}")
-        st.text(f"Entonces para el PFGIW1: {vg_iw1}V < {datos_iv_ref["PFGIW1"]["vt"] :.2f} y -4.5V < {vg_iw1 - datos_iv_ref["PFGIW1"]["vt"] :.2f}")
-        st.text(f"Para el PFGIW2: {vg_iw2}V < {datos_iv_ref["PFGIW2"]["vt"] :.2f} y -4.5V < {vg_iw2 - datos_iv_ref["PFGIW2"]["vt"] :.2f}")
-        st.text(f"Para el PFGIP2: {vg_ip2}V < {datos_iv_ref["PFGIW2"]["vt"] :.2f} y -4.5V < {vg_ip2 - datos_iv_ref["PFGIW2"]["vt"] :.2f}")
+        st.text(f"Entonces para el PFGIW1: {vg_iw1:.2f}V < {datos_iv_ref["PFGIW1"]["vt"] :.2f} y -4.5V < {vg_iw1 - datos_iv_ref["PFGIW1"]["vt"] :.2f}")
+        st.text(f"Para el PFGIW2: {vg_iw2:.2f}V < {datos_iv_ref["PFGIW2"]["vt"] :.2f} y -4.5V < {vg_iw2 - datos_iv_ref["PFGIW2"]["vt"] :.2f}")
+        st.text(f"Para el PFGIP2: {vg_ip2:.2f}V < {datos_iv_ref["PFGIW2"]["vt"] :.2f} y -4.5V < {vg_ip2 - datos_iv_ref["PFGIW2"]["vt"] :.2f}")
