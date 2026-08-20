@@ -117,7 +117,7 @@ def render_FG ():
         st.header("Análisis de Ruido")
 
         restar_deriva = st.checkbox("Restar deriva térmica para visualizar el ruido?", value=True)
-        log = st.checkbox("Graficar Semilog?", value=False)
+        logx = st.checkbox("Escala logarítmica en eje x?", value=False)
 
         ruido_corto = proc_ruido.obtener_analisis_ruido_completo(
             DISPOS, corrientes_normalizadas, es_larga=False, restar_deriva=restar_deriva
@@ -136,11 +136,21 @@ def render_FG ():
             xlabel="Tiempo [s]",
             ylabel=r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$",
             modo='lines',
-            es_log=log
+            logx=logx
         )
         graficos.graficar_histograma_ruido(
             "Distribución del Ruido Neto a corto plazo",
             dict_datos=ruido_corto["evos"]
+        )
+
+        graficos.graficar_curvas(
+            "Densidad Espectral de Potencia (PSD) - Corto Plazo",
+            dict_datos=ruido_corto["psd"],
+            xlabel="Frecuencia [Hz]",
+            ylabel=r"$\text{PSD [}\mu\text{A}^2/\text{Hz]}$",
+            modo='lines',
+            log_x=True,
+            log_y=True
         )
 
         ruido_largo = proc_ruido.obtener_analisis_ruido_completo(
@@ -153,7 +163,7 @@ def render_FG ():
             xlabel="Tiempo [s]",
             ylabel=r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$",
             modo='lines',
-            es_log=log
+            logx=logx
         )
         graficos.graficar_histograma_ruido(
             "Distribución del Ruido Neto a largo plazo",

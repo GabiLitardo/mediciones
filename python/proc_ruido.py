@@ -11,6 +11,14 @@ def convertir_r_a_temp_steinhart(resistencia):
     ln_R = np.log(resistencia)
     return (1.0 / (A_SH + B_SH * ln_R + C_SH * (ln_R ** 3))) - 273.15
 
+def calcular_psd_periodograma(tiempo_s, i_ruido_uA):
+    dt = np.mean(np.diff(tiempo_s))
+    n = len(i_ruido_uA)
+    freqs = np.fft.rfftfreq(n, d=dt)
+    fft_vals = np.fft.rfft(i_ruido_uA)
+    psd = (2.0 * dt / n) * (np.abs(fft_vals) ** 2)
+    return freqs[1:], psd[1:]
+
 @st.cache_data
 def obtener_analisis_ruido_completo(lista_dispositivos, corrientes_normalizadas, es_larga=False, restar_deriva=True):
     """
@@ -21,6 +29,7 @@ def obtener_analisis_ruido_completo(lista_dispositivos, corrientes_normalizadas,
     evos_temp = {}
     i_vs_t = {}
     std_ruido = {}
+    psd = {}
 
     for disp in lista_dispositivos:
         std_list = []
@@ -59,6 +68,11 @@ def obtener_analisis_ruido_completo(lista_dispositivos, corrientes_normalizadas,
             i_vs_t[tag] = {"x": temperatura_C, "y": corriente_uA}
             i_vs_t[tag_fit] = {"x": temperatura_C, "y": corriente_fit_uA}
 
+            # 4. Densidad Espectral de Potencia (PSD)
+            if len(tiempo_s) > 1:
+                f_eje, psd_eje = calcular_psd_periodograma(tiempo_s, y_val)
+                psd[tag] = {"x": f_eje, "y": psd_eje}
+
             std_val = np.std(y_val * 1000.0, ddof=1)
             std_list.append(std_val)
             corrientes_validas.append(float(corr))
@@ -73,5 +87,6 @@ def obtener_analisis_ruido_completo(lista_dispositivos, corrientes_normalizadas,
         "evos": evos,
         "evos_temp": evos_temp,
         "i_vs_t": i_vs_t,
-        "std_ruido": std_ruido
+        "std_ruido": std_ruido,
+        "psd": psd
     }

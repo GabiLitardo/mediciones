@@ -51,7 +51,7 @@ def graficar_relacion_normalizada(titulo, datos_numerador, datos_sensibilidad, y
         yaxis_kwargs=dict(title=ylabel)
     )
 
-def graficar_curvas(titulo, dict_datos, xlabel, ylabel, modo='markers+lines', es_log=False):
+def graficar_curvas(titulo, dict_datos, xlabel, ylabel, modo='markers+lines', logx=False, logy=False):
     fig = go.Figure()
     for etiqueta, serie in dict_datos.items():
         nombre_str = str(etiqueta)
@@ -77,8 +77,8 @@ def graficar_curvas(titulo, dict_datos, xlabel, ylabel, modo='markers+lines', es
             
     _renderizar_grafico(
         fig, titulo,
-        xaxis_kwargs=dict(title=xlabel, type="log" if es_log else "-"),
-        yaxis_kwargs=dict(title=ylabel)
+        xaxis_kwargs=dict(title=xlabel, type="log" if logx else "-"),
+        yaxis_kwargs=dict(title=ylabel, type="log" if logy else "-")
     )
 
 def graficar_histograma_ruido(titulo, dict_datos):
