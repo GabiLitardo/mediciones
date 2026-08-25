@@ -124,23 +124,6 @@ def render_FOXFET ():
             logy=True
         )
 
-        ruido_largo = proc_ruido.obtener_analisis_ruido_completo(
-            DISPOS, CORRIENTES, es_larga=True, restar_deriva=restar_deriva
-        )
-
-        graficos.graficar_curvas(
-            "Corriente vs tiempo a largo plazo",
-            dict_datos=ruido_largo["evos"],
-            xlabel="Tiempo [s]",
-            ylabel=r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$",
-            modo='lines',
-            logx=logx
-        )
-        graficos.graficar_histograma_ruido(
-            "Distribución del Ruido Neto a largo plazo",
-            dict_datos=ruido_largo["evos"]
-        )
-
         graficos.graficar_curvas(
             "Evolución de Temperatura vs Tiempo durante medición de ruido",
             dict_datos=ruido_corto["evos_temp"],
