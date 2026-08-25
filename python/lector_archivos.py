@@ -47,6 +47,8 @@ def cargar_medicion_ruido(disp, corr, es_larga):
     sufijo_larga = "_LARGA" if es_larga else ""
     nombre = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1{sufijo_larga}.txt"
     mediciones = matchear_archivos(nombre, tipo_medicion="ruido")
+    if not mediciones:
+        print(nombre, flush=True)
     return mediciones[0] if mediciones else None
 
 def _obtener_version_m(path):
