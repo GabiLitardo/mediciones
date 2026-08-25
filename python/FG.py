@@ -261,10 +261,10 @@ def render_FG ():
         
         delta_t = st.slider(
             r"Variación de temperatura supuesta $\Delta T$ [°C]",
-            min_value=1.0,
-            max_value=100.0,
-            value=10.0,
-            step=1.0
+            min_value=0.1,
+            max_value=5.0,
+            value=0.1,
+            step=0.1
         )
 
         datos_error_total = {}

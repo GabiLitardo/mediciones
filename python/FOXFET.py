@@ -74,7 +74,7 @@ def render_FOXFET ():
 
         
         graficos.graficar_curvas(
-            titulo=r"$\text{Sensibilidad FOXFET tanda 1$",
+            titulo=r"$\text{Sensibilidad FOXFET tanda 1}$",
             dict_datos=sens_totales,
             xlabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
             ylabel=r"$\text{Sensibilidad [V/Gy]}$",
