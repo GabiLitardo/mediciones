@@ -91,7 +91,7 @@ def render_FOXFET ():
         logx = st.checkbox("Escala logarítmica en eje x?", value=False)
 
         ruido_corto = proc_ruido.obtener_analisis_ruido_completo(
-            DISPOS, CORRIENTES, es_larga=False, restar_deriva=restar_deriva
+            DISPOS, CORRIENTES, es_larga=False, restar_deriva=restar_deriva, es_fox=True
         )
 
         graficos.graficar_curvas(
