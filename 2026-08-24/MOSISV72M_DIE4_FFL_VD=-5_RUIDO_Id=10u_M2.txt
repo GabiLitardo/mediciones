@@ -1,8 +1,8 @@
 
-Medici髇 hecha el 2026-08-24  01:40 p.m.
+Medici贸n hecha el 2026-08-24  01:40 p.m.
 
-Medici髇 de corriente y tensi髇 en el tiempo con posibilidad de inyectar corriente.
-Tiempo	Corriente	Tensi髇
+Medici贸n de corriente y tensi贸n en el tiempo con posibilidad de inyectar corriente.
+Tiempo	Corriente	Tensi贸n
 2.602000E+0	1.014500E-5	4.880500E+9	0.000000E+0	0.000000E+0
 5.352000E+0	1.014320E-5	4.880600E+9	0.000000E+0	0.000000E+0
 8.331000E+0	1.013650E-5	4.880600E+9	0.000000E+0	0.000000E+0
