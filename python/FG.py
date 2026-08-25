@@ -298,7 +298,7 @@ def render_FG ():
                     }
 
         if datos_error_total:
-            st.text(r"$err_{total} = \sqrt{err_{ruido}^2 + (err_{temp} \. \Delta T)^2} [\text{cGy}]$")
+            st.latex(r"\text{Error Total [cGy]} = \sqrt{\left(\frac{\sigma_I}{S}\right)^2 + \left(\frac{|\alpha| \cdot \Delta T}{S}\right)^2}")
             graficos.graficar_curvas(
                 titulo=f"Error Total Combinado vs Corriente Normalizada (ΔT = {delta_t:.1f} °C)",
                 dict_datos=datos_error_total,
