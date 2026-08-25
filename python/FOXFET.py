@@ -14,7 +14,8 @@ def render_FOXFET ():
         "Seleccionar Análisis",
         ["Evolución temporal", "Sensibilidad", "Ruido", "Temperatura", "Resumen"]
     )
-    dispos = ["FFC1", "FFC2", "FFC3", "FFL", "FFS"]
+    DISPOS = ["FFC1", "FFC2", "FFC3", "FFL", "FFS"]
+    CORRIENTES = [0.1, 1, 10, 100]
     #temperaturas = [30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130]
 
     # =====================================================================
@@ -27,16 +28,16 @@ def render_FOXFET ():
 
         I_interps = st.multiselect(
             "Corrientes de interpolación:",
-            options=[0.1e-6, 1e-6, 10e-6, 100e-6],
+            options=CORRIENTES,
             default=[10e-6]
         )
 
         datos_totales = {}
         for I_interp in I_interps:
             datos_foxfet = proc_evo.obtener_datos_crudos_tanda(
-                lista_dispositivos=dispos,
+                lista_dispositivos=DISPOS,
                 tipo_tanda="FOXFET",
-                I_interp=I_interp,
+                I_interp=I_interp * 1e-6,
                 en_dosis=en_dosis
             )
             # Prefijar la clave para distinguir dispositivo y corriente en el mismo grafico
@@ -60,13 +61,13 @@ def render_FOXFET ():
 
         I_interps = st.multiselect(
             "Corrientes de interpolación:",
-            options=[0.1e-6, 1e-6, 10e-6, 100e-6],
+            options=CORRIENTES,
             default=[10e-6]
         )
 
         sens_totales = {}
         for I_interp in I_interps:
-            sens = proc_sens.procesar_sensibilidad(dispos, "FOXFET", normalizado=False, I_interp=I_interp, n_ventana=20)
+            sens = proc_sens.procesar_sensibilidad(DISPOS, "FOXFET", normalizado=False, I_interp=I_interp * 1e-6, n_ventana=20)
             # Prefijar la clave para distinguir dispositivo y corriente en el mismo grafico
             for key, val in sens.items():
                 sens_totales[f"{key} @ {I_interp * 1e6:.1f} uA"] = val
@@ -87,8 +88,73 @@ def render_FOXFET ():
         st.header("Análisis de Ruido")
 
         restar_deriva = st.checkbox("Restar deriva térmica para visualizar el ruido?", value=True)
-        log = st.checkbox("Graficar Semilog?", value=False)
-        st.image("martillo.png", width="stretch")
+        logx = st.checkbox("Escala logarítmica en eje x?", value=False)
+
+        ruido_corto = proc_ruido.obtener_analisis_ruido_completo(
+            DISPOS, CORRIENTES, es_larga=False, restar_deriva=restar_deriva
+        )
+
+        graficos.graficar_curvas(
+            "Desvío estándar del ruido neto vs Corrientes Normalizadas",
+            dict_datos=ruido_corto["std_ruido"],
+            xlabel=r"$\text{Corrientes normalizadas }I_D\text{ [}\mu \text{A]}$",
+            ylabel="Desvío de Ruido [nA]",
+            modo='markers'
+        )
+        graficos.graficar_curvas(
+            "Corriente vs tiempo a corto plazo",
+            dict_datos=ruido_corto["evos"],
+            xlabel="Tiempo [s]",
+            ylabel=r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$",
+            modo='lines',
+            logx=logx
+        )
+        graficos.graficar_histograma_ruido(
+            "Distribución del Ruido Neto a corto plazo",
+            dict_datos=ruido_corto["evos"]
+        )
+
+        graficos.graficar_curvas(
+            "Densidad Espectral de Potencia (PSD) - Corto Plazo",
+            dict_datos=ruido_corto["psd"],
+            xlabel="Frecuencia [Hz]",
+            ylabel=r"$\text{PSD [}\mu\text{A}^2/\text{Hz]}$",
+            modo='lines',
+            logx=True,
+            logy=True
+        )
+
+        ruido_largo = proc_ruido.obtener_analisis_ruido_completo(
+            DISPOS, CORRIENTES, es_larga=True, restar_deriva=restar_deriva
+        )
+
+        graficos.graficar_curvas(
+            "Corriente vs tiempo a largo plazo",
+            dict_datos=ruido_largo["evos"],
+            xlabel="Tiempo [s]",
+            ylabel=r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$",
+            modo='lines',
+            logx=logx
+        )
+        graficos.graficar_histograma_ruido(
+            "Distribución del Ruido Neto a largo plazo",
+            dict_datos=ruido_largo["evos"]
+        )
+
+        graficos.graficar_curvas(
+            "Evolución de Temperatura vs Tiempo durante medición de ruido",
+            dict_datos=ruido_corto["evos_temp"],
+            xlabel="Tiempo [s]",
+            ylabel="Temperatura [°C]",
+            modo='lines'
+        )
+        graficos.graficar_curvas(
+            "Corriente vs Temperatura durante medición de ruido",
+            dict_datos=ruido_corto["i_vs_t"],
+            xlabel="Temperatura [°C]",
+            ylabel=r"$\text{Corriente }I_D \text{ [}\mu \text{A]}$",
+            modo='markers+lines'
+        )
     # =====================================================================
     # SECCIÓN 4: TEMPERATURA
     # =====================================================================
