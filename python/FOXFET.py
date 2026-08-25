@@ -99,7 +99,8 @@ def render_FOXFET ():
             dict_datos=ruido_corto["std_ruido"],
             xlabel=r"$\text{Corrientes normalizadas }I_D\text{ [}\mu \text{A]}$",
             ylabel="Desvío de Ruido [nA]",
-            modo='markers'
+            modo='markers',
+            logx=True
         )
         graficos.graficar_curvas(
             "Corriente vs tiempo a corto plazo",
