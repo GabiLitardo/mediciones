@@ -42,7 +42,7 @@ def render_FOXFET ():
             )
             # Prefijar la clave para distinguir dispositivo y corriente en el mismo grafico
             for key, val in datos_foxfet.items():
-                datos_totales[f"{key} @ {I_interp * 1e6:.1f} uA"] = val
+                datos_totales[f"{key} @ {I_interp :.1f} uA"] = val
 
         graficos.graficar_curvas(
             titulo="Evolución FOXFETs Tanda 1",
@@ -70,7 +70,7 @@ def render_FOXFET ():
             sens = proc_sens.procesar_sensibilidad(DISPOS, "FOXFET", normalizado=False, I_interp=I_interp * 1e-6, n_ventana=20)
             # Prefijar la clave para distinguir dispositivo y corriente en el mismo grafico
             for key, val in sens.items():
-                sens_totales[f"{key} @ {I_interp * 1e6:.1f} uA"] = val
+                sens_totales[f"{key} @ {I_interp :.1f} uA"] = val
 
         
         graficos.graficar_curvas(
