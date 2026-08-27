@@ -58,8 +58,8 @@ def obtener_analisis_ruido_completo(lista_dispositivos, corrientes_normalizadas,
             coefs_T = np.polyfit(tiempo_s, temperatura_C, deg=9)
             temperatura_fit_C = np.polyval(coefs_T, tiempo_s)
 
-            coefs_I = np.polyfit(temperatura_C, corriente_uA, deg=1)
-            corriente_fit_uA = np.polyval(coefs_I, temperatura_C)
+            coefs_I = np.polyfit(temperatura_fit_C, corriente_uA, deg=1)
+            corriente_fit_uA = np.polyval(coefs_I, temperatura_fit_C)
             i_ruido_neto_uA = corriente_uA - corriente_fit_uA
 
             y_val = i_ruido_neto_uA if restar_deriva else corriente_uA
