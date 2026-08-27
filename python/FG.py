@@ -146,7 +146,6 @@ def render_FG ():
                 "Distribución del Ruido Neto a corto plazo",
                 dict_datos=ruido_corto["evos"]
             )
-
         if extra:
             graficos.graficar_curvas(
                 "Densidad Espectral de Potencia (PSD) - Corto Plazo",
@@ -157,11 +156,9 @@ def render_FG ():
                 logx=True,
                 logy=True
             )
-
         ruido_largo = proc_ruido.obtener_analisis_ruido_completo(
             DISPOS, CORRIENTES, es_larga=True, restar_deriva=restar_deriva
         )
-
         if extra:
             graficos.graficar_curvas(
                 "Corriente vs tiempo a largo plazo",
@@ -175,7 +172,6 @@ def render_FG ():
                 "Distribución del Ruido Neto a largo plazo",
                 dict_datos=ruido_largo["evos"]
             )
-
         graficos.graficar_curvas(
             "Evolución de Temperatura vs Tiempo durante medición de ruido",
             dict_datos=ruido_corto["evos_temp"],
