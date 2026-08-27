@@ -76,7 +76,7 @@ def obtener_analisis_ruido_completo(lista_dispositivos, corrientes_normalizadas,
 
             # 3. Corriente vs Temperatura (medida y fit)
             i_vs_t[tag] = {"x": temperatura_C, "y": corriente_uA}
-            i_vs_t[tag_fit] = {"x": temperatura_C, "y": corriente_fit_uA}
+            i_vs_t[tag_fit] = {"x": temperatura_fit_C, "y": corriente_fit_uA}
 
             # 4. Densidad Espectral de Potencia (PSD)
             if len(tiempo_s) > 1:
