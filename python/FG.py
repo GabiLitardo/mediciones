@@ -181,7 +181,8 @@ def render_FG ():
             dict_datos=ruido_corto["evos_temp"],
             xlabel="Tiempo [s]",
             ylabel="Temperatura [°C]",
-            modo='lines'
+            modo='lines',
+            logx=logx
         )
         graficos.graficar_curvas(
             "Corriente vs Temperatura durante medición de ruido",
