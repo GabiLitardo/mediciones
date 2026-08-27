@@ -269,7 +269,7 @@ def render_FG ():
         )
 
         peso_ruido = st.slider(
-            "Que tan importante es el peso en el error por ruido",
+            "Peso del error por ruido",
             min_value=0.01,
             max_value=1.00,
             value=0.50,
@@ -277,7 +277,7 @@ def render_FG ():
         )
 
         peso_temp = st.slider(
-            "Que tan importante es el peso en el error por temperatura",
+            "Peso del error por temperatura",
             min_value=0.01,
             max_value=1.00,
             value=0.50,
