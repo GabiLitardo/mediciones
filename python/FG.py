@@ -302,28 +302,27 @@ def render_FG ():
 
                 # 3. Corrientes de evaluación (ordenadas)
                 x_corrientes = np.array(d_ruido["x"])
-                if len(x_corrientes) > 0:
-                    idx_r = np.argsort(x_corrientes)
-                    x_corrientes = x_corrientes[idx_r]
-                    
-                    # Interpolar sensibilidad
-                    sens_interp = np.interp(x_corrientes, x_sens_ord, y_sens_ord)
+                idx_r = np.argsort(x_corrientes)
+                x_corrientes = x_corrientes[idx_r]
+                
+                # Interpolar sensibilidad
+                sens_interp = np.interp(x_corrientes, x_sens_ord, y_sens_ord)
 
-                    # Error de Ruido en [cGy]
-                    std_uA = (np.array(d_ruido["y"])[idx_r] / 1000.0)
-                    err_ruido_cgy = (std_uA * 100.0) / sens_interp * peso_ruido
+                # Error de Ruido en [cGy]
+                std_uA = (np.array(d_ruido["y"])[idx_r] / 1000.0)
+                err_ruido_cgy = (std_uA * 100.0) / sens_interp * peso_ruido
 
-                    # Error Térmico en [cGy/°C]
-                    alpha_interp = np.interp(x_corrientes, x_temp_ord, y_temp_ord)
-                    err_temp_cgy = (alpha_interp * 100.0) / sens_interp * peso_temp
+                # Error Térmico en [cGy/°C]
+                alpha_interp = np.interp(x_corrientes, x_temp_ord, y_temp_ord)
+                err_temp_cgy = (alpha_interp * 100.0) / sens_interp * peso_temp
 
-                    # Suma en cuadratura [cGy]
-                    err_total = np.sqrt(err_ruido_cgy**2 + (err_temp_cgy * delta_t)**2)
+                # Suma en cuadratura [cGy]
+                err_total = np.sqrt(err_ruido_cgy**2 + (err_temp_cgy * delta_t)**2)
 
-                    datos_error_total[disp] = {
-                        "x": x_corrientes,
-                        "y": err_total
-                    }
+                datos_error_total[disp] = {
+                    "x": x_corrientes,
+                    "y": err_total
+                }
 
         if datos_error_total:
             st.latex(r"\text{Error Total [cGy]} = \sqrt{\left(\frac{\sigma_I}{S}\right)^2 + \left(\frac{|\alpha| \cdot \Delta T}{S}\right)^2}")
