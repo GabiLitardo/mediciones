@@ -267,6 +267,22 @@ def render_FG ():
             step=0.1
         )
 
+        peso_ruido = st.slider(
+            "Que tan importante es el peso en el error por ruido",
+            min_value=0.01,
+            max_value=1.00,
+            value=0.50,
+            step=0.01
+        )
+
+        peso_temp = st.slider(
+            "Que tan importante es el peso en el error por temperatura",
+            min_value=0.01,
+            max_value=1.00,
+            value=0.50,
+            step=0.01
+        )      
+
         datos_error_total = {}
         for disp, d_sens in sens_resumen.items():
             if disp in ruido_resumen_data["std_ruido"] and disp in temp_resumen_abs:
@@ -283,11 +299,11 @@ def render_FG ():
 
                     # 1. Error de Ruido en [cGy]
                     std_uA = (np.array(d_ruido["y"])[idx] / 1000.0)
-                    err_ruido_cgy = (std_uA * 100.0) / sens_interp
+                    err_ruido_cgy = (std_uA * 100.0) / sens_interp * peso_ruido
 
                     # 2. Error Térmico en [cGy/°C]
                     alpha_interp = np.interp(x_corrientes, d_temp["x"], d_temp["y"])
-                    err_temp_cgy = (alpha_interp * 100.0) / sens_interp
+                    err_temp_cgy = (alpha_interp * 100.0) / sens_interp * peso_temp
 
                     # Suma en cuadratura [cGy]
                     err_total = np.sqrt(err_ruido_cgy**2 + (err_temp_cgy * delta_t)**2)
