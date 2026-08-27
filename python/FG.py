@@ -290,20 +290,31 @@ def render_FG ():
                 d_ruido = ruido_resumen_data["std_ruido"][disp]
                 d_temp = temp_resumen_abs[disp]
 
+                # 1. Ordenamos la sensibilidad (x creciente obligatorio para np.interp)
+                idx_s = np.argsort(d_sens["x"])
+                x_sens_ord = np.array(d_sens["x"])[idx_s]
+                y_sens_ord = np.array(d_sens["y"])[idx_s]
+
+                # 2. Ordenamos el coeficiente térmico
+                idx_t = np.argsort(d_temp["x"])
+                x_temp_ord = np.array(d_temp["x"])[idx_t]
+                y_temp_ord = np.array(d_temp["y"])[idx_t]
+
+                # 3. Corrientes de evaluación (ordenadas)
                 x_corrientes = np.array(d_ruido["x"])
                 if len(x_corrientes) > 0:
-                    idx = np.argsort(x_corrientes)
-                    x_corrientes = x_corrientes[idx]
+                    idx_r = np.argsort(x_corrientes)
+                    x_corrientes = x_corrientes[idx_r]
                     
-                    # Interpolar sensibilidad en las corrientes evaluadas
-                    sens_interp = np.interp(x_corrientes, d_sens["x"], d_sens["y"])
+                    # Interpolar sensibilidad
+                    sens_interp = np.interp(x_corrientes, x_sens_ord, y_sens_ord)
 
-                    # 1. Error de Ruido en [cGy]
-                    std_uA = (np.array(d_ruido["y"])[idx] / 1000.0)
+                    # Error de Ruido en [cGy]
+                    std_uA = (np.array(d_ruido["y"])[idx_r] / 1000.0)
                     err_ruido_cgy = (std_uA * 100.0) / sens_interp * peso_ruido
 
-                    # 2. Error Térmico en [cGy/°C]
-                    alpha_interp = np.interp(x_corrientes, d_temp["x"], d_temp["y"])
+                    # Error Térmico en [cGy/°C]
+                    alpha_interp = np.interp(x_corrientes, x_temp_ord, y_temp_ord)
                     err_temp_cgy = (alpha_interp * 100.0) / sens_interp * peso_temp
 
                     # Suma en cuadratura [cGy]
