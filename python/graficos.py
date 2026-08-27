@@ -38,7 +38,11 @@ def graficar_relacion_normalizada(titulo, datos_numerador, datos_sensibilidad, y
             if len(x_arr) > 0:
                 idx = np.argsort(x_arr)
                 x_arr, y_arr = x_arr[idx], y_arr[idx]
-                sens_interp = np.interp(x_arr, d_sens["x"], d_sens["y"])
+                idx_s = np.argsort(d_sens["x"])
+                x_sens_ord = np.array(d_sens["x"])[idx_s]
+                y_sens_ord = np.array(d_sens["y"])[idx_s]
+
+                sens_interp = np.interp(x_arr, x_sens_ord, y_sens_ord)
                 
                 relacion = y_arr / sens_interp
                 color = COLORES_DISPOSITIVOS.get(disp)
