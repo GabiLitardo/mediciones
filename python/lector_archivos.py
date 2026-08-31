@@ -65,6 +65,10 @@ def _obtener_version_m(path):
 def cargar_medicion_temperatura(disp, corr, temp, es_fox=False, die="DIE4"):
     if es_fox:
         archivos = list(Path(".").glob(f"**/*_UTN_{die}_{disp}_VD=5_{temp}_M*.csv"))
+        if archivos:
+            archivo_reciente = max(archivos, key=_obtener_version_m)
+            mediciones = matchear_archivos(archivo_reciente.name, tipo_medicion="temperatura")
+            return mediciones[0] if mediciones else None
     else:
         # Probamos primero la variante con 'uA' y luego con 'u'
         for variante in [f"{corr}uA", f"{corr}u"]:
