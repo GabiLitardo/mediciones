@@ -217,6 +217,36 @@ def render_FG ():
         if "PFGIW1 (Fit)" in datos_temp.get("alpha_vs_i", {}):
             for disp in ["PFGIW1", "PFGIW2", "PFGIP2"]:
                 st.write(r"$I_{ZTC}$"+f"({disp}): {datos_temp['alpha_vs_i'][f"{disp} (Fit)"]['ztc'] :.2f} µA")
+
+        datos_temp_std = proc_temp.obtener_analisis_temperatura_foxfet(
+            ["STD1", "STD2"], TEMPERATURAS
+        )
+
+        graficos.graficar_curvas(
+            titulo="Curvas de Transferencia vs Temperatura (@ VD = 5V)",
+            dict_datos=datos_temp_std["iv_vs_t"],
+            xlabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
+            ylabel=r"$\text{Corriente }I_D\text{ [}\mu \text{A]}$",
+            modo='lines',
+            logy=False
+        )
+
+        graficos.graficar_curvas(
+            titulo=r"$\text{Coeficiente Térmico (}\alpha\text{) vs Tensión }V_{GS}$",
+            dict_datos=datos_temp_std["alpha_vs_vgs"],
+            xlabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
+            ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu \text{A/°C]}$",
+            modo='lines'
+        )
+
+        graficos.graficar_curvas(
+            titulo=r"$\text{Coeficiente Térmico (}\alpha\text{) vs Corriente }I_D\text{ (@ 30°C)}$",
+            dict_datos=datos_temp_std["alpha_vs_i"],
+            xlabel=r"$\text{Corriente }I_D\text{ [}\mu \text{A]}$",
+            ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu \text{A/°C]}$",
+            modo='lines',
+            logx=True
+        )
     # =====================================================================
     # SECCIÓN 5: RESUMEN
     # =====================================================================
