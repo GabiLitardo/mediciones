@@ -159,7 +159,7 @@ def render_FOXFET ():
             xlabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
             ylabel=r"$\text{Corriente }I_D\text{ [}\mu \text{A]}$",
             modo='lines',
-            logy=True
+            logy=False
         )
 
         graficos.graficar_curvas(
