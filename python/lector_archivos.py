@@ -43,12 +43,12 @@ def cargar_medicion_tanda(disp, tipo_tanda, nro):
     return None
 
 @st.cache_data
-def cargar_medicion_ruido(disp, corr, es_larga, es_fox=False):
+def cargar_medicion_ruido(disp, corr, es_larga, es_fox=False, die="DIE4"):
     sufijo_larga = "_LARGA" if es_larga else ""
     if es_fox:
-        nombre = f"MOSISV72M_DIE4_{disp}_VD=-5_RUIDO_Id={corr}u_M1.txt"
+        nombre = f"MOSISV72M_{die}_{disp}_VD=-5_RUIDO_Id={corr}u_M1.txt"
     else:
-        nombre = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1{sufijo_larga}.txt"
+        nombre = f"MOSISV72M_{die}_{disp}_VD=-4.5_RUIDO_{corr}u_M1{sufijo_larga}.txt"
     mediciones = matchear_archivos(nombre, tipo_medicion="ruido")
     if not mediciones:
         print(nombre, flush=True)

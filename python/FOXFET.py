@@ -89,9 +89,10 @@ def render_FOXFET ():
 
         restar_deriva = st.checkbox("Restar deriva térmica para visualizar el ruido?", value=True)
         logx = st.checkbox("Escala logarítmica en eje x?", value=False)
+        die = st.selectbox("Seleccionar DIE", options=["DIE4", "DIE19"])
 
         ruido_corto = proc_ruido.obtener_analisis_ruido_completo(
-            DISPOS, CORRIENTES, es_larga=False, restar_deriva=restar_deriva, es_fox=True
+            DISPOS, CORRIENTES, es_larga=False, restar_deriva=restar_deriva, es_fox=True, die=die
         )
 
         graficos.graficar_curvas(

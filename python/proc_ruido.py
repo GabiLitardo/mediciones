@@ -30,7 +30,7 @@ def calcular_psd(tiempo_s, i_ruido_uA):
     return freqs[1:], psd[1:]
 
 @st.cache_data
-def obtener_analisis_ruido_completo(lista_dispositivos, corrientes_normalizadas, es_larga=False, restar_deriva=True, es_fox=False):
+def obtener_analisis_ruido_completo(lista_dispositivos, corrientes_normalizadas, es_larga=False, restar_deriva=True, es_fox=False, die="DIE4"):
     """
     Retorna cuatro diccionarios planos unificados con formato:
     {"Etiqueta Leyenda": {"x": array, "y": array}}
@@ -46,7 +46,7 @@ def obtener_analisis_ruido_completo(lista_dispositivos, corrientes_normalizadas,
         corrientes_validas = []
 
         for corr in corrientes_normalizadas:
-            datos_matriz = cargar_medicion_ruido(disp, corr, es_larga, es_fox)
+            datos_matriz = cargar_medicion_ruido(disp, corr, es_larga, es_fox, die)
             if datos_matriz is None:
                 continue
 
