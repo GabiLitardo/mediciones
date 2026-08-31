@@ -219,7 +219,7 @@ def render_FG ():
                 st.write(r"$I_{ZTC}$"+f"({disp}): {datos_temp['alpha_vs_i'][f"{disp} (Fit)"]['ztc'] :.2f} µA")
 
         datos_temp_std = proc_temp.obtener_analisis_temperatura_v2(
-            ["STD1", "STD2"], TEMPERATURAS, es_std=True
+            ["STD1", "STD2"], TEMPERATURAS, die="DIE19", es_std=True
         )
 
         graficos.graficar_curvas(
