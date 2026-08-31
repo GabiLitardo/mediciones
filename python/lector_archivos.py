@@ -14,6 +14,8 @@ def matchear_archivos(nombre_archivo_generico, tipo_medicion="iv"):
             medicion = np.genfromtxt(ruta_archivo, delimiter='\t', skip_header=5, usecols=(0, 1, 2), encoding="cp1252")
         elif tipo_medicion == "temperatura":
             medicion = np.genfromtxt(ruta_archivo, delimiter=',', skip_header=1, usecols=(3, 4))
+        elif tipo_medicion == "temperatura_fox":
+                    medicion = np.genfromtxt(ruta_archivo, delimiter=',', skip_header=1, usecols=(2, 4))
         elif tipo_medicion == "iv":
             medicion = np.genfromtxt(ruta_archivo, skip_header=2, usecols=(0, 1), encoding="cp1252")
         mediciones.append(medicion)  
@@ -68,7 +70,7 @@ def cargar_medicion_temperatura(disp, corr, temp, es_fox=False, die="DIE4"):
         if archivos:
             print(f"Archivo encontrado para {die}, {disp} a {temp}°C", flush=True)
             archivo_reciente = max(archivos, key=_obtener_version_m)
-            mediciones = matchear_archivos(archivo_reciente.name, tipo_medicion="temperatura")
+            mediciones = matchear_archivos(archivo_reciente.name, tipo_medicion="temperatura_fox")
             return mediciones[0] if mediciones else None
     else:
         # Probamos primero la variante con 'uA' y luego con 'u'
