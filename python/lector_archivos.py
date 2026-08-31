@@ -72,6 +72,7 @@ def cargar_medicion_temperatura(disp, corr, temp, es_fox=False, die="DIE4", es_s
             archivo_reciente = max(archivos, key=_obtener_version_m)
             mediciones = matchear_archivos(archivo_reciente.name, tipo_medicion="temperatura_fox")
             return mediciones[0] if mediciones else None
+        print(f"Archivo NO encontrado para {die}, {disp} a {temp}°C", flush=True)
     else:
         # Probamos primero la variante con 'uA' y luego con 'u'
         for variante in [f"{corr}uA", f"{corr}u"]:
