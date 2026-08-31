@@ -166,7 +166,7 @@ def render_FOXFET ():
             dict_datos=datos_temp_fox["alpha_vs_vgs"],
             xlabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
             ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu \text{A/°C]}$",
-            modo='lines'
+            modo='markers'
         )
 
     # =====================================================================
