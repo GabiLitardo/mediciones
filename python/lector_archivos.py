@@ -1,6 +1,5 @@
 # lector_archivos.py
 from pathlib import Path
-import re
 import numpy as np
 import streamlit as st
 
@@ -69,7 +68,7 @@ def cargar_medicion_temperatura(disp, corr, temp, es_fox=False, die="DIE4", es_s
         tension="-5" if es_std else "5"
         archivos = list(Path(".").glob(f"**/*_UTN_{die}_{disp}_VD={tension}_{temp}_M*.csv"))
         if archivos:
-            print(f"Archivo encontrado para {die}, {disp} a {temp}°C", flush=True)
+            st.text(f"Archivo encontrado para {die}, {disp} a {temp}°C")
             archivo_reciente = max(archivos, key=_obtener_version_m)
             mediciones = matchear_archivos(archivo_reciente.name, tipo_medicion="temperatura_fox")
             return mediciones[0] if mediciones else None
