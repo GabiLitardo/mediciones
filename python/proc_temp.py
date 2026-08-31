@@ -96,6 +96,7 @@ def obtener_analisis_temperatura_foxfet(lista_dispositivos, lista_temperaturas, 
         for temp in lista_temperaturas:
             datos = cargar_medicion_temperatura(disp, corr=None, temp=temp, es_fox=True, die=die)
             if datos is not None:
+                print("A", flush=True)
                 # Ordenar por Vgs ascendente para evitar problemas de interpolación
                 idx_ord = np.argsort(datos[:, 0])
                 vgs = datos[idx_ord, 0]
