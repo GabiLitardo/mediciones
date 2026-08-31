@@ -227,8 +227,7 @@ def render_FG ():
             dict_datos=datos_temp_std["iv_vs_t"],
             xlabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
             ylabel=r"$\text{Corriente }I_D\text{ [}\mu \text{A]}$",
-            modo='lines',
-            logy=False
+            modo='lines'
         )
 
         graficos.graficar_curvas(
@@ -239,14 +238,6 @@ def render_FG ():
             modo='lines'
         )
 
-        graficos.graficar_curvas(
-            titulo=r"$\text{Coeficiente Térmico (}\alpha\text{) vs Corriente }I_D\text{ (@ 30°C)}$",
-            dict_datos=datos_temp_std["alpha_vs_i"],
-            xlabel=r"$\text{Corriente }I_D\text{ [}\mu \text{A]}$",
-            ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu \text{A/°C]}$",
-            modo='lines',
-            logx=True
-        )
     # =====================================================================
     # SECCIÓN 5: RESUMEN
     # =====================================================================

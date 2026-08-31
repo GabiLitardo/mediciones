@@ -133,17 +133,7 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
                 "y": alphas
             }
 
-            # Corriente de referencia a temperatura ambiente más baja (primer elemento)
-            id_referencia = matriz_id[0, :]
-            idx_i_ord = np.argsort(id_referencia)
-
-            alpha_vs_i[disp] = {
-                "x": id_referencia[idx_i_ord],
-                "y": alphas[idx_i_ord]
-            }
-
     return {
         "iv_vs_t": iv_vs_t,
-        "alpha_vs_vgs": alpha_vs_vgs,
-        "alpha_vs_i": alpha_vs_i
+        "alpha_vs_vgs": alpha_vs_vgs
     }
