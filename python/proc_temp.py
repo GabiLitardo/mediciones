@@ -77,7 +77,7 @@ def obtener_analisis_temperatura(lista_dispositivos, corrientes_normalizadas, li
     }
 
 @st.cache_data
-def obtener_analisis_temperatura_foxfet(lista_dispositivos, lista_temperaturas, die="DIE4"):
+def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die="DIE4", es_std=False):
     """
     Procesa curvas de transferencia I-V a distintas temperaturas para FOXFET.
     Retorna:
@@ -94,7 +94,7 @@ def obtener_analisis_temperatura_foxfet(lista_dispositivos, lista_temperaturas, 
 
         # 1. Carga de curvas I-V por temperatura
         for temp in lista_temperaturas:
-            datos = cargar_medicion_temperatura(disp, corr=None, temp=temp, es_fox=True, die=die)
+            datos = cargar_medicion_temperatura(disp, corr=None, temp=temp, es_fox=True, die=die, es_std=es_std)
             if datos is not None:
                 print("", flush=True)
                 # Ordenar por Vgs ascendente para evitar problemas de interpolación

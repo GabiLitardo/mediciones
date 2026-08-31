@@ -149,7 +149,7 @@ def render_FOXFET ():
 
         die = st.selectbox("Seleccionar DIE", options=["DIE4", "DIE19"])
 
-        datos_temp_fox = proc_temp.obtener_analisis_temperatura_foxfet(
+        datos_temp_fox = proc_temp.obtener_analisis_temperatura_v2(
             DISPOS, TEMPERATURAS, die=die
         )
 

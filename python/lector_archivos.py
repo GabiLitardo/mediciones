@@ -64,9 +64,10 @@ def _obtener_version_m(path):
     return -1
 
 @st.cache_data
-def cargar_medicion_temperatura(disp, corr, temp, es_fox=False, die="DIE4"):
+def cargar_medicion_temperatura(disp, corr, temp, es_fox=False, die="DIE4", es_std=False):
     if es_fox:
-        archivos = list(Path(".").glob(f"**/*_UTN_{die}_{disp}_VD=5_{temp}_M*.csv"))
+        tension="-5" if es_std else "5"
+        archivos = list(Path(".").glob(f"**/*_UTN_{die}_{disp}_VD={tension}_{temp}_M*.csv"))
         if archivos:
             print(f"Archivo encontrado para {die}, {disp} a {temp}°C", flush=True)
             archivo_reciente = max(archivos, key=_obtener_version_m)
