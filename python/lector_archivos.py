@@ -51,8 +51,6 @@ def cargar_medicion_ruido(disp, corr, es_larga, es_fox=False, die="DIE4"):
     else:
         nombre = f"MOSISV72M_{die}_{disp}_VD=-4.5_RUIDO_{corr}u_M1{sufijo_larga}.txt"
     mediciones = matchear_archivos(nombre, tipo_medicion="ruido")
-    if not mediciones:
-        print(nombre, flush=True)
     return mediciones[0] if mediciones else None
 
 def _obtener_version_m(path):
@@ -72,6 +70,7 @@ def cargar_medicion_temperatura(disp, corr, temp, es_fox=False, die="DIE4", es_s
             archivo_reciente = max(archivos, key=_obtener_version_m)
             mediciones = matchear_archivos(archivo_reciente.name, tipo_medicion="temperatura_fox")
             return mediciones[0] if mediciones else None
+        print(f"_UTN_{die}_{disp}_VD={tension}_{temp}_M*.csv", flush=True)
     else:
         # Probamos primero la variante con 'uA' y luego con 'u'
         for variante in [f"{corr}uA", f"{corr}u"]:
