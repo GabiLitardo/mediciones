@@ -29,7 +29,7 @@ def calcular_psd(tiempo_s, i_ruido_uA):
     )
     return freqs[1:], psd[1:]
 
-@st.cache_data
+
 def obtener_analisis_ruido_completo(lista_dispositivos, corrientes_normalizadas, es_larga=False, restar_deriva=True, es_fox=False, die="DIE4"):
     """
     Retorna cuatro diccionarios planos unificados con formato:

@@ -3,7 +3,7 @@ import numpy as np
 import streamlit as st
 from lector_archivos import cargar_medicion_temperatura
 
-@st.cache_data
+
 def obtener_analisis_temperatura(lista_dispositivos, corrientes_normalizadas, lista_temperaturas):
     """
     Procesa las mediciones de temperatura y retorna dos diccionarios planos unificados:
@@ -76,7 +76,7 @@ def obtener_analisis_temperatura(lista_dispositivos, corrientes_normalizadas, li
         "alpha_vs_i": alpha_vs_i
     }
 
-@st.cache_data
+
 def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die="DIE4", es_std=False):
     """
     Procesa curvas de transferencia I-V a distintas temperaturas para FOXFET.

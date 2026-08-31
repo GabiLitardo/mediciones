@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 import streamlit as st
 
-@st.cache_data
+
 def matchear_archivos(nombre_archivo_generico, tipo_medicion="iv"):
     directorio_base = Path(".")
     lista_de_rutas = directorio_base.glob("**/" + nombre_archivo_generico)
@@ -20,7 +20,7 @@ def matchear_archivos(nombre_archivo_generico, tipo_medicion="iv"):
         mediciones.append(medicion)  
     return mediciones
 
-@st.cache_data
+
 def cargar_curva_iv_referencia(dispositivo):
     if dispositivo in ["PFGIW2", "PFGIP2", "PFGIW3"]:
         nombre_archivo = "MOSISV72M_DIE4_PMOS_STD1_IV_VD=-4.5V_M1.ri"
@@ -30,7 +30,7 @@ def cargar_curva_iv_referencia(dispositivo):
     datos = matchear_archivos(nombre_archivo, tipo_medicion="iv")
     return datos[0]
 
-@st.cache_data
+
 def cargar_medicion_tanda(disp, tipo_tanda, nro):
     if tipo_tanda in ["FG_tanda1", "FOXFET"]:
         sufijo = ".ri"; prefijo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_" if tipo_tanda != "FOXFET" else f"MOSISV72M_DIE4_{disp}_IV_VD=5V_postrad{nro}_"
@@ -43,7 +43,7 @@ def cargar_medicion_tanda(disp, tipo_tanda, nro):
             return datos[0]
     return None
 
-@st.cache_data
+
 def cargar_medicion_ruido(disp, corr, es_larga, es_fox=False, die="DIE4"):
     sufijo_larga = "_LARGA" if es_larga else ""
     if es_fox:
@@ -62,7 +62,7 @@ def _obtener_version_m(path):
             return int(texto_version)
     return -1
 
-@st.cache_data
+
 def cargar_medicion_temperatura(disp, corr, temp, es_fox=False, die="DIE4", es_std=False):
     if es_fox:
         tension="-5" if es_std else "5"

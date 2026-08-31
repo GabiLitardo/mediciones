@@ -30,7 +30,7 @@ def calcular_fit_polinomico(tiempos_list, corrientes_list):
     coeficientes = np.polyfit(tiempos_list, corrientes_list, deg=4)
     return coeficientes.tolist()
 
-@st.cache_data
+
 def obtener_vg_por_corriente(dispositivo, corriente_buscada):
     datos = cargar_curva_iv_referencia(dispositivo)
     tensiones_g = datos[:, 0]
@@ -41,7 +41,7 @@ def obtener_vg_por_corriente(dispositivo, corriente_buscada):
         corriente_buscada = corriente_buscada / 56.0
     return np.interp(corriente_buscada, corrientes_d[indices_ordenados], tensiones_g[indices_ordenados])
 
-@st.cache_data
+
 def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, I_interp = 1e-5, rng = 60, en_dosis = False):
     resultado = {}
     factor_x = TASA_DOSIS if en_dosis else 1.0
@@ -85,7 +85,7 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, I_interp = 1e-5, 
 
     return resultado
 
-@st.cache_data
+
 def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda, en_dosis=False):
     datos_crudos = obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, en_dosis=en_dosis)
     resultado = {}
@@ -119,7 +119,7 @@ def obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda, en_dosis=False):
 
     return resultado
 
-@st.cache_data
+
 def obtener_curvas_iv_referencia(lista_dispositivos):
     """
     Retorna las curvas de transferencia I-V de referencia en formato plano unificado
