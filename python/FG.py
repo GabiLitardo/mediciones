@@ -6,7 +6,7 @@ import proc_evo
 import proc_sens
 import proc_ruido
 import proc_temp
-
+ 
 def render_FG ():
     st.title("Resumen mediciones Chaves-Litardo")
 
