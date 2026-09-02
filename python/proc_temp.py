@@ -83,11 +83,9 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
     Retorna:
     - 'iv_vs_t': {"disp @ T°C": {"x": array_vgs, "y": array_id_uA}}
     - 'alpha_vs_vgs': {"disp": {"x": array_vgs, "y": array_alpha}}
-    - 'alpha_vs_i': {"disp": {"x": array_id_ref_uA, "y": array_alpha}}
     """
     iv_vs_t = {}
     alpha_vs_vgs = {}
-    alpha_vs_i = {}
 
     for disp in lista_dispositivos:
         curvas_por_temp = {}
