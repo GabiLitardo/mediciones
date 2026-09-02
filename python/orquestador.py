@@ -2,7 +2,7 @@
 import streamlit as st
 from FG import render_FG
 from FOXFET import render_FOXFET
- 
+
 st.set_page_config(page_title="Mediciones Chaves-Litardo", layout="wide")
 
 familia = st.sidebar.radio(
