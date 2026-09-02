@@ -1,10 +1,9 @@
 # lector_archivos.py
 from pathlib import Path
-import re
 import numpy as np
 import streamlit as st
 
-@st.cache_data
+
 def matchear_archivos(nombre_archivo_generico, tipo_medicion="iv"):
     directorio_base = Path(".")
     lista_de_rutas = directorio_base.glob("**/" + nombre_archivo_generico)
@@ -14,12 +13,14 @@ def matchear_archivos(nombre_archivo_generico, tipo_medicion="iv"):
             medicion = np.genfromtxt(ruta_archivo, delimiter='\t', skip_header=5, usecols=(0, 1, 2), encoding="cp1252")
         elif tipo_medicion == "temperatura":
             medicion = np.genfromtxt(ruta_archivo, delimiter=',', skip_header=1, usecols=(3, 4))
+        elif tipo_medicion == "temperatura_fox":
+                    medicion = np.genfromtxt(ruta_archivo, delimiter=',', skip_header=1, usecols=(2, 4))
         elif tipo_medicion == "iv":
             medicion = np.genfromtxt(ruta_archivo, skip_header=2, usecols=(0, 1), encoding="cp1252")
         mediciones.append(medicion)  
     return mediciones
 
-@st.cache_data
+
 def cargar_curva_iv_referencia(dispositivo):
     if dispositivo in ["PFGIW2", "PFGIP2", "PFGIW3"]:
         nombre_archivo = "MOSISV72M_DIE4_PMOS_STD1_IV_VD=-4.5V_M1.ri"
@@ -29,7 +30,7 @@ def cargar_curva_iv_referencia(dispositivo):
     datos = matchear_archivos(nombre_archivo, tipo_medicion="iv")
     return datos[0]
 
-@st.cache_data
+
 def cargar_medicion_tanda(disp, tipo_tanda, nro):
     if tipo_tanda in ["FG_tanda1", "FOXFET"]:
         sufijo = ".ri"; prefijo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_" if tipo_tanda != "FOXFET" else f"MOSISV72M_DIE4_{disp}_IV_VD=5V_postrad{nro}_"
@@ -42,16 +43,14 @@ def cargar_medicion_tanda(disp, tipo_tanda, nro):
             return datos[0]
     return None
 
-@st.cache_data
-def cargar_medicion_ruido(disp, corr, es_larga, es_fox=False):
+
+def cargar_medicion_ruido(disp, corr, es_larga, es_fox=False, die="DIE4"):
     sufijo_larga = "_LARGA" if es_larga else ""
     if es_fox:
-        nombre = f"MOSISV72M_DIE4_{disp}_VD=-5_RUIDO_Id={corr}u_M1.txt"
+        nombre = f"MOSISV72M_{die}_{disp}_VD=-5_RUIDO_Id={corr}u_M1.txt"
     else:
-        nombre = f"MOSISV72M_DIE4_{disp}_VD=-4.5_RUIDO_{corr}u_M1{sufijo_larga}.txt"
+        nombre = f"MOSISV72M_{die}_{disp}_VD=-4.5_RUIDO_{corr}u_M1{sufijo_larga}.txt"
     mediciones = matchear_archivos(nombre, tipo_medicion="ruido")
-    if not mediciones:
-        print(nombre, flush=True)
     return mediciones[0] if mediciones else None
 
 def _obtener_version_m(path):
@@ -61,14 +60,24 @@ def _obtener_version_m(path):
             return int(texto_version)
     return -1
 
-@st.cache_data
-def cargar_medicion_temperatura(disp, corr, temp):
-    # Probamos primero la variante con 'uA' y luego con 'u'
-    for variante in [f"{corr}uA", f"{corr}u"]:
-        archivos = list(Path(".").glob(f"**/*_UTN_DIE4_{disp}_{variante}_{temp}_M*.csv"))
+
+def cargar_medicion_temperatura(disp, corr, temp, es_fox=False, die="DIE4", es_std=False):
+    if es_fox:
+        tension="-5" if es_std else "5"
+        archivos = list(Path(".").glob(f"**/*_UTN_{die}_{disp}_VD={tension}_{temp}_M*.csv"))
         if archivos:
+            print(f"Archivo encontrado para {die}, {disp} a {temp}°C", flush=True)
             archivo_reciente = max(archivos, key=_obtener_version_m)
-            mediciones = matchear_archivos(archivo_reciente.name, tipo_medicion="temperatura")
+            mediciones = matchear_archivos(archivo_reciente.name, tipo_medicion="temperatura_fox")
             return mediciones[0] if mediciones else None
-            
+        print(f"_UTN_{die}_{disp}_VD={tension}_{temp}_M*.csv", flush=True)
+    else:
+        # Probamos primero la variante con 'uA' y luego con 'u'
+        for variante in [f"{corr}uA", f"{corr}u"]:
+            archivos = list(Path(".").glob(f"**/*_UTN_{die}_{disp}_{variante}_{temp}_M*.csv"))
+            if archivos:
+                archivo_reciente = max(archivos, key=_obtener_version_m)
+                mediciones = matchear_archivos(archivo_reciente.name, tipo_medicion="temperatura")
+                return mediciones[0] if mediciones else None
+                
     return None

@@ -16,7 +16,7 @@ def render_FOXFET ():
     )
     DISPOS = ["FFC1", "FFC2", "FFC3", "FFL", "FFS"]
     CORRIENTES = [0.1, 1, 10, 100]
-    #temperaturas = [30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130]
+    TEMPERATURAS = [30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130]
 
     # =====================================================================
     # SECCIÓN 1: EVOLUCIÓN TEMPORAL
@@ -89,9 +89,10 @@ def render_FOXFET ():
 
         restar_deriva = st.checkbox("Restar deriva térmica para visualizar el ruido?", value=True)
         logx = st.checkbox("Escala logarítmica en eje x?", value=False)
+        die = st.selectbox("Seleccionar DIE", options=["DIE4", "DIE19"])
 
         ruido_corto = proc_ruido.obtener_analisis_ruido_completo(
-            DISPOS, CORRIENTES, es_larga=False, restar_deriva=restar_deriva, es_fox=True
+            DISPOS, CORRIENTES, es_larga=False, restar_deriva=restar_deriva, es_fox=True, die=die
         )
 
         graficos.graficar_curvas(
@@ -145,7 +146,28 @@ def render_FOXFET ():
     elif opcion == "Temperatura":
         st.markdown("---")
         st.header("Análisis de Coeficiente Térmico")
-        st.image("martillo.png", width="stretch")
+
+        die = st.selectbox("Seleccionar DIE", options=["DIE4", "DIE19"])
+
+        datos_temp_fox = proc_temp.obtener_analisis_temperatura_v2(
+            DISPOS, TEMPERATURAS, die=die
+        )
+
+        graficos.graficar_curvas(
+            titulo="Curvas de Transferencia vs Temperatura (@ VD = 5V)",
+            dict_datos=datos_temp_fox["iv_vs_t"],
+            xlabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
+            ylabel=r"$\text{Corriente }I_D\text{ [}\mu \text{A]}$",
+            modo='lines'
+        )
+
+        graficos.graficar_curvas(
+            titulo=r"$\text{Coeficiente Térmico (}\alpha\text{) vs Tensión }V_{GS}$",
+            dict_datos=datos_temp_fox["alpha_vs_vgs"],
+            xlabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
+            ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu \text{A/°C]}$",
+            modo='markers'
+        )
 
     # =====================================================================
     # SECCIÓN 5: RESUMEN
