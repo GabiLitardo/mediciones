@@ -231,10 +231,10 @@ def render_FG ():
         )
 
         graficos.graficar_curvas(
-            titulo=r"$\text{Coeficiente Térmico (}\alpha\text{) vs Tensión }V_{GS}$",
-            dict_datos=datos_temp_std["alpha_vs_vgs"],
-            xlabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
-            ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu \text{A/°C]}$",
+            titulo=r"$\text{Coeficiente Térmico (}\alpha\text{) vs Corriente }I_D$",
+            dict_datos=datos_temp_std["alpha_vs_i"],
+            xlabel=r"$\text{Corriente }I_d\text{ [}\mu\text{A]}$",
+            ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [V/°C]}$",
             modo='markers'
         )
 
