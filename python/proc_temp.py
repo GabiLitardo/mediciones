@@ -80,12 +80,15 @@ def obtener_analisis_temperatura(lista_dispositivos, corrientes_normalizadas, li
 def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die="DIE4", es_std=False):
     """
     Procesa curvas de transferencia I-V a distintas temperaturas para FOXFET.
+    Interpola V_GS sobre un vector común de corriente (intersección estricta)
+    y calcula el coeficiente térmico alpha_V = d(V_GS)/dT en [V/°C].
+    
     Retorna:
     - 'iv_vs_t': {"disp @ T°C": {"x": array_vgs, "y": array_id_uA}}
-    - 'alpha_vs_vgs': {"disp": {"x": array_vgs, "y": array_alpha}}
+    - 'alpha_vs_i': {"disp": {"x": array_id_comun_uA, "y": array_alpha_v}}
     """
     iv_vs_t = {}
-    alpha_vs_vgs = {}
+    alpha_vs_i = {}
 
     for disp in lista_dispositivos:
         curvas_por_temp = {}
@@ -94,44 +97,52 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
         for temp in lista_temperaturas:
             datos = cargar_medicion_temperatura(disp, corr=None, temp=temp, es_fox=True, die=die, es_std=es_std)
             if datos is not None:
-                # Ordenar por Vgs ascendente para evitar problemas de interpolación
-                idx_ord = np.argsort(datos[:, 0])
-                vgs = datos[idx_ord, 0]
-                id_uA = np.abs(datos[idx_ord, 1]) * 1e6
+                # Ordenar por Id ascendente obligatorio para np.interp
+                vgs = datos[:, 0]
+                id_uA = np.abs(datos[:, 1]) * 1e6
+                
+                idx_ord = np.argsort(id_uA)
+                vgs_ord = vgs[idx_ord]
+                id_ord = id_uA[idx_ord]
 
-                curvas_por_temp[temp] = {"vgs": vgs, "id": id_uA}
-                iv_vs_t[f"{disp} @ {temp}°C"] = {"x": vgs, "y": id_uA}
+                curvas_por_temp[temp] = {"vgs": vgs_ord, "id": id_ord}
+                iv_vs_t[f"{disp} @ {temp}°C"] = {"x": vgs_ord, "y": id_ord}
 
         if len(curvas_por_temp) >= 2:
-            # Vector común de Vgs para alinear todas las temperaturas
-            vgs_base = list(curvas_por_temp.values())[0]["vgs"]
             temps_disponibles = np.array(sorted(curvas_por_temp.keys()))
 
-            # Matriz de corrientes: filas = temperaturas, columnas = puntos de Vgs
-            matriz_id = []
-            for t in temps_disponibles:
-                vgs_t = curvas_por_temp[t]["vgs"]
-                id_t = curvas_por_temp[t]["id"]
-                id_interp = np.interp(vgs_base, vgs_t, id_t)
-                matriz_id.append(id_interp)
+            # 2. Intersección estricta de corrientes para evitar extrapolación
+            i_min = max([np.min(curvas_por_temp[t]["id"]) for t in temps_disponibles])
+            i_max = min([np.max(curvas_por_temp[t]["id"]) for t in temps_disponibles])
 
-            matriz_id = np.array(matriz_id)  # Shape: (n_temps, n_vgs)
+            if i_min < i_max and i_min > 0:
+                # 150 puntos distribuidos logarítmicamente entre el piso y el techo común
+                id_base = np.geomspace(i_min, i_max, 150)
 
-            # 2. Ajuste lineal I vs T punto por punto en cada Vgs
-            # Coeficiente alpha = d(Id)/dT
-            n_puntos = len(vgs_base)
-            alphas = np.zeros(n_puntos)
+                # Matriz de tensiones: filas = temperaturas, columnas = puntos de corriente común
+                matriz_vgs = []
+                for t in temps_disponibles:
+                    vgs_t = curvas_por_temp[t]["vgs"]
+                    id_t = curvas_por_temp[t]["id"]
+                    vgs_interp = np.interp(id_base, id_t, vgs_t)
+                    matriz_vgs.append(vgs_interp)
 
-            for col in range(n_puntos):
-                coef = np.polyfit(temps_disponibles, matriz_id[:, col], deg=1)
-                alphas[col] = coef[0]
+                matriz_vgs = np.array(matriz_vgs)  # Shape: (n_temps, n_puntos)
 
-            alpha_vs_vgs[disp] = {
-                "x": vgs_base,
-                "y": alphas
-            }
+                # 3. Ajuste lineal V_GS vs T en cada corriente fija -> alpha_V [V/°C]
+                n_puntos = len(id_base)
+                alphas_v = np.zeros(n_puntos)
+
+                for col in range(n_puntos):
+                    coef = np.polyfit(temps_disponibles, matriz_vgs[:, col], deg=1)
+                    alphas_v[col] = coef[0]
+
+                alpha_vs_i[disp] = {
+                    "x": id_base,
+                    "y": alphas_v
+                }
 
     return {
         "iv_vs_t": iv_vs_t,
-        "alpha_vs_vgs": alpha_vs_vgs
+        "alpha_vs_i": alpha_vs_i
     }

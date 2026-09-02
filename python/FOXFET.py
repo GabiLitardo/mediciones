@@ -162,11 +162,12 @@ def render_FOXFET ():
         )
 
         graficos.graficar_curvas(
-            titulo=r"$\text{Coeficiente Térmico (}\alpha\text{) vs Tensión }V_{GS}$",
+            titulo=r"$\text{Coeficiente Térmico (}\alpha\text{) vs Corriente }I_D$",
             dict_datos=datos_temp_fox["alpha_vs_vgs"],
-            xlabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
-            ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu \text{A/°C]}$",
-            modo='markers'
+            xlabel=r"$\text{Corriente }I_D\text{ [}\mu\text{A]}$",
+            ylabel=r"$\text{Coeficiente Térmico }\alpha_V\text{ [V/°C]}$",
+            modo='markers',
+            logx=True
         )
 
     # =====================================================================
