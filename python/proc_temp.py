@@ -79,70 +79,102 @@ def obtener_analisis_temperatura(lista_dispositivos, corrientes_normalizadas, li
 
 def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die="DIE4", es_std=False):
     """
-    Procesa curvas de transferencia I-V a distintas temperaturas para FOXFET.
-    Interpola V_GS sobre un vector común de corriente (intersección estricta)
-    y calcula el coeficiente térmico alpha_V = d(V_GS)/dT en [V/°C].
-    
-    Retorna:
-    - 'iv_vs_t': {"disp @ T°C": {"x": array_vgs, "y": array_id_uA}}
-    - 'alpha_vs_i': {"disp": {"x": array_id_comun_uA, "y": array_alpha_v}}
+    Procesa curvas de transferencia I-V a distintas temperaturas.
+    - Si es_std=False (FOXFET): 
+        Interpola V_GS sobre un vector común de corriente (intersección estricta)
+        y calcula alpha_V = d(V_GS)/dT en [V/°C] vs I_D.
+    - Si es_std=True (STD): 
+        Interpola I_D sobre un vector común de V_GS
+        y calcula alpha_I = d(I_D)/dT en [uA/°C] vs V_GS.
     """
     iv_vs_t = {}
-    alpha_vs_i = {}
+    alpha_dict = {}
 
     for disp in lista_dispositivos:
         curvas_por_temp = {}
 
-        # 1. Carga de curvas I-V por temperatura
+        # 1. Carga de datos crudos
         for temp in lista_temperaturas:
             datos = cargar_medicion_temperatura(disp, corr=None, temp=temp, es_fox=True, die=die, es_std=es_std)
             if datos is not None:
-                # Ordenar por Id ascendente obligatorio para np.interp
                 vgs = datos[:, 0]
                 id_uA = np.abs(datos[:, 1]) * 1e6
-                
-                idx_ord = np.argsort(id_uA)
-                vgs_ord = vgs[idx_ord]
-                id_ord = id_uA[idx_ord]
 
-                curvas_por_temp[temp] = {"vgs": vgs_ord, "id": id_ord}
-                iv_vs_t[f"{disp} @ {temp}°C"] = {"x": vgs_ord, "y": id_ord}
+                # Guardamos ordenado por Vgs para graficar siempre las I-V limpias
+                idx_vgs = np.argsort(vgs)
+                curvas_por_temp[temp] = {
+                    "vgs": vgs[idx_vgs],
+                    "id": id_uA[idx_vgs]
+                }
+                iv_vs_t[f"{disp} @ {temp}°C"] = {
+                    "x": vgs[idx_vgs],
+                    "y": id_uA[idx_vgs]
+                }
 
         if len(curvas_por_temp) >= 2:
             temps_disponibles = np.array(sorted(curvas_por_temp.keys()))
 
-            # 2. Intersección estricta de corrientes para evitar extrapolación
-            i_min = max([np.min(curvas_por_temp[t]["id"]) for t in temps_disponibles])
-            i_max = min([np.max(curvas_por_temp[t]["id"]) for t in temps_disponibles])
+            if es_std:
+                # =========================================================
+                # MODO STD: alpha_I = d(Id)/dT [uA/°C] vs V_GS
+                # =========================================================
+                vgs_base = list(curvas_por_temp.values())[0]["vgs"]
 
-            if i_min < i_max and i_min > 0:
-                # 150 puntos distribuidos logarítmicamente entre el piso y el techo común
-                id_base = np.geomspace(i_min, i_max, 150)
-
-                # Matriz de tensiones: filas = temperaturas, columnas = puntos de corriente común
-                matriz_vgs = []
+                matriz_id = []
                 for t in temps_disponibles:
                     vgs_t = curvas_por_temp[t]["vgs"]
                     id_t = curvas_por_temp[t]["id"]
-                    vgs_interp = np.interp(id_base, id_t, vgs_t)
-                    matriz_vgs.append(vgs_interp)
+                    id_interp = np.interp(vgs_base, vgs_t, id_t)
+                    matriz_id.append(id_interp)
 
-                matriz_vgs = np.array(matriz_vgs)  # Shape: (n_temps, n_puntos)
+                matriz_id = np.array(matriz_id)
 
-                # 3. Ajuste lineal V_GS vs T en cada corriente fija -> alpha_V [V/°C]
-                n_puntos = len(id_base)
-                alphas_v = np.zeros(n_puntos)
-
+                n_puntos = len(vgs_base)
+                alphas_i = np.zeros(n_puntos)
                 for col in range(n_puntos):
-                    coef = np.polyfit(temps_disponibles, matriz_vgs[:, col], deg=1)
-                    alphas_v[col] = coef[0]
+                    coef = np.polyfit(temps_disponibles, matriz_id[:, col], deg=1)
+                    alphas_i[col] = coef[0]
 
-                alpha_vs_i[disp] = {
-                    "x": id_base,
-                    "y": alphas_v
+                alpha_dict[disp] = {
+                    "x": vgs_base,
+                    "y": alphas_i
                 }
 
+            else:
+                # =========================================================
+                # MODO FOXFET: alpha_V = d(Vgs)/dT [V/°C] vs I_D
+                # =========================================================
+                i_min = max([np.min(curvas_por_temp[t]["id"]) for t in temps_disponibles])
+                i_max = min([np.max(curvas_por_temp[t]["id"]) for t in temps_disponibles])
+
+                if i_min < i_max and i_min > 0:
+                    id_base = np.geomspace(i_min, i_max, 150)
+
+                    matriz_vgs = []
+                    for t in temps_disponibles:
+                        vgs_t = curvas_por_temp[t]["vgs"]
+                        id_t = curvas_por_temp[t]["id"]
+
+                        # np.interp exige eje x (id_t) estrictamente creciente
+                        idx_id = np.argsort(id_t)
+                        vgs_interp = np.interp(id_base, id_t[idx_id], vgs_t[idx_id])
+                        matriz_vgs.append(vgs_interp)
+
+                    matriz_vgs = np.array(matriz_vgs)
+
+                    n_puntos = len(id_base)
+                    alphas_v = np.zeros(n_puntos)
+                    for col in range(n_puntos):
+                        coef = np.polyfit(temps_disponibles, matriz_vgs[:, col], deg=1)
+                        alphas_v[col] = coef[0]
+
+                    alpha_dict[disp] = {
+                        "x": id_base,
+                        "y": alphas_v
+                    }
+
+    clave_alpha = "alpha_vs_vgs" if es_std else "alpha_vs_i"
     return {
         "iv_vs_t": iv_vs_t,
-        "alpha_vs_i": alpha_vs_i
+        clave_alpha: alpha_dict
     }
