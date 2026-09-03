@@ -248,8 +248,7 @@ def render_FG ():
             dict_datos=datos_temp_std["alpha_vs_i"],
             xlabel=r"$\text{Corriente }I_D\text{ [}\mu\text{A]}$",
             ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu\text{A/°C]}$",
-            modo='lines',
-            logx=True
+            modo='markers',
         )
 
     # =====================================================================
