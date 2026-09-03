@@ -219,23 +219,29 @@ def render_FG ():
                 st.write(r"$I_{ZTC}$"+f"({disp}): {datos_temp['alpha_vs_i'][f"{disp} (Fit)"]['ztc'] :.2f} µA")
 
         datos_temp_std = proc_temp.obtener_analisis_temperatura_v2(
-            ["STD1", "STD2"], TEMPERATURAS, die="DIE19", es_std=True
+            lista_dispositivos=["STD1", "STD2"],
+            lista_temperaturas=TEMPERATURAS,
+            die="DIE4",
+            es_std=True
         )
 
+        # 1. Gráfico de curvas de transferencia a distintas temperaturas
         graficos.graficar_curvas(
-            titulo="Curvas de Transferencia vs Temperatura (@ VD = 5V)",
+            titulo="Curvas de Transferencia vs Temperatura (STD)",
             dict_datos=datos_temp_std["iv_vs_t"],
             xlabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
-            ylabel=r"$\text{Corriente }I_D\text{ [}\mu \text{A]}$",
-            modo='lines'
+            ylabel=r"$\text{Corriente }I_D\text{ [}\mu\text{A]}$",
+            modo='lines',
+            logy=True
         )
 
+        # 2. Gráfico de Coeficiente Térmico alpha_I [uA/°C] vs V_GS
         graficos.graficar_curvas(
-            titulo=r"$\text{Coeficiente Térmico (}\alpha\text{) vs Corriente }I_D$",
-            dict_datos=datos_temp_std["alpha_vs_i"],
-            xlabel=r"$\text{Corriente }I_d\text{ [}\mu\text{A]}$",
-            ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [V/°C]}$",
-            modo='markers'
+            titulo=r"$\text{Coeficiente Térmico }\alpha_I\text{ vs Tensión }V_{GS}\text{ (STD)}$",
+            dict_datos=datos_temp_std["alpha_vs_vgs"],
+            xlabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
+            ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu\text{A/°C]}$",
+            modo='lines'
         )
 
     # =====================================================================
