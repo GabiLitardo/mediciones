@@ -221,7 +221,7 @@ def render_FG ():
         datos_temp_std = proc_temp.obtener_analisis_temperatura_v2(
             lista_dispositivos=["STD1", "STD2"],
             lista_temperaturas=TEMPERATURAS,
-            die="DIE4",
+            die="DIE19",
             es_std=True
         )
 
