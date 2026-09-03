@@ -81,14 +81,13 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
     """
     Procesa curvas de transferencia I-V a distintas temperaturas.
     - Si es_std=False (FOXFET): 
-        Interpola V_GS sobre un vector común de corriente (intersección estricta)
-        y calcula alpha_V = d(V_GS)/dT en [V/°C] vs I_D.
+        Calcula alpha_V = d(V_GS)/dT [V/°C] vs I_D.
     - Si es_std=True (STD): 
-        Interpola I_D sobre un vector común de V_GS
-        y calcula alpha_I = d(I_D)/dT en [uA/°C] vs V_GS.
+        Calcula alpha_I = d(I_D)/dT [uA/°C] vs V_GS y vs I_D (ref a T amb).
     """
     iv_vs_t = {}
-    alpha_dict = {}
+    alpha_vs_vgs = {}
+    alpha_vs_i = {}
 
     for disp in lista_dispositivos:
         curvas_por_temp = {}
@@ -100,7 +99,6 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
                 vgs = datos[:, 0]
                 id_uA = np.abs(datos[:, 1]) * 1e6
 
-                # Guardamos ordenado por Vgs para graficar siempre las I-V limpias
                 idx_vgs = np.argsort(vgs)
                 curvas_por_temp[temp] = {
                     "vgs": vgs[idx_vgs],
@@ -116,7 +114,7 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
 
             if es_std:
                 # =========================================================
-                # MODO STD: alpha_I = d(Id)/dT [uA/°C] vs V_GS
+                # MODO STD: alpha_I = d(Id)/dT [uA/°C]
                 # =========================================================
                 vgs_base = list(curvas_por_temp.values())[0]["vgs"]
 
@@ -135,9 +133,18 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
                     coef = np.polyfit(temps_disponibles, matriz_id[:, col], deg=1)
                     alphas_i[col] = coef[0]
 
-                alpha_dict[disp] = {
+                # 1. alpha vs Vgs
+                alpha_vs_vgs[disp] = {
                     "x": vgs_base,
                     "y": alphas_i
+                }
+
+                # 2. alpha vs Id (usando como referencia T ambiente: primera fila)
+                id_ref = matriz_id[0, :]
+                idx_id_ord = np.argsort(id_ref)
+                alpha_vs_i[disp] = {
+                    "x": id_ref[idx_id_ord],
+                    "y": alphas_i[idx_id_ord]
                 }
 
             else:
@@ -155,7 +162,6 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
                         vgs_t = curvas_por_temp[t]["vgs"]
                         id_t = curvas_por_temp[t]["id"]
 
-                        # np.interp exige eje x (id_t) estrictamente creciente
                         idx_id = np.argsort(id_t)
                         vgs_interp = np.interp(id_base, id_t[idx_id], vgs_t[idx_id])
                         matriz_vgs.append(vgs_interp)
@@ -168,13 +174,13 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
                         coef = np.polyfit(temps_disponibles, matriz_vgs[:, col], deg=1)
                         alphas_v[col] = coef[0]
 
-                    alpha_dict[disp] = {
+                    alpha_vs_i[disp] = {
                         "x": id_base,
                         "y": alphas_v
                     }
 
-    clave_alpha = "alpha_vs_vgs" if es_std else "alpha_vs_i"
     return {
         "iv_vs_t": iv_vs_t,
-        clave_alpha: alpha_dict
+        "alpha_vs_vgs": alpha_vs_vgs,
+        "alpha_vs_i": alpha_vs_i
     }

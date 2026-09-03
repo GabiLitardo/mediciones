@@ -243,6 +243,15 @@ def render_FG ():
             modo='markers'
         )
 
+        graficos.graficar_curvas(
+            titulo=r"$\text{Coeficiente Térmico }\alpha_I\text{ vs Corriente }I_D\text{ (STD @ T amb)}$",
+            dict_datos=datos_temp_std["alpha_vs_i"],
+            xlabel=r"$\text{Corriente }I_D\text{ [}\mu\text{A]}$",
+            ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu\text{A/°C]}$",
+            modo='lines',
+            logx=True
+        )
+
     # =====================================================================
     # SECCIÓN 5: RESUMEN
     # =====================================================================
