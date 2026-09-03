@@ -196,7 +196,7 @@ def render_FG ():
         st.header("Análisis de Coeficiente Térmico")
 
         datos_temp = proc_temp.obtener_analisis_temperatura(
-            DISPOS, CORRIENTES, TEMPERATURAS
+            DISPOS, CORRIENTES, TEMPERATURAS, vd=-5
         )
 
         graficos.graficar_curvas(

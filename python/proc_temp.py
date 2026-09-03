@@ -4,7 +4,7 @@ import streamlit as st
 from lector_archivos import cargar_medicion_temperatura
 
 
-def obtener_analisis_temperatura(lista_dispositivos, corrientes_normalizadas, lista_temperaturas):
+def obtener_analisis_temperatura(lista_dispositivos, corrientes_normalizadas, lista_temperaturas, vd=-4.5):
     """
     Procesa las mediciones de temperatura y retorna dos diccionarios planos unificados:
     - 'i_vs_t': {"disp @ corr uA": {"x": array_temp, "y": array_corriente}}
@@ -28,7 +28,7 @@ def obtener_analisis_temperatura(lista_dispositivos, corrientes_normalizadas, li
                     v_drain = datos[:, 0]
                     i_drain = datos[:, 1]
 
-                    idx_vd = np.argmin(np.abs(v_drain - (-4.5)))
+                    idx_vd = np.argmin(np.abs(v_drain - (vd)))
                     i_en_v5 = np.abs(i_drain[idx_vd]) * 1e6
 
                     temps_aux.append(float(temp))
