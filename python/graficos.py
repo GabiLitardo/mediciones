@@ -10,7 +10,7 @@ def _renderizar_grafico(fig_ply, titulo, xaxis_kwargs=None, yaxis_kwargs=None, t
     xaxis = dict(showgrid=False, showline=False, zeroline=False, mirror=True)
     if xaxis_kwargs: 
         xaxis.update(xaxis_kwargs)
-    yaxis = dict(showgrid=True, gridcolor="rgba(255, 255, 255, 0.2)"if template=="plotly_dark" else "#e0e0e0", showline=False, zeroline=False, mirror=True)
+    yaxis = dict(showgrid=True, gridcolor="rgba(255, 255, 255, 0.2)", showline=False, zeroline=False, mirror=True)
     if yaxis_kwargs: 
         yaxis.update(yaxis_kwargs)
 
