@@ -10,6 +10,9 @@ import proc_temp
 def render_FG ():
     st.title("Resumen mediciones Chaves-Litardo")
 
+    es_oscuro = st.checkbox("Modo oscuro", value=True)
+    template = "plotly_dark" if es_oscuro else "plotly_white"
+
     opcion = st.sidebar.radio(
         "Seleccionar Análisis",
         ["Evolución temporal", "Sensibilidad", "Ruido", "Temperatura", "Resumen", "Pruebas"]
@@ -33,7 +36,8 @@ def render_FG ():
             dict_datos=datos_fg_t1,
             xlabel="Dosis Acumulada [Gy]" if en_dosis else "Tiempo de irradiación [min]",
             ylabel=r"$I_D\text{ [}\mu \text{A]}$",
-            modo='markers+lines'
+            modo='markers+lines',
+            template=template
         )
 
         datos_fg_t2 = proc_evo.obtener_datos_crudos_tanda(DISPOS, "FG_tanda2", en_dosis=en_dosis)
@@ -42,7 +46,8 @@ def render_FG ():
             dict_datos=datos_fg_t2,
             xlabel="Dosis Acumulada [Gy]" if en_dosis else "Tiempo de irradiación [min]",
             ylabel=r"$I_D\text{ [}\mu \text{A]}$",
-            modo='markers+lines'
+            modo='markers+lines',
+            template=template
         )
 
         st.subheader("Evolución de la tensión de compuerta equivalente ($V_{FG}$)")
@@ -53,7 +58,8 @@ def render_FG ():
             dict_datos=datos_vg_t1,
             xlabel="Dosis Acumulada [Gy]" if en_dosis else "Tiempo de irradiación [min]",
             ylabel=r"$\text{Tensión }V_{FG}\text{ [V]}$",
-            modo='markers+lines'
+            modo='markers+lines',
+            template=template
         )
         
         datos_vg_t2 = proc_evo.obtener_datos_evolucion_vg(DISPOS, "FG_tanda2", en_dosis = en_dosis)
@@ -62,7 +68,8 @@ def render_FG ():
             dict_datos=datos_vg_t2,
             xlabel="Dosis Acumulada [Gy]" if en_dosis else "Tiempo de irradiación [min]",
             ylabel=r"$\text{Tensión }V_{FG}\text{ [V]}$",
-            modo='markers+lines'
+            modo='markers+lines',
+            template=template
         )
 
     # =====================================================================
@@ -79,7 +86,8 @@ def render_FG ():
             dict_datos=sens_norm_t1,
             xlabel=r"$\text{Tensión equivalente }V_{FG}\text{ [V]}$",
             ylabel=r"$\text{Sensibilidad normalizada [V/Gy]}$",
-            modo='markers+lines'
+            modo='markers+lines',
+            template=template
         )
             
         sens_norm_t2 = proc_sens.procesar_sensibilidad(DISPOS, "FG_tanda2", normalizado=True)
@@ -88,7 +96,8 @@ def render_FG ():
             dict_datos=sens_norm_t2,
             xlabel=r"$\text{Tensión equivalente }V_{FG}\text{ [V]}$",
             ylabel=r"$\text{Sensibilidad normalizada [V/Gy]}$",
-            modo='markers+lines'
+            modo='markers+lines',
+            template=template
         )
             
         st.subheader("Sin normalizar")
@@ -99,7 +108,8 @@ def render_FG ():
             dict_datos=sens_abs_t1,
             xlabel=r"$\text{Corriente normalizada }I_{D_{norm}}\text{ [}\mu\text{A]}$",
             ylabel=r"$\text{Tasa de cambio [(}\mu\text{A)/Gy]}$",
-            modo='markers+lines'
+            modo='markers+lines',
+            template=template
         )
             
         sens_abs_t2 = proc_sens.procesar_sensibilidad(DISPOS, "FG_tanda2", normalizado=False)
@@ -108,7 +118,8 @@ def render_FG ():
             dict_datos=sens_abs_t2,
             xlabel=r"$\text{Corriente normalizada }I_{D_{norm}}\text{ [}\mu\text{A]}$",
             ylabel=r"$\text{Tasa de cambio [(}\mu\text{A)/Gy]}$",
-            modo='markers+lines'
+            modo='markers+lines',
+            template=template
         )
 
     # =====================================================================
@@ -131,7 +142,8 @@ def render_FG ():
             dict_datos=ruido_corto["std_ruido"],
             xlabel=r"$\text{Corrientes normalizadas }I_D\text{ [}\mu \text{A]}$",
             ylabel="Desvío de Ruido [nA]",
-            modo='markers'
+            modo='markers',
+            template=template
         )
         graficos.graficar_curvas(
             "Corriente vs tiempo a corto plazo",
@@ -139,12 +151,14 @@ def render_FG ():
             xlabel="Tiempo [s]",
             ylabel=r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$",
             modo='lines',
-            logx=logx
+            logx=logx,
+            template=template
         )
         if extra:
             graficos.graficar_histograma_ruido(
                 "Distribución del Ruido Neto a corto plazo",
-                dict_datos=ruido_corto["evos"]
+                dict_datos=ruido_corto["evos"],
+                template=template
             )
         if extra:
             graficos.graficar_curvas(
@@ -154,7 +168,8 @@ def render_FG ():
                 ylabel=r"$\text{PSD [}\mu\text{A}^2/\text{Hz]}$",
                 modo='lines',
                 logx=True,
-                logy=True
+                logy=True,
+                template=template
             )
         ruido_largo = proc_ruido.obtener_analisis_ruido_completo(
             DISPOS, CORRIENTES, es_larga=True, restar_deriva=restar_deriva
@@ -166,11 +181,13 @@ def render_FG ():
                 xlabel="Tiempo [s]",
                 ylabel=r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$",
                 modo='lines',
-                logx=logx
+                logx=logx,
+                template=template
             )
             graficos.graficar_histograma_ruido(
                 "Distribución del Ruido Neto a largo plazo",
-                dict_datos=ruido_largo["evos"]
+                dict_datos=ruido_largo["evos"],
+                template=template
             )
         graficos.graficar_curvas(
             "Evolución de Temperatura vs Tiempo durante medición de ruido",
@@ -178,14 +195,16 @@ def render_FG ():
             xlabel="Tiempo [s]",
             ylabel="Temperatura [°C]",
             modo='lines',
-            logx=logx
+            logx=logx,
+            template=template
         )
         graficos.graficar_curvas(
             "Corriente vs Temperatura durante medición de ruido",
             dict_datos=ruido_corto["i_vs_t"],
             xlabel="Temperatura [°C]",
             ylabel=r"$\text{Corriente }I_D \text{ [}\mu \text{A]}$",
-            modo='markers+lines'
+            modo='markers+lines',
+            template=template
         )
 
     # =====================================================================
@@ -204,14 +223,16 @@ def render_FG ():
             dict_datos=datos_temp["i_vs_t"],
             xlabel="Temperatura [°C]",
             ylabel=r"$\text{Corriente }I_D \text{ @ }V_D \text{ = -4.5V [}\mu \text{A]}$",
-            modo='markers+lines'
+            modo='markers+lines',
+            template=template
         )
         graficos.graficar_curvas(
             titulo=r"$\text{Coeficiente Térmico (}\alpha\text{) vs Corrientes Normalizadas}$",
             dict_datos=datos_temp["alpha_vs_i"],
             xlabel=r"$\text{Corrientes Normalizadas }I_D\text{ [}\mu \text{A]}$",
             ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu \text{A/°C]}$",
-            modo='markers+lines'
+            modo='markers+lines',
+            template=template
         )
 
         if "PFGIW1 (Fit)" in datos_temp.get("alpha_vs_i", {}):
@@ -232,6 +253,7 @@ def render_FG ():
             xlabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
             ylabel=r"$\text{Corriente }I_D\text{ [}\mu\text{A]}$",
             modo='lines',
+            template=template
         )
 
         # 2. Gráfico de Coeficiente Térmico alpha_I [uA/°C] vs V_GS
@@ -240,7 +262,8 @@ def render_FG ():
             dict_datos=datos_temp_std["alpha_vs_vgs"],
             xlabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
             ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu\text{A/°C]}$",
-            modo='markers'
+            modo='markers',
+            template=template
         )
 
         graficos.graficar_curvas(
@@ -249,6 +272,7 @@ def render_FG ():
             xlabel=r"$\text{Corriente }I_D\text{ [}\mu\text{A]}$",
             ylabel=r"$\text{Coeficiente Térmico }\alpha\text{ [}\mu\text{A/°C]}$",
             modo='markers',
+            template=template
         )
 
     # =====================================================================
@@ -273,7 +297,8 @@ def render_FG ():
             datos_numerador=ruido_resumen_data["std_ruido"],         
             datos_sensibilidad=sens_resumen, 
             ylabel="Error Equivalente por Ruido [cGy]", 
-            factor_escala=100.0/1000.0
+            factor_escala=100.0/1000.0,
+            template=template
         )
 
         # 4. Modulo de alpha para el error térmico (|alpha| / S)
@@ -289,7 +314,8 @@ def render_FG ():
             datos_numerador=temp_resumen_abs,         
             datos_sensibilidad=sens_resumen, 
             ylabel="Error Térmico Equivalente [cGy/°C]",
-            factor_escala=100.0
+            factor_escala=100.0,
+            template=template
         )
 
         st.subheader("Error Total Combinado")
@@ -365,7 +391,8 @@ def render_FG ():
                 dict_datos=datos_error_total,
                 xlabel=r"$\text{Corriente Normalizada }I_{D_{norm}} \text{ [}\mu \text{A]}$",
                 ylabel="Error Total Combinado [cGy]",
-                modo='markers+lines'
+                modo='markers+lines',
+                template=template
             )
 
     # =====================================================================
@@ -380,7 +407,8 @@ def render_FG ():
             dict_datos=datos_iv_ref,
             xlabel=r"$\text{Tensión de Compuerta }V_G\text{ [V]}$",
             ylabel=r"$I_D\text{ [}\mu \text{A]}$",
-            modo='markers'
+            modo='markers',
+            template=template
         )
 
         datos_temp = proc_temp.obtener_analisis_temperatura(

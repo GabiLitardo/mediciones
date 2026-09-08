@@ -6,7 +6,7 @@ import plotly.io as pio
 
 COLORES_DISPOSITIVOS = {"PFGIW1": "#1f77b4", "PFGIW2": "#ff7f0e", "PFGIP2": "#2ca02c"}
 
-def _renderizar_grafico(fig_ply, titulo, xaxis_kwargs=None, yaxis_kwargs=None, **layout_kwargs):
+def _renderizar_grafico(fig_ply, titulo, xaxis_kwargs=None, yaxis_kwargs=None, template="plotly_dark", **layout_kwargs):
     xaxis = dict(showgrid=False, showline=False, zeroline=False)
     if xaxis_kwargs: 
         xaxis.update(xaxis_kwargs)
@@ -16,7 +16,7 @@ def _renderizar_grafico(fig_ply, titulo, xaxis_kwargs=None, yaxis_kwargs=None, *
 
     fig_ply.update_layout(
         title=titulo, 
-        template="plotly_dark", 
+        template=template, 
         paper_bgcolor="#0e1117", 
         plot_bgcolor="#0e1117",
         font=dict(color="white"), 
@@ -27,7 +27,7 @@ def _renderizar_grafico(fig_ply, titulo, xaxis_kwargs=None, yaxis_kwargs=None, *
     html = pio.to_html(fig_ply, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False)
     st.iframe(html, height="content")
 
-def graficar_relacion_normalizada(titulo, datos_numerador, datos_sensibilidad, ylabel, factor_escala):
+def graficar_relacion_normalizada(titulo, datos_numerador, datos_sensibilidad, ylabel, factor_escala, template):
     fig = go.Figure()
     for disp, d_sens in datos_sensibilidad.items():
         if datos_numerador and disp in datos_numerador:
@@ -52,10 +52,11 @@ def graficar_relacion_normalizada(titulo, datos_numerador, datos_sensibilidad, y
         fig, 
         dict(text=titulo, x=0.5, xanchor="center"), 
         xaxis_kwargs=dict(title=r"$\text{Corriente Normalizada }I_{D_{norm}} \text{ [}\mu \text{A]}$"), 
-        yaxis_kwargs=dict(title=ylabel)
+        yaxis_kwargs=dict(title=ylabel),
+        template=template
     )
 
-def graficar_curvas(titulo, dict_datos, xlabel, ylabel, modo='markers+lines', logx=False, logy=False):
+def graficar_curvas(titulo, dict_datos, xlabel, ylabel, modo='markers+lines', logx=False, logy=False, template="plotly_dark"):
     fig = go.Figure()
     for etiqueta, serie in dict_datos.items():
         nombre_str = str(etiqueta)
@@ -82,10 +83,11 @@ def graficar_curvas(titulo, dict_datos, xlabel, ylabel, modo='markers+lines', lo
     _renderizar_grafico(
         fig, titulo,
         xaxis_kwargs=dict(title=xlabel, type="log" if logx else "-"),
-        yaxis_kwargs=dict(title=ylabel, type="log" if logy else "-")
+        yaxis_kwargs=dict(title=ylabel, type="log" if logy else "-"),
+        template=template
     )
 
-def graficar_histograma_ruido(titulo, dict_datos):
+def graficar_histograma_ruido(titulo, dict_datos, template):
     """
     Dibuja histogramas consumiendo la estructura plana unificada {"Etiqueta": {"x": ..., "y": ...}}.
     """
@@ -101,5 +103,6 @@ def graficar_histograma_ruido(titulo, dict_datos):
         fig, titulo, 
         xaxis_kwargs=dict(title="Ruido Neto [nA]"), 
         yaxis_kwargs=dict(title="Densidad de Probabilidad"), 
-        barmode='overlay'
+        barmode='overlay',
+        template=template
     )

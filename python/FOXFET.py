@@ -10,6 +10,9 @@ import proc_temp
 def render_FOXFET ():
     st.title("Resumen mediciones Chaves-Litardo")
 
+    es_oscuro = st.checkbox("Modo oscuro", value=True)
+    template = "plotly_dark" if es_oscuro else "plotly_white"
+
     opcion = st.sidebar.radio(
         "Seleccionar Análisis",
         ["Evolución temporal", "Sensibilidad", "Ruido", "Temperatura", "Resumen"]
@@ -49,7 +52,8 @@ def render_FOXFET ():
             dict_datos=datos_totales,
             xlabel="Dosis Acumulada [Gy]" if en_dosis else "Tiempo de irradiación [min]",
             ylabel="Tensión [V]",
-            modo='markers'
+            modo='markers',
+            template=template
         )
 
     # =====================================================================
@@ -78,7 +82,8 @@ def render_FOXFET ():
             dict_datos=sens_totales,
             xlabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
             ylabel=r"$\text{Sensibilidad [V/Gy]}$",
-            modo='markers+lines'
+            modo='markers+lines',
+            template=template
         )
     # =====================================================================
     # SECCIÓN 3: RUIDO
@@ -101,7 +106,8 @@ def render_FOXFET ():
             xlabel=r"$\text{Corrientes normalizadas }I_D\text{ [}\mu \text{A]}$",
             ylabel="Desvío de Ruido [nA]",
             modo='markers',
-            logx=True
+            logx=True,
+            template=template
         )
         graficos.graficar_curvas(
             "Corriente vs tiempo a corto plazo",
@@ -109,11 +115,13 @@ def render_FOXFET ():
             xlabel="Tiempo [s]",
             ylabel=r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$",
             modo='lines',
-            logx=logx
+            logx=logx,
+            template=template
         )
         graficos.graficar_histograma_ruido(
             "Distribución del Ruido Neto a corto plazo",
-            dict_datos=ruido_corto["evos"]
+            dict_datos=ruido_corto["evos"],
+            template=template
         )
 
         graficos.graficar_curvas(
@@ -123,7 +131,8 @@ def render_FOXFET ():
             ylabel=r"$\text{PSD [}\mu\text{A}^2/\text{Hz]}$",
             modo='lines',
             logx=True,
-            logy=True
+            logy=True,
+            template=template
         )
 
         graficos.graficar_curvas(
@@ -131,14 +140,16 @@ def render_FOXFET ():
             dict_datos=ruido_corto["evos_temp"],
             xlabel="Tiempo [s]",
             ylabel="Temperatura [°C]",
-            modo='lines'
+            modo='lines',
+            template=template
         )
         graficos.graficar_curvas(
             "Corriente vs Temperatura durante medición de ruido",
             dict_datos=ruido_corto["i_vs_t"],
             xlabel="Temperatura [°C]",
             ylabel=r"$\text{Corriente }I_D \text{ [}\mu \text{A]}$",
-            modo='markers+lines'
+            modo='markers+lines',
+            template=template
         )
     # =====================================================================
     # SECCIÓN 4: TEMPERATURA
@@ -158,7 +169,8 @@ def render_FOXFET ():
             dict_datos=datos_temp_fox["iv_vs_t"],
             xlabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
             ylabel=r"$\text{Corriente }I_D\text{ [}\mu \text{A]}$",
-            modo='lines'
+            modo='lines',
+            template=template
         )
 
         graficos.graficar_curvas(
@@ -166,7 +178,8 @@ def render_FOXFET ():
             dict_datos=datos_temp_fox["vgs_vs_t_fijo"],
             xlabel=r"$\text{Temperatura [°C]}$",
             ylabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
-            modo='markers+lines'
+            modo='markers+lines',
+            template=template
         )
         
         graficos.graficar_curvas(
@@ -175,7 +188,8 @@ def render_FOXFET ():
             xlabel=r"$\text{Corriente }I_D\text{ [}\mu\text{A]}$",
             ylabel=r"$\text{Coeficiente Térmico }\alpha_V\text{ [mV/°C]}$",
             modo='markers',
-            logx=True
+            logx=True,
+            template=template
         )
 
     # =====================================================================
