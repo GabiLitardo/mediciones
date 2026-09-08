@@ -81,13 +81,17 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
     """
     Procesa curvas de transferencia I-V a distintas temperaturas.
     - Si es_std=False (FOXFET): 
-        Calcula alpha_V = d(V_GS)/dT [V/°C] vs I_D.
+        Calcula alpha_V = d(V_GS)/dT [V/°C] vs I_D, y genera curvas V_GS vs T a corrientes fijas.
     - Si es_std=True (STD): 
         Calcula alpha_I = d(I_D)/dT [uA/°C] vs V_GS y vs I_D (ref a T amb).
     """
     iv_vs_t = {}
     alpha_vs_vgs = {}
     alpha_vs_i = {}
+    vgs_vs_t_fijo = {}
+
+    # Corrientes de polarización objetivo para verificar linealidad Vgs vs T
+    CORRIENTES_TEST_UA = [0.1, 1.0, 10.0, 100.0]
 
     for disp in lista_dispositivos:
         curvas_por_temp = {}
@@ -133,13 +137,13 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
                     coef = np.polyfit(temps_disponibles, matriz_id[:, col], deg=1)
                     alphas_i[col] = coef[0]
 
-                # 1. alpha vs Vgs
+                # alpha vs Vgs
                 alpha_vs_vgs[disp] = {
                     "x": vgs_base,
                     "y": alphas_i
                 }
 
-                # 2. alpha vs Id (usando como referencia T ambiente: primera fila)
+                # alpha vs Id (ref T ambiente)
                 id_ref = matriz_id[0, :]
                 idx_id_ord = np.argsort(id_ref)
                 alpha_vs_i[disp] = {
@@ -166,8 +170,9 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
                         vgs_interp = np.interp(id_base, id_t[idx_id], vgs_t[idx_id])
                         matriz_vgs.append(vgs_interp)
 
-                    matriz_vgs = np.array(matriz_vgs)
+                    matriz_vgs = np.array(matriz_vgs)  # Shape: (n_temps, 150)
 
+                    # Cálculo continuo de alpha_V
                     n_puntos = len(id_base)
                     alphas_v = np.zeros(n_puntos)
                     for col in range(n_puntos):
@@ -179,8 +184,40 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
                         "y": alphas_v
                     }
 
+                    # Extracción de V_GS vs T para corrientes fijas objetivo
+                    for i_target in CORRIENTES_TEST_UA:
+                        if i_min <= i_target <= i_max:
+                            # Interpolamos el V_GS a cada temperatura para esta i_target
+                            vgs_a_target = []
+                            for t in temps_disponibles:
+                                vgs_t = curvas_por_temp[t]["vgs"]
+                                id_t = curvas_por_temp[t]["id"]
+                                idx_id = np.argsort(id_t)
+                                vgs_val = np.interp(i_target, id_t[idx_id], vgs_t[idx_id])
+                                vgs_a_target.append(vgs_val)
+
+                            vgs_a_target = np.array(vgs_a_target)
+                            
+                            # Ajuste lineal para mostrar la recta
+                            coef = np.polyfit(temps_disponibles, vgs_a_target, deg=1)
+                            recta_ajuste = coef[0] * temps_disponibles + coef[1]
+
+                            # Puntos medidos/interpolados
+                            vgs_vs_t_fijo[f"{disp} @ {i_target} µA (Datos)"] = {
+                                "x": temps_disponibles,
+                                "y": vgs_a_target,
+                                "modo": "markers"
+                            }
+                            # Recta de ajuste
+                            vgs_vs_t_fijo[f"{disp} @ {i_target} µA (Ajuste, α={coef[0]*1e3:.2f} mV/°C)"] = {
+                                "x": temps_disponibles,
+                                "y": recta_ajuste,
+                                "modo": "lines"
+                            }
+
     return {
         "iv_vs_t": iv_vs_t,
         "alpha_vs_vgs": alpha_vs_vgs,
-        "alpha_vs_i": alpha_vs_i
+        "alpha_vs_i": alpha_vs_i,
+        "vgs_vs_t_fijo": vgs_vs_t_fijo
     }
