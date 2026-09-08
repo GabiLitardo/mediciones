@@ -165,7 +165,7 @@ def render_FOXFET ():
             titulo=r"$\text{Verificación de Linealidad: }V_{GS}\text{ vs Temperatura (a }I_D\text{ fija)}$",
             dict_datos=datos_temp_fox["vgs_vs_t_fijo"],
             xlabel=r"$\text{Temperatura [°C]}$",
-            ylabel=r"$\text{Tensión Compuesta }V_{GS}\text{ [V]}$",
+            ylabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
             modo='lines+markers'
         )
         
