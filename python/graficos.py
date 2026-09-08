@@ -10,16 +10,16 @@ def _renderizar_grafico(fig_ply, titulo, xaxis_kwargs=None, yaxis_kwargs=None, t
     xaxis = dict(showgrid=False, showline=False, zeroline=False)
     if xaxis_kwargs: 
         xaxis.update(xaxis_kwargs)
-    yaxis = dict(showgrid=True, gridcolor="rgba(255, 255, 255, 0.2)", showline=False, zeroline=False)
+    yaxis = dict(showgrid=True, gridcolor="rgba(255, 255, 255, 0.2)"if template=="plotly_dark" else "#e0e0e0", showline=False, zeroline=False)
     if yaxis_kwargs: 
         yaxis.update(yaxis_kwargs)
 
     fig_ply.update_layout(
         title=titulo, 
         template=template, 
-        paper_bgcolor="#0e1117", 
-        plot_bgcolor="#0e1117",
-        font=dict(color="white"), 
+        paper_bgcolor="#0e1117" if template=="plotly_dark" else "white", 
+        plot_bgcolor="#0e1117" if template=="plotly_dark" else "white",
+        font=dict(color="white"if template=="plotly_dark" else "black"), 
         xaxis=xaxis, 
         yaxis=yaxis, 
         **layout_kwargs
