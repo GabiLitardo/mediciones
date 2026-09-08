@@ -166,7 +166,7 @@ def render_FOXFET ():
             dict_datos=datos_temp_fox["vgs_vs_t_fijo"],
             xlabel=r"$\text{Temperatura [°C]}$",
             ylabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
-            modo='lines'
+            modo='markers+lines'
         )
         
         graficos.graficar_curvas(

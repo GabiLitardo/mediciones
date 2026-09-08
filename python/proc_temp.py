@@ -201,14 +201,14 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
 
                             etiqueta_base = f"{disp} @ {i_target} µA"
 
-                            # 1. Puntos experimentales (solo marcadores si el modo lo permite, o traza de datos)
-                            vgs_vs_t_fijo[f"{etiqueta_base}"] = {
+                            # 1. Puntos medidos/interpolados (debe llevar " (Medido)")
+                            vgs_vs_t_fijo[f"{etiqueta_base} (Medido)"] = {
                                 "x": temps_disponibles,
                                 "y": vgs_a_target
                             }
 
-                            # 2. Recta de ajuste lineal
-                            vgs_vs_t_fijo[f"{etiqueta_base} - Ajuste Lineal"] = {
+                            # 2. Recta de ajuste lineal (debe llevar exactamente " (Fit)")
+                            vgs_vs_t_fijo[f"{etiqueta_base} (Fit)"] = {
                                 "x": temps_disponibles,
                                 "y": recta_ajuste
                             }
