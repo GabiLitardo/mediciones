@@ -166,7 +166,7 @@ def render_FOXFET (template):
             dict_datos=datos_temp_fox["iv_vs_t"],
             xlabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
             ylabel=r"$\text{Corriente }I_D\text{ [}\mu \text{A]}$",
-            modo='lines',
+            modo='markers',
             template=template
         )
 
