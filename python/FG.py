@@ -7,11 +7,8 @@ import proc_sens
 import proc_ruido
 import proc_temp
  
-def render_FG ():
+def render_FG (template):
     st.title("Resumen mediciones Chaves-Litardo")
-
-    es_oscuro = st.checkbox("Modo oscuro", value=True)
-    template = "plotly_dark" if es_oscuro else "plotly_white"
 
     opcion = st.sidebar.radio(
         "Seleccionar Análisis",
