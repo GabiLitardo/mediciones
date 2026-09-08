@@ -7,10 +7,10 @@ import plotly.io as pio
 COLORES_DISPOSITIVOS = {"PFGIW1": "#1f77b4", "PFGIW2": "#ff7f0e", "PFGIP2": "#2ca02c"}
 
 def _renderizar_grafico(fig_ply, titulo, xaxis_kwargs=None, yaxis_kwargs=None, template="plotly_dark", **layout_kwargs):
-    xaxis = dict(showgrid=False, showline=False, zeroline=False)
+    xaxis = dict(showgrid=False, showline=False, zeroline=False, mirror=True)
     if xaxis_kwargs: 
         xaxis.update(xaxis_kwargs)
-    yaxis = dict(showgrid=True, gridcolor="rgba(255, 255, 255, 0.2)"if template=="plotly_dark" else "#e0e0e0", showline=False, zeroline=False)
+    yaxis = dict(showgrid=True, gridcolor="rgba(255, 255, 255, 0.2)"if template=="plotly_dark" else "#e0e0e0", showline=False, zeroline=False, mirror=True)
     if yaxis_kwargs: 
         yaxis.update(yaxis_kwargs)
 
