@@ -200,18 +200,17 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
                             recta_ajuste = coef[0] * temps_disponibles + coef[1]
 
                             etiqueta_base = f"{disp} @ {i_target} µA"
-                            
-                            # Datos medidos (marcadores)
-                            vgs_vs_t_fijo[f"{etiqueta_base} (Datos)"] = {
+
+                            # 1. Puntos experimentales (solo marcadores si el modo lo permite, o traza de datos)
+                            vgs_vs_t_fijo[f"{etiqueta_base}"] = {
                                 "x": temps_disponibles,
-                                "y": vgs_a_target,
-                                "modo": "markers"
+                                "y": vgs_a_target
                             }
-                            # Recta de ajuste (línea) vinculada al mismo grupo
-                            vgs_vs_t_fijo[f"{etiqueta_base} (Fit)"] = {
+
+                            # 2. Recta de ajuste lineal
+                            vgs_vs_t_fijo[f"{etiqueta_base} - Ajuste Lineal"] = {
                                 "x": temps_disponibles,
-                                "y": recta_ajuste,
-                                "modo": "lines"
+                                "y": recta_ajuste
                             }
 
     return {
