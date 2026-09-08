@@ -170,9 +170,8 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
                         vgs_interp = np.interp(id_base, id_t[idx_id], vgs_t[idx_id])
                         matriz_vgs.append(vgs_interp)
 
-                    matriz_vgs = np.array(matriz_vgs)  # Shape: (n_temps, 150)
+                    matriz_vgs = np.array(matriz_vgs)
 
-                    # Cálculo continuo de alpha_V
                     n_puntos = len(id_base)
                     alphas_v = np.zeros(n_puntos)
                     for col in range(n_puntos):
@@ -187,7 +186,6 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
                     # Extracción de V_GS vs T para corrientes fijas objetivo
                     for i_target in CORRIENTES_TEST_UA:
                         if i_min <= i_target <= i_max:
-                            # Interpolamos el V_GS a cada temperatura para esta i_target
                             vgs_a_target = []
                             for t in temps_disponibles:
                                 vgs_t = curvas_por_temp[t]["vgs"]
@@ -198,18 +196,19 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
 
                             vgs_a_target = np.array(vgs_a_target)
                             
-                            # Ajuste lineal para mostrar la recta
                             coef = np.polyfit(temps_disponibles, vgs_a_target, deg=1)
                             recta_ajuste = coef[0] * temps_disponibles + coef[1]
 
-                            # Puntos medidos/interpolados
-                            vgs_vs_t_fijo[f"{disp} @ {i_target} µA (Datos)"] = {
+                            etiqueta_base = f"{disp} @ {i_target} µA"
+                            
+                            # Datos medidos (marcadores)
+                            vgs_vs_t_fijo[f"{etiqueta_base} (Datos)"] = {
                                 "x": temps_disponibles,
                                 "y": vgs_a_target,
                                 "modo": "markers"
                             }
-                            # Recta de ajuste
-                            vgs_vs_t_fijo[f"{disp} @ {i_target} µA (Fit, α={coef[0]*1e3:.2f} mV/°C)"] = {
+                            # Recta de ajuste (línea) vinculada al mismo grupo
+                            vgs_vs_t_fijo[f"{etiqueta_base} (Fit)"] = {
                                 "x": temps_disponibles,
                                 "y": recta_ajuste,
                                 "modo": "lines"
