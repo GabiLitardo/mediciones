@@ -161,6 +161,15 @@ def render_FOXFET ():
             modo='lines'
         )
 
+        if datos_temp.get("vgs_vs_t_fijo"):
+            graficos.graficar_curvas(
+                titulo=r"$\text{Verificación de Linealidad: }V_{GS}\text{ vs Temperatura (a }I_D\text{ fija)}$",
+                dict_datos=datos_temp["vgs_vs_t_fijo"],
+                xlabel=r"$\text{Temperatura [°C]}$",
+                ylabel=r"$\text{Tensión Compuesta }V_{GS}\text{ [V]}$",
+                modo='lines+markers'
+            )
+        
         graficos.graficar_curvas(
             titulo=r"$\text{Coeficiente Térmico (}\alpha\text{) vs Corriente }I_D$",
             dict_datos=datos_temp_fox["alpha_vs_i"],
