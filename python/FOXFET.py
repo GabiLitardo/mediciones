@@ -173,7 +173,7 @@ def render_FOXFET ():
             titulo=r"$\text{Coeficiente Térmico (}\alpha\text{) vs Corriente }I_D$",
             dict_datos=datos_temp_fox["alpha_vs_i"],
             xlabel=r"$\text{Corriente }I_D\text{ [}\mu\text{A]}$",
-            ylabel=r"$\text{Coeficiente Térmico }\alpha_V\text{ [V/°C]}$",
+            ylabel=r"$\text{Coeficiente Térmico }\alpha_V\text{ [mV/°C]}$",
             modo='markers',
             logx=True
         )

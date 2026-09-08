@@ -156,7 +156,7 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
                     # Ajuste lineal en bloque para todo el vector continuo: matriz_vgs (n_temps, 150)
                     # np.polyfit devuelve matriz (deg+1, 150)
                     coefs = np.polyfit(temps_disponibles, matriz_vgs, deg=1)
-                    alphas_v = coefs[0]
+                    alphas_v = coefs[0] * 1e3
                     intercepts_v = coefs[1]
 
                     alpha_vs_i[disp] = {"x": id_base, "y": alphas_v}
