@@ -209,7 +209,7 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
                                 "modo": "markers"
                             }
                             # Recta de ajuste
-                            vgs_vs_t_fijo[f"{disp} @ {i_target} µA (Ajuste, α={coef[0]*1e3:.2f} mV/°C)"] = {
+                            vgs_vs_t_fijo[f"{disp} @ {i_target} µA (Fit, α={coef[0]*1e3:.2f} mV/°C)"] = {
                                 "x": temps_disponibles,
                                 "y": recta_ajuste,
                                 "modo": "lines"
