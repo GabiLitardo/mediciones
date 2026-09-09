@@ -55,13 +55,14 @@ def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, I_in
         
         coefs_dy = np.polyder(coefs_y)
         eje_y_fit = np.abs(np.polyval(coefs_dy, t_cont)) / TASA_DOSIS
+        factor_aux = 1e3 if (normalizado or tipo_tanda=="FOXFET") else 1
         eje_x_fit = np.polyval(coefs_x, t_cont)
         
         # 2. Sensibilidad discreta por ventana
         ex_disc, ey_disc = calcular_sensibilidad_ventana(tiempos, corrientes, corrientes_norm, n_ventana)
 
         # Diccionario plano unificado
-        resultado[f"{disp} (Fit)"] = {"x": eje_x_fit, "y": eje_y_fit}
-        resultado[disp] = {"x": ex_disc, "y": ey_disc}
+        resultado[f"{disp} (Fit)"] = {"x": eje_x_fit, "y": eje_y_fit * factor_aux}
+        resultado[disp] = {"x": ex_disc, "y": ey_disc * factor_aux}
         
     return resultado

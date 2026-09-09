@@ -82,7 +82,7 @@ def render_FG (template):
             titulo=r"$\text{Sensibilidad FG tanda 1 (Sensibilidad vs }V_{FG}\text{)}$",
             dict_datos=sens_norm_t1,
             xlabel=r"$\text{Tensión equivalente }V_{FG}\text{ [V]}$",
-            ylabel=r"$\text{Sensibilidad normalizada [V/Gy]}$",
+            ylabel=r"$\text{Sensibilidad normalizada [mV/Gy]}$",
             modo='markers+lines',
             template=template
         )
@@ -92,7 +92,7 @@ def render_FG (template):
             titulo=r"$\text{Sensibilidad FG tanda 2 (Sensibilidad vs }V_{FG}\text{)}$",
             dict_datos=sens_norm_t2,
             xlabel=r"$\text{Tensión equivalente }V_{FG}\text{ [V]}$",
-            ylabel=r"$\text{Sensibilidad normalizada [V/Gy]}$",
+            ylabel=r"$\text{Sensibilidad normalizada [mV/Gy]}$",
             modo='markers+lines',
             template=template
         )

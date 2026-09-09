@@ -78,7 +78,7 @@ def render_FOXFET (template):
             titulo=r"$\text{Sensibilidad FOXFET tanda 1}$",
             dict_datos=sens_totales,
             xlabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
-            ylabel=r"$\text{Sensibilidad [V/Gy]}$",
+            ylabel=r"$\text{Sensibilidad [mV/Gy]}$",
             modo='markers+lines',
             template=template
         )
