@@ -98,19 +98,19 @@ def render_FOXFET (template):
         )
 
         graficos.graficar_curvas(
-            "Desvío estándar del ruido neto vs Corrientes Normalizadas",
+            "Desvío estándar del ruido neto vs Corriente de polarización",
             dict_datos=ruido_corto["std_ruido"],
-            xlabel=r"$\text{Corrientes normalizadas }I_D\text{ [}\mu \text{A]}$",
-            ylabel="Desvío de Ruido [nA]",
+            xlabel=r"$\text{Corriente de polarización }I_D\text{ [}\mu \text{A]}$",
+            ylabel="Desvío de Ruido [µV]", 
             modo='markers',
             logx=True,
             template=template
         )
         graficos.graficar_curvas(
-            "Corriente vs tiempo a corto plazo",
+            "Tensión vs tiempo a corto plazo",
             dict_datos=ruido_corto["evos"],
             xlabel="Tiempo [s]",
-            ylabel=r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$",
+            ylabel=r"$\text{Tensión de Ruido Neto [mV]}$",
             modo='lines',
             logx=logx,
             template=template
@@ -125,7 +125,7 @@ def render_FOXFET (template):
             "Densidad Espectral de Potencia (PSD) - Corto Plazo",
             dict_datos=ruido_corto["psd"],
             xlabel="Frecuencia [Hz]",
-            ylabel=r"$\text{PSD [}\mu\text{A}^2/\text{Hz]}$",
+            ylabel=r"$\text{PSD [mV}^2/\text{Hz]}$",
             modo='lines',
             logx=True,
             logy=True,
@@ -141,10 +141,10 @@ def render_FOXFET (template):
             template=template
         )
         graficos.graficar_curvas(
-            "Corriente vs Temperatura durante medición de ruido",
+            "Tensión vs Temperatura durante medición de ruido",
             dict_datos=ruido_corto["i_vs_t"],
             xlabel="Temperatura [°C]",
-            ylabel=r"$\text{Corriente }I_D \text{ [}\mu \text{A]}$",
+            ylabel=r"$\text{Tensión }V_{GS} \text{ [mV]}$",
             modo='markers+lines',
             template=template
         )
