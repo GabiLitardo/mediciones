@@ -147,7 +147,7 @@ def render_FG (template):
             dict_datos=ruido_corto["evos"],
             xlabel="Tiempo [s]",
             ylabel=r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$",
-            modo='lines',
+            modo='markers',
             logx=logx,
             template=template
         )
@@ -177,7 +177,7 @@ def render_FG (template):
                 dict_datos=ruido_largo["evos"],
                 xlabel="Tiempo [s]",
                 ylabel=r"$\text{Corriente de Ruido Neto [}\mu\text{A]}$",
-                modo='lines',
+                modo='markers',
                 logx=logx,
                 template=template
             )
@@ -191,7 +191,7 @@ def render_FG (template):
             dict_datos=ruido_corto["evos_temp"],
             xlabel="Tiempo [s]",
             ylabel="Temperatura [°C]",
-            modo='lines',
+            modo='markers',
             logx=logx,
             template=template
         )
@@ -200,7 +200,7 @@ def render_FG (template):
             dict_datos=ruido_corto["i_vs_t"],
             xlabel="Temperatura [°C]",
             ylabel=r"$\text{Corriente }I_D \text{ [}\mu \text{A]}$",
-            modo='markers+lines',
+            modo='markers',
             template=template
         )
 

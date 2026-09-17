@@ -111,7 +111,7 @@ def render_FOXFET (template):
             dict_datos=ruido_corto["evos"],
             xlabel="Tiempo [s]",
             ylabel=r"$\text{Tensión de Ruido Neto [mV]}$",
-            modo='lines',
+            modo='markers',
             logx=logx,
             template=template
         )
@@ -137,7 +137,7 @@ def render_FOXFET (template):
             dict_datos=ruido_corto["evos_temp"],
             xlabel="Tiempo [s]",
             ylabel="Temperatura [°C]",
-            modo='lines',
+            modo='markers',
             template=template
         )
         graficos.graficar_curvas(
@@ -145,7 +145,7 @@ def render_FOXFET (template):
             dict_datos=ruido_corto["i_vs_t"],
             xlabel="Temperatura [°C]",
             ylabel=r"$\text{Tensión }V_{GS} \text{ [mV]}$",
-            modo='markers+lines',
+            modo='markers',
             template=template
         )
     # =====================================================================
