@@ -157,9 +157,9 @@ def render_FOXFET (template):
 
         die = st.selectbox("Seleccionar DIE", options=["DIE4", "DIE19"])
         postrad = st.selectbox("Seleccionar postrad", options=["0", "1"])
-        if postrad==0:
+        if postrad=="0":
             fecha="2026-08-28"
-        if postrad==1:
+        if postrad=="1":
             fecha="2026-09-18"
         else:
             fecha="**"
