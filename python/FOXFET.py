@@ -156,9 +156,21 @@ def render_FOXFET (template):
         st.header("Análisis de Coeficiente Térmico")
 
         die = st.selectbox("Seleccionar DIE", options=["DIE4", "DIE19"])
+        postrad = st.selectbox("Seleccionar postrad", options=["0", "1"])
+        if postrad==0:
+            fecha="2026-08-28"
+        if postrad==1:
+            fecha="2026-09-18"
+        else:
+            fecha="**"
+
 
         datos_temp_fox = proc_temp.obtener_analisis_temperatura_v2(
-            DISPOS, TEMPERATURAS, die=die
+            DISPOS, 
+            TEMPERATURAS, 
+            die=die,
+            es_std=False,
+            fecha=fecha
         )
 
         graficos.graficar_curvas(

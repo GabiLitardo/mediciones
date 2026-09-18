@@ -77,7 +77,7 @@ def obtener_analisis_temperatura(lista_dispositivos, corrientes_normalizadas, li
     }
 
 
-def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die="DIE4", es_std=False):
+def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die="DIE4", es_std=False, fecha="**"):
     """
     Procesa curvas de transferencia I-V a distintas temperaturas.
     - Si es_std=False (FOXFET): 
@@ -97,7 +97,7 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
 
         # 1. Carga de datos crudos
         for temp in lista_temperaturas:
-            datos = cargar_medicion_temperatura(disp, corr=None, temp=temp, es_fox=True, die=die, es_std=es_std, fecha="2026-09-18")
+            datos = cargar_medicion_temperatura(disp, corr=None, temp=temp, es_fox=True, die=die, es_std=es_std, fecha=fecha)
             if datos is not None:
                 vgs = datos[:, 0]
                 id_uA = np.abs(datos[:, 1]) * 1e6

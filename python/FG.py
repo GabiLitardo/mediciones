@@ -215,6 +215,14 @@ def render_FG (template):
             DISPOS, CORRIENTES, TEMPERATURAS, vd=-5
         )
 
+        postrad = st.selectbox("Seleccionar postrad", options=["0", "1"])
+        if postrad==0:
+            fecha="2026-08-28"
+        if postrad==1:
+            fecha="2026-09-18"
+        else:
+            fecha="**"
+
         graficos.graficar_curvas(
             titulo="Evolución de Corriente de Drain vs Temperatura (@ VD = -4.5V)",
             dict_datos=datos_temp["i_vs_t"],
@@ -240,7 +248,8 @@ def render_FG (template):
             lista_dispositivos=["STD1", "STD2"],
             lista_temperaturas=TEMPERATURAS,
             die="DIE19",
-            es_std=True
+            es_std=True,
+            fecha=fecha
         )
 
         # 1. Gráfico de curvas de transferencia a distintas temperaturas
