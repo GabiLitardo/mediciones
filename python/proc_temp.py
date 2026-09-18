@@ -97,7 +97,7 @@ def obtener_analisis_temperatura_v2(lista_dispositivos, lista_temperaturas, die=
 
         # 1. Carga de datos crudos
         for temp in lista_temperaturas:
-            datos = cargar_medicion_temperatura(disp, corr=None, temp=temp, es_fox=True, die=die, es_std=es_std)
+            datos = cargar_medicion_temperatura(disp, corr=None, temp=temp, es_fox=True, die=die, es_std=es_std, fecha="2026-09-18")
             if datos is not None:
                 vgs = datos[:, 0]
                 id_uA = np.abs(datos[:, 1]) * 1e6
