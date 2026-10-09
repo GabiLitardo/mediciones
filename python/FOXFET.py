@@ -156,13 +156,15 @@ def render_FOXFET (template):
         st.header("Análisis de Coeficiente Térmico")
 
         die = st.selectbox("Seleccionar DIE", options=["DIE4", "DIE19"])
-        postrad = st.selectbox("Seleccionar postrad", options=["0", "1", "2"])
+        postrad = st.selectbox("Seleccionar postrad", options=["0", "1", "2", "3"])
         if postrad=="0":
             fecha="2026-08-28"
         elif postrad=="1":
             fecha="2026-09-18"
         elif postrad=="2":
             fecha="2026-10-02"
+        elif postrad=="3":
+            fecha="2026-10-09"
         else:
             fecha="**"
 
