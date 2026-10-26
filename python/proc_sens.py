@@ -35,8 +35,29 @@ def calcular_sensibilidad_ventana(tiempos, corrientes_proc, corrientes_norm, n_v
     return np.array(eje_x), np.array(eje_y) / TASA_DOSIS
 
 
-def procesar_sensibilidad(lista_dispositivos, tipo_tanda, normalizado=True, I_interp = 1e-5, n_ventana=6):
-    datos_crudos = obtener_datos_evolucion_vg(lista_dispositivos, tipo_tanda) if normalizado else obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, I_interp)
+def procesar_sensibilidad(
+    lista_dispositivos,
+    tipo_tanda,
+    normalizado=True,
+    I_interp=1e-5,
+    n_ventana=6,
+    tanda="tanda2",
+    die="DIE4"
+):
+    if normalizado:
+        datos_crudos = obtener_datos_evolucion_vg(
+            lista_dispositivos,
+            tipo_tanda,
+            en_dosis=False
+        )
+    else:
+        datos_crudos = obtener_datos_crudos_tanda(
+            lista_dispositivos,
+            tipo_tanda,
+            I_interp=I_interp,
+            tanda=tanda,
+            die=die
+        )
     resultado = {}
 
     for tag, datos in datos_crudos.items():
