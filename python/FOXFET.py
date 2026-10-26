@@ -31,6 +31,7 @@ def render_FOXFET (template):
             options=CORRIENTES,
             default=[10]
         )
+        
 
         datos_totales = {}
         for I_interp in I_interps:
