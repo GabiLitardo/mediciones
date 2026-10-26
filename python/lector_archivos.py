@@ -31,16 +31,34 @@ def cargar_curva_iv_referencia(dispositivo):
     return datos[0]
 
 
-def cargar_medicion_tanda(disp, tipo_tanda, nro):
-    if tipo_tanda in ["FG_tanda1", "FOXFET"]:
-        sufijo = ".ri"; prefijo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_" if tipo_tanda != "FOXFET" else f"MOSISV72M_DIE4_{disp}_IV_VD=5V_postrad{nro}_"
+def cargar_medicion_tanda(disp, tipo_tanda, nro,
+                         tanda="tanda2", die="DIE4"):
+
+    if tipo_tanda == "FOXFET":
+        prefijo = (
+            f"MOSISV72M_{die}_{disp}_"
+            f"IV_VD=5V_postrad{nro}_"
+        )
+        sufijo = f"_{tanda}.ri"
+
+    elif tipo_tanda == "FG_tanda1":
+        prefijo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_"
+        sufijo = ".ri"
+
     elif tipo_tanda == "FG_tanda2":
-        sufijo = "_2.ri"; prefijo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_"
+        prefijo = f"MOSISV72M_DIE4_{disp}_VG=0_postrad{nro}_"
+        sufijo = "_2.ri"
+
+    else:
+        raise ValueError(f"Tipo de tanda desconocido: {tipo_tanda}")
 
     for m_ver in ["M2", "M1"]:
-        datos = matchear_archivos(f"{prefijo}{m_ver}{sufijo}")
+        datos = matchear_archivos(
+            f"{prefijo}{m_ver}{sufijo}"
+        )
         if datos:
             return datos[0]
+
     return None
 
 

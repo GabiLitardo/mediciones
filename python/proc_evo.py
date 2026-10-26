@@ -42,13 +42,13 @@ def obtener_vg_por_corriente(dispositivo, corriente_buscada):
     return np.interp(corriente_buscada, corrientes_d[indices_ordenados], tensiones_g[indices_ordenados])
 
 
-def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, I_interp = 1e-5, rng = 60, en_dosis = False):
+def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, I_interp = 1e-5, rng = 60, en_dosis = False, tanda="tanda2", die= 'DIE4'):
     resultado = {}
     factor_x = TASA_DOSIS if en_dosis else 1.0
     for disp in lista_dispositivos:
         tiempos, valores = [], []
         for nro in range(0, rng):
-            archivo_encontrado = cargar_medicion_tanda(disp, tipo_tanda, nro)
+            archivo_encontrado = cargar_medicion_tanda(disp, tipo_tanda, nro, tanda=tanda,die= die)
             
             if archivo_encontrado is not None:
                 t = calcular_tiempo_acumulado(nro, tipo_tanda)

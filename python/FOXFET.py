@@ -30,8 +30,19 @@ def render_FOXFET (template):
             "Corrientes de interpolación:",
             options=CORRIENTES,
             default=[10]
+        )      
+
+        tanda = st.selectbox(
+            "Seleccionar tanda de medición:",
+            options=["tanda1", "tanda2"],
+            index=1
         )
-        
+
+        die = st.selectbox(
+        "Seleccionar DIE:",
+        options=["DIE4", "DIE19"],
+        index=0
+        )
 
         datos_totales = {}
         for I_interp in I_interps:
@@ -39,14 +50,16 @@ def render_FOXFET (template):
                 lista_dispositivos=DISPOS,
                 tipo_tanda="FOXFET",
                 I_interp=I_interp * 1e-6,
-                en_dosis=en_dosis
+                en_dosis=en_dosis, 
+                tanda=tanda,
+                die=die
             )
             # Prefijar la clave para distinguir dispositivo y corriente en el mismo grafico
             for key, val in datos_foxfet.items():
                 datos_totales[f"{key} @ {I_interp :.1f} uA"] = val
 
         graficos.graficar_curvas(
-            titulo="Evolución FOXFETs Tanda 1",
+            titulo=f"Evolución FOXFETs {tanda} - {die}",
             dict_datos=datos_totales,
             xlabel="Dosis Acumulada [Gy]" if en_dosis else "Tiempo de irradiación [min]",
             ylabel="Tensión [V]",
