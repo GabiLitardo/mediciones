@@ -70,9 +70,24 @@ def render_FOXFET (template):
     # =====================================================================
     # SECCIÓN 2: SENSIBILIDAD
     # =====================================================================
+    # =====================================================================
+# SECCIÓN 2: SENSIBILIDAD
+# =====================================================================
     elif opcion == "Sensibilidad":
         st.markdown("---")
         st.header("Análisis de sensibilidad")
+
+        tanda = st.selectbox(
+            "Seleccionar tanda de medición:",
+            options=["tanda1", "tanda2"],
+            index=1
+        )
+
+        die = st.selectbox(
+            "Seleccionar DIE:",
+            options=["DIE4", "DIE19"],
+            index=0
+        )
 
         I_interps = st.multiselect(
             "Corrientes de interpolación:",
@@ -81,19 +96,27 @@ def render_FOXFET (template):
         )
 
         sens_totales = {}
-        for I_interp in I_interps:
-            sens = proc_sens.procesar_sensibilidad(DISPOS, "FOXFET", normalizado=False, I_interp=I_interp * 1e-6, n_ventana=20)
-            # Prefijar la clave para distinguir dispositivo y corriente en el mismo grafico
-            for key, val in sens.items():
-                sens_totales[f"{key} @ {I_interp :.1f} uA"] = val
 
-        
+        for I_interp in I_interps:
+            sens = proc_sens.procesar_sensibilidad(
+                DISPOS,
+                "FOXFET",
+                normalizado=False,
+                I_interp=I_interp * 1e-6,
+                n_ventana=20 if tanda == "tanda1" else 6,
+                tanda=tanda,
+                die=die
+            )
+
+            for key, val in sens.items():
+                sens_totales[f"{key} @ {I_interp:.1f} uA"] = val
+
         graficos.graficar_curvas(
-            titulo=r"$\text{Sensibilidad FOXFET tanda 1}$",
+            titulo=f"Sensibilidad FOXFETs {tanda} - {die}",
             dict_datos=sens_totales,
             xlabel=r"$\text{Tensión }V_{GS}\text{ [V]}$",
             ylabel=r"$\text{Sensibilidad [mV/Gy]}$",
-            modo='markers+lines',
+            modo="markers+lines",
             template=template
         )
     # =====================================================================
@@ -190,6 +213,10 @@ def render_FOXFET (template):
             es_std=False,
             fecha=fecha
         )
+
+        for dispositivo, valores in datos.items():
+            if "(Medido)" in dispositivo:
+                st.write(f"{dispositivo}: {len(valores['x'])} mediciones")
 
         graficos.graficar_curvas(
             titulo="Curvas de Transferencia vs Temperatura (@ VD = 5V)",

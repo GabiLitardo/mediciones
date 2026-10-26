@@ -68,7 +68,7 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, I_interp = 1e-5, 
                         valores.append(np.abs(corrientes[idx[0]] * 1e6))
                         tiempos.append(t)
             else:
-                break               
+                continue               
         if tiempos:
             indices = np.argsort(tiempos)
             x_arr = np.array(tiempos)[indices] * factor_x
