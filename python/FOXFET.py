@@ -214,7 +214,7 @@ def render_FOXFET (template):
             fecha=fecha
         )
 
-        for dispositivo, valores in datos.items():
+        for dispositivo, valores in datos_temp_fox.items():
             if "(Medido)" in dispositivo:
                 st.write(f"{dispositivo}: {len(valores['x'])} mediciones")
 
