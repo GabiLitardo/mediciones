@@ -214,10 +214,6 @@ def render_FOXFET (template):
             fecha=fecha
         )
 
-        for dispositivo, valores in datos_temp_fox.items():
-            if "(Medido)" in dispositivo:
-                st.write(f"{dispositivo}: {len(valores['x'])} mediciones")
-
         graficos.graficar_curvas(
             titulo="Curvas de Transferencia vs Temperatura (@ VD = 5V)",
             dict_datos=datos_temp_fox["iv_vs_t"],
