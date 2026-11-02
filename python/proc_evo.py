@@ -5,18 +5,38 @@ from lector_archivos import cargar_curva_iv_referencia
 from lector_archivos import cargar_medicion_tanda
 TASA_DOSIS = 0.18
 
-def calcular_tiempo_acumulado(nro, tipo_tanda):
+def calcular_tiempo_acumulado(nro, tipo_tanda, tanda = "tanda1"):
     t = 0
     for i in range(1, nro + 1):
         if tipo_tanda == "FOXFET":
-            if i <= 32: t += 10
-            elif i <= 44: t += 15
-            elif i <= 47: t += 20
-            elif i <= 50: t += 25
-            elif i <= 52: t += 30
-            elif i <= 53: t += 35
-            else: t += 10
-        if tipo_tanda in ["FG_tanda1", "FG_tanda2"]:
+            if tanda == "tanda1":
+                    if i <= 32:
+                        t += 10
+                    elif i <= 44:
+                        t += 15
+                    elif i <= 47:
+                        t += 20
+                    elif i <= 50:
+                        t += 25
+                    elif i <= 52:
+                        t += 30
+                    elif i <= 53:
+                        t += 35
+                    else:
+                        t += 10
+
+            elif tanda == "tanda2":
+                # COMPLETAR 
+                if i <= 0:       # Cambiar límite
+                    t += 0       # Cambiar minutos
+                elif i <= 0:     # Cambiar límite
+                    t += 0       # Cambiar minutos
+                elif i <= 0:     # Cambiar límite
+                    t += 0       # Cambiar minutos
+                else:
+                    t += 0       # Cambiar minutos
+
+        elif tipo_tanda in ["FG_tanda1", "FG_tanda2"]:
             if i <= 9: t += 10
             elif i <= 21: t += 15
             elif i <= 24: t += 20
@@ -51,7 +71,7 @@ def obtener_datos_crudos_tanda(lista_dispositivos, tipo_tanda, I_interp = 1e-5, 
             archivo_encontrado = cargar_medicion_tanda(disp, tipo_tanda, nro, tanda=tanda,die= die)
             
             if archivo_encontrado is not None:
-                t = calcular_tiempo_acumulado(nro, tipo_tanda)
+                t = calcular_tiempo_acumulado(nro, tipo_tanda, tanda=tanda)
                 tensiones = archivo_encontrado[:, 0]
                 corrientes = archivo_encontrado[:, 1]
                 
