@@ -7,6 +7,7 @@ import proc_sens
 import proc_ruido
 import proc_temp
 
+
 def render_FOXFET (template):
     st.title("Resumen mediciones Chaves-Litardo")
 
