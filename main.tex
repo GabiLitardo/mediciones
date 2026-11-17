@@ -1,0 +1,260 @@
+\documentclass[12pt,a4paper,oneside]{book}
+
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{hyperref}
+
+\geometry{
+    left=3cm,
+    right=2.5cm,
+    top=3cm,
+    bottom=2.5cm
+}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=blue,
+    urlcolor=blue,
+    unicode=true
+}
+
+\title{Estudio de respuesta a la radiación de dispositivos de compuerta flotante y su aplicación a dosimetría}
+\author{Gabriel Julián Litardo}
+\date{2026}
+
+\begin{document}
+\input{caratula.tex}
+\tableofcontents
+
+\chapter*{Resumen}Este trabajo de tesis buscó estudiar y caracterizar dispositivos MOSFET de tipo Floating Gate para su uso como dosímetros de radiación ionizante. La principal aplicación de este tipo de sensores es en entornos de radioterapia y en el ambiente aeroespacial.
+
+El principal valor que trae esta investigación es el estudio de FGMOSFETs (Floating Gate MOS Field Effect Transistor) con inyector de NWELL. La principal ventaja de este tipo de dispositivos con respecto a transistores estándar es que, al tener la compuerta aislada, evitamos tener que polarizar el mismo a la hora de medir radiación. Además, la carga almacenada en el Gate (ya sea por haberlo cargado o por irradiación) se mantiene estable en el tiempo, mitigando en gran medida el efecto de pérdida de información o fading.
+
+\chapter{Introducción y marco teórico}
+
+\section{Importancia de la medición de radiación ionizante}
+La radiación ionizante y sus efectos comenzaron a conocerse hacia finales de la década de 1890. Se encontraron diversas aplicaciones médicas e industriales que impulsaron un avance tecnológico basado en los hallazgos. Sin embargo, en paralelo al avance tecnológico, avanzó también el conocimiento acerca de los efectos nocivos de la radiación ionizante. Uno de los impulsores más grandes de la dosimetría radiológica fue el estudio de la capacidad de dañar tejidos biológicos de este fenómeno.
+
+Hoy en día sabemos que una de las aplicaciones más representativas de la radiación ionizante es la radioterapia de pacientes oncológicos, donde es de suma importancia tener un método de medición de dosis recibida por el paciente que sea confiable.
+
+Además, como la radiación ionizante afecta los dispositivos electrónicos degradando su nivel de carga, resulta de interés estudiar como es su comportamiento en entornos donde haya presencia de radiación. Por ejemplo, aplicaciones aeroespaciales o la generación de energía en centrales nucleares, entornos hostiles donde la longevidad del equipo y su precisión es de suma importancia para asegurar el cumplimiento de la misión y para asegurar la salud del personal.
+
+Dado que la radiación ionizante es imperceptible para los sentidos humanos y su interacción provoca tanto daños en tejidos biológicos como degradación en los dispositivos electrónicos, resulta indispensable contar con sistemas de monitoreo precisos. La dosimetría surge así como la disciplina encargada de cuantificar la energía depositada por la radiación en un medio material.
+
+\section{Precursores de la dosímetría}
+Inicialmente, la cuantificación de la radiación ionizante dependía de diversas tecnologías clásicas, cada una con principios físicos y limitaciones operativas particulares que motivaron la búsqueda de alternativas integrables y de menor tamaño como la que se estudia en este trabajo.
+
+\begin{itemize}
+    \item \textbf{Placas fotográficas y dosímetros de película (Film Badges):} Constituyeron el primer método histórico de detección. Se basan en el ennegrecimiento de una emulsión de haluros de plata proporcional a la dosis recibida. Si bien ofrecían un registro permanente y de bajo costo, requerían un revelado químico posterior, impedían la lectura en tiempo real y presentaban una fuerte dependencia energética.
+    
+    \item \textbf{Cámaras de ionización y contadores Geiger:} Basados en la ionización de un gas contenido en un volumen delimitado por electrodos polarizados, permiten medir la carga recolectada o contar eventos individuales de radiación. Las cámaras de ionización siguen siendo el estándar de referencia por su alta precisión, aunque presentan desventajas como su tamaño relativamente voluminoso, la necesidad de altas tensiones de polarización y la imposibilidad de realizar mediciones puntuales en cavidades pequeñas o directamente \textit{in vivo}.
+    
+    \item \textbf{Dosímetros Termoluminiscentes (TLD):} Utilizan cristales dieléctricos que almacenan energía en trampas cristalinas al ser irradiados. Posteriormente, al calentar el material de forma controlada, esta energía se libera en forma de luz visible proporcional a la dosis absorbida. Aunque son compactos y pasivos, su proceso de lectura destruye la información almacenada, requieren equipamiento especializado de calentamiento y no permiten el monitoreo continuo durante la exposición.
+    
+    \item \textbf{Diodos semiconductores:} Aprovechan la generación de pares electrón-hueco en la región de vaciamiento de una juntura p-n para producir una corriente proporcional a la tasa de dosis. Si bien ofrecen buena resolución espacial y respuesta inmediata, suelen sufrir degradación acumulada por daño en la red cristalina (lo que altera su sensibilidad con el uso) y requieren polarización o conexiones activas durante la irradiación.
+\end{itemize}
+
+Las limitaciones inherentes a estos sistemas, como el volumen físico, la necesidad de altas tensiones, la lectura destructiva o la imposibilidad de integración impulsaron el desarrollo de los dosímetros MOS como una solución compacta, de bajo consumo y compatible con los procesos estándar de fabricación microelectrónica.
+
+\section{Fundamentos de la dosimetría MOS}
+La utilización de dispositivos MOS (Metal-Oxide-Semiconductor) para fines dosimétricos fue propuesta inicialmente durante la década de 1970. En sus orígenes, esta tecnología estuvo orientada a aplicaciones aeroespaciales, un entorno donde la medición y el monitoreo continuo de la radiación resultan de vital importancia para prever y contrarrestar los efectos perjudiciales de la misma sobre la integridad de los distintos componentes electrónicos. Posteriormente, se propuso y validó el uso de dosímetros MOS en el ámbito médico, específicamente para aplicaciones de radioterapia en pacientes oncológicos. En este escenario clínico, la implementación de estos sensores tiene como objetivo primordial garantizar que la dosis absorbida por el paciente sea de manera estricta la justa y necesaria, salvaguardando de este modo la salud del paciente y la seguridad de todo el personal que se encuentre en contacto con él.
+
+El principio de funcionamiento de los dosímetros MOS se sustenta en la formación y acumulación de carga en la capa de óxido de los transistores. Cuando un haz incidente de radiación ionizante interactúa con la materia, la energía de las partículas posee la capacidad de romper enlaces atómicos en la red cristalina, generando pares electrón-hueco. En el caso particular del contacto metálico de un transistor MOS, la elevada densidad de electrones libres presente en el material, conceptualizada usualmente como un "mar de electrones", provoca que cualquier enlace roto sea restablecido por otro portador de manera casi instantánea. Un fenómeno de características similares ocurre en la sección del semiconductor (usualmente silicio): la movilidad tanto de electrones como de huecos es lo suficientemente alta como para que un porcentaje mayoritario de estos portadores se recombine de forma inmediata. Consecuentemente, no se produce un almacenamiento de carga permanente, aunque es factible la ocurrencia de alteraciones transitorias conocidas como \textit{Single-Event Effects} (SEE).
+
+Por otro lado, en el material dieléctrico (óxido), la situación física difiere ya que si el haz de radiación incidente posee una energía media de aproximadamente $17 \pm 1$ eV, entonces, efectivamente logrará generar pares electrón-hueco. La fracción específica de estos portadores que logra eludir la recombinación inicial se define como \textit{fractional yield}, denotado matemáticamente como $f_Y(E)$. Este parámetro exhibe una fuerte dependencia respecto a la magnitud del campo eléctrico presente en el material ($E$). Una vez que los portadores logran separarse exitosamente, los electrones, dada su alta movilidad relativa, son rápidamente arrastrados fuera del óxido hacia alguno de los terminales de contacto. En contrapartida, los huecos experimentan un mecanismo de transporte altamente dispersivo y lento. Al ser arrastrados por la acción del campo eléctrico, estos pueden encontrarse con defectos estructurales o imperfecciones intrínsecas en la red del óxido que, desde una perspectiva energética, actúan como profundos pozos de potencial en la banda de valencia. En estas trampas localizadas pueden quedar alojados de forma estable, dando lugar a la formación de una densidad de carga neta positiva y de carácter relativamente permanente. Esta carga espacial atrapada genera un efecto de apantallamiento sobre el campo eléctrico inducido por la tensión aplicada en la Gate ($V_G$). Desde una perspectiva macroscópica y eléctrica, este fenómeno se traduce en un corrimiento medible de la tensión de umbral ($V_T$) del transistor; en términos prácticos, es necesario aplicar una tensión de magnitud mayor para alcanzar la misma corriente de conducción $I_D$ que el dispositivo presentaba antes de ser sometido a la irradiación.
+
+El corrimiento de $V_T$ en función de la dosis acumulada obedece a la ecuación \eqref{eq:vt}:
+\begin{equation}
+\Delta V_T = - \frac{1}{\varepsilon_{SiO_2}}\,\int_0^{t_{ox}}\,\rho (x)\,x\,dx-\frac{\Delta Q_{IT}}{C'_{ox}}
+\label{eq:vt}
+\end{equation}
+Donde $x$ representa la distancia medida desde el Gate hacia la interfaz con el semiconductor, $t_{ox}$ es el espesor total del óxido, $\rho(x)$ define la densidad volumétrica de la carga atrapada en el dieléctrico, $\Delta Q_{IT}$ corresponde a la variación de la densidad superficial de trampas de interfaz (generadas primariamente por aquellos huecos que no fueron capturados en trampas volumétricas y que, por arrastre, terminan reaccionando con los enlaces en la interfaz semiconductor-óxido), $\varepsilon_{SiO_2}$ es la permitividad eléctrica del óxido de Silicio y, finalmente, $C'_{ox}$ denota la capacitancia del óxido por unidad de área.
+
+El aspecto más relevante de este fenómeno radica en que, si se logra caracterizar con precisión el desplazamiento de $V_T$ en función de la dosis incidente, es decir, si se determina la sensibilidad a la radiación propia del sensor, resulta completamente factible realizar el procedimiento inverso. Esto implica medir el corrimiento de $V_T$ y, a partir del valor de sensibilidad previamente calibrado, estimar la dosis total recibida.
+
+\section{El FGMOSFET como sensor radiológico}
+El mecanismo físico detallado en la sección anterior constituye el pilar de la dosimetría MOS. Sin embargo, su implementación convencional presenta diversas oportunidades de mejora tecnológica. Por ejemplo, para garantizar una generación y separación efectiva de la carga en el óxido (asegurando así un $f_Y(E)$ de magnitud no despreciable), resulta necesario polarizar fuertemente el dispositivo durante la exposición. Esta limitación impone severas restricciones en el diseño de los bancos de medición y añade complicaciones logísticas y de salud al requerir instrumentación activa conectada al sensor durante, por ejemplo, la ejecución de tratamientos médicos.
+
+Por otro lado, la carga generada y atrapada en el óxido adolece de problemas de estabilidad a largo plazo. Se manifiesta un proceso físico denominado \textit{fading}, mediante el cual una fracción de la carga atrapada sufre una neutralización gradual con el transcurso del tiempo. Adicionalmente, frente a un incremento de la temperatura ambiente (\textit{Thermal Annealing}), la energía térmica suministrada al sistema puede ser suficiente para permitir que los portadores logren "escapar" de las trampas energéticas y se recombinen, lo que inevitablemente borra de forma parcial la información de la dosis previamente almacenada. (Este fenómeno es distinto a lo analizado como coeficiente térmico más adelante en el trabajo)
+
+El transistor FGMOSFET de canal P, el cual constituye el dispositivo central de estudio en el presente trabajo, logra solucionar eficazmente varios de estos inconvenientes. Dado que el nodo del Floating Gate (FG) se encuentra aislado eléctricamente en su totalidad, su estado de carga neto se modifica inicialmente inyectando electrones de manera controlada mediante el efecto túnel de Fowler-Nordheim. Al encontrarse pre-cargado con una polaridad negativa, el propio campo eléctrico interno generado por los portadores allí almacenados es el responsable de separar los pares electrón-hueco generados por la radiación incidente. Bajo esta condición operativa, al someter el sensor a irradiación, los huecos generados en el óxido se moverán por efecto de arrastre en dirección hacia el FG. Al alcanzarlo, neutralizarán una porción de la carga electrónica almacenada, lo que se traduce en una disminución efectiva del módulo de la tensión $V_{FG}$.
+
+Desde la perspectiva de un transistor estándar, este fenómeno es equivalente a disminuir la tensión $V_G$ aplicada, desplazando el punto de operación a lo largo de su curva de transferencia y, consecuentemente, alterando la corriente de conducción $I_D$. Midiendo la diferencia neta de la corriente $I_D$ antes y después de la exposición, se puede estimar la dosis recibida. Este método innovador permite operar el dosímetro en un \textit{modo completamente pasivo}, prescindiendo por completo de fuentes de alimentación externas o de esquemas de polarización activa durante el período de exposición a radiación.
+
+Una estrategia de diseño fundamental para potenciar la sensibilidad a la radiación de estos dispositivos consiste en extender el área de la compuerta flotante más allá de la zona activa del canal, tal como se puede apreciar en la Figura ???, depositándola directamente sobre la región del óxido de campo (\textit{Field Oxide} o FOX). Dado que el espesor característico del óxido de campo ($t_{fox}$) es típicamente uno o dos órdenes de magnitud mayor que el correspondiente al óxido de compuerta ($t_{gox}$), el volumen efectivo disponible para la recolección de carga inducida por radiación se incrementa de forma sustancial. Analíticamente, la sensibilidad a la radiación $S$ adquiere una proporcionalidad directa con el cuadrado del espesor del óxido dominante ($S \propto t_{fox}^2$). Finalmente, debido a que el FG se encuentra confinado y completamente aislado por barreras de potencial, la neutralización de la carga actúa como un proceso puramente acumulativo que retiene su estabilidad a lo largo del tiempo, logrando mitigar de forma drástica el perjudicial efecto de \textit{fading}.
+
+\section{Mecanismos de inyección de carga por efecto túnel Fowler-Nordheim}
+Con el propósito de establecer el nivel inicial de carga en la compuerta flotante (y, con ello, definir de antemano el estado operativo y de sensibilidad del sensor) se recurre a la inyección de portadores empleando la densidad de corriente de Fowler-Nordheim (FN). Con el objetivo de facilitar la comprensión, supondremos en primera instancia una estructura teórica de índole clásica, la cual difiere ligeramente de la arquitectura estudiada en este trabajo.
+
+Asumamos una estructura análoga a la ilustrada en la Figura ???, la cual, analizada de izquierda a derecha, se compone de una difusión conductora de polisilicio (poly2) que actúa como nodo inyector o \textit{Control Gate} (CG), seguida de una capa de óxido delgado denominada \textit{tunnel oxide} (con un espesor $t_{to}$), una segunda difusión de poly2 que conforma físicamente lo que llamaremos FG, una capa de óxido de mayor grosor o \textit{Gate oxide} (con espesor $t_{ox}$) y, en última instancia, el sustrato semiconductor. En condiciones de reposo normal y en ausencia de un campo eléctrico externo aplicado, el diagrama de bandas de energía se comporta como el que se detalla en la Figura ???. Allí se observa que el nivel energético tanto del CG como del FG es considerablemente menor que el correspondiente a las bandas de conducción de los materiales óxidos adyacentes, lo cual garantiza un aislamiento eléctrico absoluto. Sin embargo, al aplicar una tensión externa de magnitud suficientemente negativa en el terminal del CG, se induce una deformación en el diagrama de bandas, tal como se esquematiza en la Figura ???. El nivel energético de los electrones situados en el CG experimenta un aumento, mientras que la banda de conducción en la región del $t_{to}$ se inclina deformándose linealmente en respuesta al campo eléctrico.
+
+Al forzar la aparición de un alto campo eléctrico a través de esta barrera dieléctrica (en regímenes que típicamente superan los $E_{to} > 6\,\text{MV/cm}$), los electrones en el CG se enfrentan a una barrera de potencial que adopta una geometría triangular. Esta barrera se vuelve lo suficientemente estrecha como para que exista una probabilidad no nula de que los electrones la superen mediante el denominado efecto túnel. La densidad de corriente de FN inyectada bajo estas condiciones responde analíticamente a la ecuación \eqref{eq:FN}:
+\begin{equation}
+J_{FN} = A \cdot E_{to}^2 \cdot \exp\left(-\frac{B}{E_{to}}\right)
+\label{eq:FN}
+\end{equation}
+donde $E_{to}$ representa la magnitud del campo eléctrico presente en la región del óxido de túnel, mientras que $A$ y $B$ son constantes físicas del material, dependientes de la masa efectiva de los portadores involucrados y de la altura de la barrera de potencial en la interfaz.
+
+Para el caso particular del FGMOSFET, al encontrarse el nodo del FG aislado, la carga inyectada comienza a acumularse. Por aplicación directa de la ley de Gauss, esta acumulación de carga estática genera una tensión interna $V_{FG}$ que actúa apantallando la magnitud efectiva del campo eléctrico aplicado $E_{to}$. Como consecuencia directa, la corriente de inyección FN experimenta una disminución progresiva conforme el FG incrementa su nivel de carga. Este comportamiento temporal, de naturaleza exponencial, tiende asintóticamente a un estado de saturación, resultando en una dinámica completamente análoga al proceso de carga transitoria de un capacitor estándar, tal como se puede evidenciar en las curvas de la Figura ???.
+
+Este mecanismo físico es fundamental para los dispositivos bajo estudio, puesto que otorga la capacidad de que el sensor sea periódicamente "reseteado" y retornado a un estado inicial de alta sensibilidad de manera repetitiva y confiable tras haber sido sometido a sucesivos ciclos de irradiación.
+
+Finalmente, resulta fundamental realizar una aclaración estructural: si bien esta explicación teórica se apoya en el uso de un \textit{Control Gate} clásico, los dispositivos analizados en este trabajo carecen de dicho terminal, ya que la presencia de uno disminuye la sensibilidad radiológica por su efecto capacitivo. La arquitectura real de los dispositivos será diseccionada con mayor grado de detalle en secciones posteriores. No obstante, a modo de resumen, cabe destacar que la misma está compuesta por dos transistores MOSFET que comparten un único FG común: un transistor lector y un transistor inyector. Centrándonos en el dispositivo inyector para los fines de esta explicación, los diagramas de bandas de energía son equivalentes a lo expuesto en los párrafos previos. Con la salvedad que la inyección de portadores se efectúa a través de un contacto polarizado en un pozo NWELL. Esto implica que la corriente de FN constituye en la práctica un traspaso directo de portadores desde el sustrato semiconductor hacia el nodo del FG, atravesando el \textit{Gate oxide}. Simultáneamente, en el extremo opuesto del FG, se ubica la estructura correspondiente al transistor lector, el cual ha sido diseñado incorporando un óxido de espesor mayor para evitar la fuga de carga previamente almacenada en el FG.
+
+\chapter{Dispositivos bajo estudio}
+
+\section{Descripción del proceso tecnológico y topología de los dispositivos}
+Los dispositivos de estado sólido bajo estudio en el presente trabajo de investigación están constituidos por transistores de tipo FGMOSFET,específicamente, diseñados con un canal P, desarrollados bajo un proceso tecnológico estandarizado de 500 nm. Desde el punto de vista de su arquitectura física y topológica, estos componentes se encuentran conformados internamente por una estructura dual que integra dos transistores funcionalmente acoplados: un dispositivo encargado de la lectura del estado del sensor (Lector) y un segundo dispositivo destinado exclusivamente a la inyección de carga (Inyector).
+
+\section{Estructura del transistor con inyector de NWELL}
+Tal como se puede apreciar en detalle en la Figura ???, al llevar a cabo un análisis transversal del corte lateral de la estructura, es posible observar con claridad que ambos transistores comparten un elemento común, el Floating Gate. Del lado derecho del esquema, el dispositivo inyector presenta una particularidad en su conexionado, dado que todos sus terminales característicos (Drain, Source y Bulk) se encuentran deliberadamente cortocircuitados conformando un único nodo terminal unificado, al cual nos referiremos de aquí en adelante simplemente como inyector. 
+
+Para el caso de que se requiera inducir un proceso de inyección de electrones hacia el FG, es necesario fijar una tensión de polarización negativa en dicho nodo. Esta magnitud de tensión aplicada será directamente proporcional a la energía de los portadores de carga en la banda de conducción del sustrato de silicio. Como ha sido detallado en secciones previas, la energía de dichos portadores deberá superar un umbral crítico para lograr que la corriente de túnel sea efectivamente por el mecanismo de Fowler-Nordheim.
+
+El diseño del transistor inyector fue optimizado con el propósito de ocupar la menor área superficial posible. Esta decisión se fundamenta en la necesidad de minimizar al extremo el acople capacitivo parásito existente entre el propio inyector y el FG, garantizando de esta manera que este último permanezca aislado eléctricamente respecto del exterior. Además, la sensibilidad radiológica del dispositivo se encuentra íntimamente ligada y presenta una fuerte dependencia respecto al factor geométrico determinado por la relación $\frac{A_{FG}}{A_{iny}}$, por lo que, para aumentar la misma, es conveniente trabajar con un dispositivo inyector con el menor área que permita el nodo tecnológico.
+
+Desde otra perspectiva, al observar el sector izquierdo de la ya mencionada Figura ???, nos encontramos con la estructura correspondiente al transistor lector. Este componente cumple un rol determinante, puesto que, una vez que se ha logrado establecer y fijar una cantidad de carga en el FG mediante corriente FN, y tras aplicar una tensión de polarización $V_{DS}$ de magnitud suficientemente negativa, a través de este transistor circulará una corriente $I_D$, la cual, al ser medida, permite estimar el nivel de carga neta almacenada en el FG. Este último paso es solo posible gracias a la adición de dispositivos estándar en el DIE, se desarrollará más adelante sobre estos transistores auxiliares.
+
+\section{Dimensiones y geometrías de los sensores analizados}
+Durante la etapa del diseño del layout de estos dispositivos sensores, se tomó la determinación de dimensionarlos implementando diversas relaciones de aspecto $\frac{W}{L}$. Esta variabilidad geométrica introducida de forma intencional permitió llevar a cabo un análisis de los distintos comportamientos y plantear relaciones de compromiso entre la corriente de conducción del dispositivo (y por lo tanto su sensibilidad), su resolución en dosis, el ruido eléctrico y el coeficiente térmico. Se presentan las características físicas de los dispositivos estudiados en este trabajo en el Cuadro \ref{tab:dimensiones}.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{llccccc}
+\toprule
+Característica & Símbolo & PFGIW1 & PFGIW2 & PFGIW XFAB-like & PFGIP2 & Unidad \\
+\midrule
+Ancho de finger & W & 20 & 10 & 100 & 20 & $\mu$m \\
+Largo del finger & L & 10 & 10 & 25 & 20 & $\mu$m \\
+Multiplicidad & m & 2 & 1 & 14 & 1 & \\
+Área Floating Gate & $A_{FG}$ & $400\times450$ & $225\times200$ & $375\times480$ & $400\times100$ & $\mu m^{2}$ \\
+Área Inyector & $A_{iny}$ & $1.8\times2.4$ & $1.8\times2.4$ & $1.8\times2.4$ & $6\times6$ & $\mu m^{2}$ \\
+\bottomrule
+\end{tabular}
+\caption{Dimensiones de los FGMOSFET estudiados}
+\label{tab:dimensiones}
+\end{table}
+
+Al analizar el Cuadro \ref{tab:dimensiones}, se infiere que, en una situación donde los dispositivos presentan un idéntico nivel de carga o una misma tensión equivalente $V_{FG}$, la magnitud de la corriente medida tendrá variaciones. Con el fin de aportar mayor simplicidad conceptual, adoptaremos como característica principal el $\frac{W}{L}$ propio de cada una de las variantes.
+
+\subsection{Dispositivo PFGIW1 $(W/L=4)$}
+Con base en lo expuesto, el dispositivo PFGIW1 presenta una relación de $\frac{W}{L}=4$.
+
+\subsection{Dispositivos PFGIW2 y PFGIP2 $(W/L=1)$}
+Por su parte, la variante identificada como PFGIW2 exhibe una relación de $\frac{W}{L}=1$, y de igual manera, el dispositivo PFGIP2 comparte exactamente la misma proporción con un $\frac{W}{L}=1$.
+
+\subsection{Dispositivo PFGIW3 / PFGIW XFAB-like $(W/L=56)$}
+Finalmente, el dispositivo operativo PFGIW XFAB-like (denominado PFGIW3 a partir de este punto) se distingue por poseer una relación geométrica considerablemente mayor de $\frac{W}{L}=56$.
+
+\section{Transistores estándar de referencia (STD1 y STD2)}
+En adición a la caracterización de los FGMOSFET, resulta necesario presentar a los transistores estándar de referencia STD1 y STD2. La inclusión de estos componentes es de gran importancia, dado que han sido fabricados utilizando el mismo proceso que los PFGIW1 y PFGIW2, lo que implica que poseen idénticas dimensiones que los transistores lectores. No obstante, al tratarse de arquitecturas estándar, su Gate no se encuentra aislado, sino que es accesible desde el exterior. Esta característica nos permite medir sus curvas de transferencia, y, a partir del procesamiento de dichas curvas, obtener empíricamente la tensión $V_{G}$ asociada a una corriente $I_D$ específica. En última instancia, este procedimiento es el mecanismo que permite estimar la tensión $V_{FG}$ de los FGMOSFET a partir de la medición de la corriente $I_D$.
+
+\chapter{Metodología y bancos de medición}
+
+\section{Instrumental utilizado en el laboratorio}
+Las caracterizaciones eléctricas necesarias para el desarrollo de este trabajo se llevaron a cabo utilizando el equipamiento disponible en el Laboratorio de Física de Dispositivos y Microelectrónica (LFDM). El banco de medición principal comprende el siguiente instrumental de precisión:
+\begin{itemize}
+    \item Probe Station Wentworth Laboratories, empleada para el posicionado y contacto eléctrico preciso a nivel de DIE.
+    \item Electrómetros Keithley 617, utilizados específicamente para la medición de corrientes del orden de picoampers con alta resolución.
+    \item Fuente de corriente programable Keithley 220, encargada de polarizar de manera controlada el nodo de inyección.
+    \item Escáner matricial Keithley 705, utilizado para el enrutamiento automatizado y secuencial de las distintas señales eléctricas.
+    \item Generador de pulsos Hewlett-Packard HP8112A, fundamental para la implementación de las técnicas de inyección pulsada.
+\end{itemize}
+
+\section{Protocolo de inyección y control de carga en la compuerta flotante}
+Con el propósito de controlar de manera reproducible el nivel de carga almacenada en el FG de los dispositivos FGMOSFET, se emplearon scripts de Python desarrollados previamente en el entorno del laboratorio. Estos programas basan su principio de funcionamiento en la inyección de portadores mediante secuencias de pulsos, lo que permite un ajuste fino y progresivo de la tensión equivalente $V_{FG}$ hasta alcanzar el estado operativo deseado.
+
+\section{Banco de ensayos bajo radiación}
+\subsection[Fuente beta de 90Sr y tasa de dosis]{Fuente beta de \texorpdfstring{$^{90}\text{Sr}$}{90Sr} y calibración de la tasa de dosis}
+Para llevar a cabo los ensayos de exposición a radiación ionizante se utilizó el cañón de irradiación perteneciente al LFDM, el cual se encuentra provisto de una fuente beta de estroncio-90 ($^{90}\text{Sr}$). A partir de mediciones previas realizadas sobre este sistema, la tasa de dosis se ha calibrado en un valor de aproximadamente $0.18\,\text{Gy/min}$ para la posición estándar de irradiación de las muestras (identificada como posición 3, tal como se ilustra en la Figura ???).
+
+\subsection{Metodología de adquisición de la descarga temporal y Sensibilidad}
+La sensibilidad radiológica traduce de forma directa la capacidad intrínseca del FG para convertir una variación física de carga, inducida por la radiación, en un cambio eléctrico mensurable. Como paso preliminar, se relevaron las curvas de transferencia de los dispositivos estándar (STD) con el fin de determinar los niveles máximos de corriente correspondientes a un estado de carga pleno: $1.5$\,\si{\milli\ampere} para el PFGIW1, $375$\,\si{\micro\ampere} para los modelos PFGIW2 y PFGIP2, y $2$\,\si{\milli\ampere} en el caso del PFGIW3. 
+
+En una primera aproximación experimental, se procedió a inicializar tres de los dispositivos (PFGIW1, PFGIW2 y PFGIW3) a una corriente de referencia análoga (del orden de los $2$\,\si{\milli\ampere}) para luego trasladar la muestra y someterla al proceso de irradiación. Esta etapa preliminar cumplió el propósito de verificar tanto la validez de los fundamentos físicos expuestos en la Introducción como la correcta operatividad del instrumental de medición. Principalmente, sirvió como etapa de familiarización con el entorno de Python que, mediante la automatización del generador de pulsos, inyecta la carga en los FGMOSFET. El resultado empírico de esta descarga temporal puede observarse en la Figura ???, donde se evidencia cómo la corriente medida experimentó una disminución progresiva en función de la dosis absorbida, en total concordancia con el comportamiento previsto.
+
+Tomando como base estos datos experimentales, se procedió a estimar la curva de sensibilidad radiológica de los sensores en función de su nivel de carga residual. Inicialmente, se optó por calcular esta métrica evaluando la diferencia neta de corriente entre exposiciones sucesivas y dividiendo dicho valor por el intervalo de tiempo. No obstante, a causa del ruido inherente al proceso de medición, este enfoque directo derivó en una curva con fluctuaciones pronunciadas que dificultaban su lectura. Para solventar este inconveniente, se implementó un algoritmo de cálculo de sensibilidad utilizando ventanas móviles, promediando los resultados parciales. Esta técnica analítica arrojó como resultado una atenuación notable del ruido de medición. En paralelo, se evaluó una alternativa consistente en realizar un ajuste matemático sobre la serie de datos originales, permitiendo obtener una derivada analítica más estable.
+
+Ambos procesamientos comparativos se encuentran graficados en la Figura ???. En dicha representación es posible notar también cómo la sensibilidad del dispositivo tiende a un estado de saturación una vez superado el umbral de los 250\,\si{\micro\ampere}.
+
+Posteriormente, con el objetivo de establecer una comparativa entre los tres dispositivos operando bajo condiciones equivalentes, se tomó la decisión de inicializarlos al mismo nivel de carga antes de dar comienzo a las irradiaciones. Se adoptó como punto inicial la máxima tensión medida previamente en los transistores estándar asociados, fijando las corrientes en $1.5$\,\si{\milli\ampere} (PFGIW1), $375$\,\si{\micro\ampere} (PFGIW2/PFGIP2) y $2$\,\si{\milli\ampere} (PFGIW3). 
+Tras alcanzar esta carga inicial, se reanudaron las irradiaciones siguiendo una metodología análoga a la primera tanda, con la salvedad de que en esta ocasión se aplicaron incrementos progresivos en los tiempos de exposición. De este modo, se garantizó que la dosis acumulada en cada paso generara un corrimiento eléctrico lo suficientemente significativo. Los resultados derivados de esta campaña se ilustran en la Figura ???.
+
+\section{Banco de medición de ruido eléctrico}
+El ruido presente en la corriente de Drain constituye un factor limitante que establece la resolución mínima detectable por el sensor. Para su adecuada caracterización, se definieron distintas corrientes nominales normalizadas de operación (100\,\si{\micro\ampere}, 150\,\si{\micro\ampere}, 200\,\si{\micro\ampere}, 250\,\si{\micro\ampere} y 350\,\si{\micro\ampere}) y se procedió a la adquisición de series temporales continuas con una duración extendida de 7200 segundos.
+El propósito fundamental de esta caracterización radica en el hecho de que el ruido eléctrico intrínseco, proveniente tanto de la física del dispositivo sensor como de la instrumentación asociada al banco de pruebas, se traduce de manera directa en fluctuaciones indeseadas durante la medición de la corriente de conducción $I_D$. Teniendo en consideración que la estimación de la dosis de radiación absorbida se realiza de forma indirecta, evaluando el diferencial de corriente entre sucesivas mediciones, cualquier variación originada por estas fuentes de ruido posee el potencial de introducir una ambigüedad significativa. En consecuencia, estas fluctuaciones corren el riesgo de enmascarar la señal radiológica real o, de manera inversa, simular un corrimiento en la corriente que podría ser erróneamente interpretado como una medición de dosis efectiva.
+
+\subsection{Calibración de temperatura y sustracción de la deriva térmica}
+De forma simultánea a la medición de las fluctuaciones de corriente, se registró la resistencia de un termistor NTC, el cual fue previamente caracterizado siguiendo el modelo matemático de Steinhart-Hart. Teniendo en cuenta que las oscilaciones térmicas del ambiente de laboratorio introducen una deriva en la corriente que puede ser interpretada como ruido de baja frecuencia, se estimó la correlación lineal existente entre la corriente del dispositivo y la temperatura externa. Una vez cuantificada, esta señal térmica fue sustraída analíticamente de la serie temporal original, con el propósito de aislar de manera exclusiva el verdadero ruido eléctrico del dispositivo.
+
+\subsection{Procesamiento: Ruido Referido a la Entrada}
+Las series temporales resultantes, ya libres de la componente de deriva térmica, fueron sometidas a un procesamiento estadístico para extraer el valor eficaz del ruido RMS ($\sigma_I$). Al efectuar el cociente entre este parámetro y la sensibilidad previamente calculada, se logró determinar el error equivalente en términos de dosis aportado por el ruido intrínseco.
+
+\section{Banco de caracterización térmica (ZTC)}
+El objetivo central de la caracterización térmica consiste en lograr la identificación precisa del punto de Coeficiente Térmico Nulo (ZTC). En este punto de operación específico, los efectos físicos contrapuestos derivados de la variación de la movilidad de portadores y la dependencia térmica de la tensión de umbral logran cancelarse mutuamente, otorgando al sensor inmunidad frente a las variaciones ambientales. De manera complementaria, se buscó cuantificar el coeficiente térmico del dispositivo en las mismas corrientes nominales empleadas durante las mediciones de ruido. Esto brinda la posibilidad de establecer comparaciones entre distintos escenarios donde rigen relaciones de compromiso directo entre el coeficiente térmico, el nivel de ruido y la sensibilidad.
+
+\subsection[Barrido de temperatura entre 30 °C y 130 °C]{Protocolo de barrido de temperatura entre \texorpdfstring{30~°C y 130~°C}{30 °C y 130 °C}}
+Las rutinas de medición térmica se llevaron a cabo empleando el \textit{chuck} térmico disponible en las instalaciones del NanoLab de la UTN. Manteniendo fijos los mismos niveles de carga evaluados en los ensayos de ruido, se ejecutaron barridos de temperatura controlados, procediendo a la adquisición de las curvas de salida de los dispositivos FG al estabilizarse cada paso térmico.
+
+\subsection{Extracción del coeficiente \texorpdfstring{($\alpha_I$)}{(α)} y validación física}
+A partir del procesamiento de las curvas obtenidas, se extrajo el coeficiente de temperatura ($\alpha_I = \partial I_D / \partial T$) operando a una tensión constante de $V_{DS} = -4.5$\,V, y se determinó matemáticamente el punto de cruce por cero para hallar la corriente $I_{ZTC}$.
+
+
+\chapter{Resultados experimentales y discusión}
+
+\section{Determinación de la tensión equivalente de compuerta flotante \texorpdfstring{($V_{FG}$)}{(VFG)}}
+
+\section{Respuesta frente a radiación ionizante}
+\subsection{Evolución temporal de la corriente de drain \texorpdfstring{($I_D$)}{(ID)}}
+\subsection[Sensibilidad absoluta en corriente frente a la dosis]{Sensibilidad absoluta en corriente frente a la dosis \texorpdfstring{($\mu\text{A/Gy}$)}{(uA/Gy)}}
+\subsection[Sensibilidad normalizada en tensión]{Sensibilidad normalizada en tensión \texorpdfstring{($V_{\text{FG}}$ vs Dosis)}{(VFG vs Dosis)}}
+
+\section{Caracterización del ruido eléctrico en función de la corriente de carga}
+\subsection{Evolución del ruido neto en el dominio temporal}
+\subsection{Desvío estándar del ruido \texorpdfstring{($\sigma_I$)}{(sigma\_I)}}
+
+\section{Comportamiento térmico de los dispositivos}
+\subsection[Extracción del coeficiente térmico]{Extracción del coeficiente térmico \texorpdfstring{($\alpha = \partial I_D / \partial T$)}{(alpha = dID/dT)}}
+\subsection{Determinación del punto de coeficiente térmico nulo \texorpdfstring{($I_{\text{ZTC}}$)}{(IZTC)}}
+\subsection{Condición de saturación en el punto ZTC}
+
+\section{Análisis global mediante figuras de mérito}
+\subsection{Dosis equivalente de ruido \texorpdfstring{($\sigma_I / S$)}{(sigma\_I / S)}}
+\subsection{Factor de error térmico equivalente \texorpdfstring{($|\alpha| / S$)}{(|alpha| / S)}}
+\subsection{Error total combinado en cuadratura}
+
+
+\chapter{Conclusiones y trabajo futuro}
+|
+\section{Conclusiones}
+
+\section{Trabajo futuro}
+
+
+\begin{thebibliography}{99}
+
+\bibitem{1}
+Mariano Garcia-Inza, Sebastián Carbonetto y Adrián Faigon,
+``MOS Devices and Integrated Circuits for Ionizing Radiation Dosimetry: a Review.''
+
+\bibitem{2}
+Luciana Nimo, María Victoria Cassani, Adrian Faigon, Eduardo Gabriel Redin, Mariano Garcia-Inza y Sebastián Carbonetto
+``A Study of Pulsed-Charging Methods for Floating Gate MOSFETs Designed for Radiation Measurements.''
+
+\bibitem{3}
+Sebastian Carbonetto, Luciano Genovese, Lucas Sambuco Salomone, Mariano Garcia-Inza, Eduardo Gabriel Redin y Adrian Faigon,
+``Total Ionizing Dose Effects on Floating Gate Structures. Preliminary Results.''
+
+\bibitem{4}
+Sebastian Carbonetto, Juan Cruz Suarez Martene, Mariano Garcia-Inza y Adrian Faigon,
+``Injection Mesurements and Simulation for a Floating Gate MOSFET Designed for Radiation Measurements.''
+
+\end{thebibliography}
+
+\end{document}
