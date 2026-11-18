@@ -1,0 +1,47 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {chapter}{\numberline {1}Introducción y marco teórico}{4}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Importancia de la medición de radiación ionizante}{4}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Precursores de la dosímetría}{4}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Fundamentos de la dosimetría MOS}{5}{section.1.3}%
+\contentsline {section}{\numberline {1.4}El FGMOSFET como sensor radiológico}{7}{section.1.4}%
+\contentsline {section}{\numberline {1.5}Mecanismos de inyección de carga por efecto túnel Fowler-Nordheim}{8}{section.1.5}%
+\contentsline {chapter}{\numberline {2}Dispositivos bajo estudio}{10}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Descripción del proceso tecnológico y topología de los dispositivos}{10}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Estructura del transistor con inyector de NWELL}{10}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Dimensiones y geometrías de los sensores analizados}{11}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Dispositivo PFGIW1 $(W/L=4)$}{11}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Dispositivos PFGIW2 y PFGIP2 $(W/L=1)$}{11}{subsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.3.3}Dispositivo PFGIW3 / PFGIW XFAB-like $(W/L=56)$}{12}{subsection.2.3.3}%
+\contentsline {section}{\numberline {2.4}Transistores estándar de referencia (STD1 y STD2)}{12}{section.2.4}%
+\contentsline {chapter}{\numberline {3}Metodología y bancos de medición}{13}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Instrumental utilizado en el laboratorio}{13}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Protocolo de inyección y control de carga en la compuerta flotante}{13}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Banco de ensayos bajo radiación}{14}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Fuente beta de 90Sr y tasa de dosis}{14}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Metodología de adquisición de la descarga temporal y Sensibilidad}{14}{subsection.3.3.2}%
+\contentsline {section}{\numberline {3.4}Banco de medición de ruido eléctrico}{15}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Calibración de temperatura y sustracción de la deriva térmica}{15}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Procesamiento: Ruido Referido a la Entrada}{15}{subsection.3.4.2}%
+\contentsline {section}{\numberline {3.5}Banco de caracterización térmica (ZTC)}{16}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}Barrido de temperatura entre 30 °C y 130 °C}{16}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.2}Extracción del coeficiente ($\alpha _I$) y validación física}{16}{subsection.3.5.2}%
+\contentsline {chapter}{\numberline {4}Resultados experimentales y discusión}{17}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Determinación de la tensión equivalente de compuerta flotante ($V_{FG}$)}{18}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Respuesta frente a radiación ionizante}{18}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Evolución temporal de la corriente de drain ($I_D$)}{18}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Sensibilidad absoluta en corriente frente a la dosis}{18}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}Sensibilidad normalizada en tensión}{18}{subsection.4.2.3}%
+\contentsline {section}{\numberline {4.3}Caracterización del ruido eléctrico en función de la corriente de carga}{18}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Evolución del ruido neto en el dominio temporal}{18}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Desvío estándar del ruido ($\sigma _I$)}{18}{subsection.4.3.2}%
+\contentsline {section}{\numberline {4.4}Comportamiento térmico de los dispositivos}{18}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Extracción del coeficiente térmico}{18}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}Determinación del punto de coeficiente térmico nulo ($I_{\text {ZTC}}$)}{18}{subsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.4.3}Condición de saturación en el punto ZTC}{18}{subsection.4.4.3}%
+\contentsline {section}{\numberline {4.5}Análisis global mediante figuras de mérito}{18}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}Dosis equivalente de ruido ($\sigma _I / S$)}{18}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}Factor de error térmico equivalente ($|\alpha | / S$)}{18}{subsection.4.5.2}%
+\contentsline {subsection}{\numberline {4.5.3}Error total combinado en cuadratura}{18}{subsection.4.5.3}%
+\contentsline {chapter}{\numberline {5}Conclusiones y trabajo futuro}{19}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Conclusiones}{19}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Trabajo futuro}{19}{section.5.2}%
